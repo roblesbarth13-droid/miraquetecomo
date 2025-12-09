@@ -117,6 +117,7 @@ export const insertOfferSchema = createInsertSchema(offers).omit({
   id: true,
   createdAt: true,
   status: true,
+  businessId: true,
 }).extend({
   originalPrice: z.string().refine((val) => parseFloat(val) > 0, {
     message: "El precio original debe ser mayor a 0",

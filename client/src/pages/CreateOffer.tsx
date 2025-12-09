@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useLocation } from "wouter";
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
@@ -25,7 +25,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { ArrowLeft, Upload, Loader2 } from "lucide-react";
+import { ArrowLeft, Upload, Loader2, ImagePlus, X } from "lucide-react";
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
@@ -55,6 +55,10 @@ export default function CreateOffer() {
   const { user, isAuthenticated, isLoading: authLoading, isBusiness } = useAuth();
   const { toast } = useToast();
   const [calculatedPrice, setCalculatedPrice] = useState<number>(0);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -95,6 +99,53 @@ export default function CreateOffer() {
     }
   }, [authLoading, isAuthenticated, isBusiness, navigate, toast]);
 
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: "Archivo muy grande",
+          description: "La imagen no puede superar los 5MB",
+          variant: "destructive",
+        });
+        return;
+      }
+      setSelectedFile(file);
+      const url = URL.createObjectURL(file);
+      setPreviewUrl(url);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setSelectedFile(null);
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+      setPreviewUrl(null);
+    }
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+    form.setValue("imageUrl", "");
+  };
+
+  const uploadImage = async (file: File): Promise<string | null> => {
+    const formData = new FormData();
+    formData.append("image", file);
+    
+    const response = await fetch("/api/upload", {
+      method: "POST",
+      body: formData,
+      credentials: "include",
+    });
+    
+    if (!response.ok) {
+      throw new Error("Error al subir la imagen");
+    }
+    
+    const data = await response.json();
+    return data.imageUrl;
+  };
+
   const createMutation = useMutation({
     mutationFn: async (data: FormValues) => {
       const payload = {
@@ -104,6 +155,13 @@ export default function CreateOffer() {
       return await apiRequest("POST", "/api/ofertas", payload);
     },
     onSuccess: () => {
+      // Clean up file state
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+      setSelectedFile(null);
+      setPreviewUrl(null);
+      
       toast({
         title: "Oferta creada",
         description: "Tu oferta ya está visible para los usuarios.",
@@ -132,8 +190,32 @@ export default function CreateOffer() {
     },
   });
 
-  const onSubmit = (data: FormValues) => {
-    createMutation.mutate(data);
+  const onSubmit = async (data: FormValues) => {
+    try {
+      let uploadedImageUrl: string | undefined = undefined;
+      
+      // Upload image if selected
+      if (selectedFile) {
+        setIsUploading(true);
+        uploadedImageUrl = await uploadImage(selectedFile) || undefined;
+        setIsUploading(false);
+      }
+      
+      // Create offer with uploaded image URL (or empty if no image)
+      const offerData = {
+        ...data,
+        imageUrl: uploadedImageUrl || "",
+      };
+      
+      createMutation.mutate(offerData);
+    } catch (error) {
+      setIsUploading(false);
+      toast({
+        title: "Error",
+        description: "No se pudo subir la imagen. Intentá de nuevo.",
+        variant: "destructive",
+      });
+    }
   };
 
   if (authLoading) {
@@ -317,32 +399,66 @@ export default function CreateOffer() {
                   />
                 </div>
 
-                <FormField
-                  control={form.control}
-                  name="imageUrl"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>URL de imagen (opcional)</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="url"
-                          placeholder="https://ejemplo.com/imagen.jpg"
-                          {...field}
-                          data-testid="input-image-url"
+                <div className="space-y-2">
+                  <Label>Foto del producto (opcional)</Label>
+                  <div className="flex flex-col gap-4">
+                    {previewUrl ? (
+                      <div className="relative w-full aspect-video rounded-lg overflow-hidden border border-border">
+                        <img
+                          src={previewUrl}
+                          alt="Vista previa"
+                          className="w-full h-full object-cover"
+                          data-testid="img-preview"
                         />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="icon"
+                          className="absolute top-2 right-2"
+                          onClick={handleRemoveImage}
+                          data-testid="button-remove-image"
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <div
+                        className="w-full aspect-video rounded-lg border-2 border-dashed border-muted-foreground/50 flex flex-col items-center justify-center gap-2 cursor-pointer hover-elevate active-elevate-2 transition-all"
+                        onClick={() => fileInputRef.current?.click()}
+                        data-testid="dropzone-image"
+                      >
+                        <ImagePlus className="h-10 w-10 text-muted-foreground" />
+                        <p className="text-sm text-muted-foreground">
+                          Hacé clic para subir una foto
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          JPG, PNG, WebP o GIF (max 5MB)
+                        </p>
+                      </div>
+                    )}
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,image/gif"
+                      onChange={handleFileSelect}
+                      className="hidden"
+                      data-testid="input-image-file"
+                    />
+                  </div>
+                </div>
 
                 <Button
                   type="submit"
                   className="w-full"
-                  disabled={createMutation.isPending}
+                  disabled={createMutation.isPending || isUploading}
                   data-testid="button-submit-offer"
                 >
-                  {createMutation.isPending ? (
+                  {isUploading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Subiendo imagen...
+                    </>
+                  ) : createMutation.isPending ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Creando...

@@ -5,6 +5,21 @@ import { Clock, MapPin } from "lucide-react";
 import type { OfferWithBusiness } from "@shared/schema";
 import { categoryDisplayNames } from "@shared/schema";
 
+// Default category images
+import panaderiaImg from "@assets/stock_images/artisan_bakery_bread_88577d89.jpg";
+import verduleriaImg from "@assets/stock_images/fresh_vegetables_mar_abe5a0bf.jpg";
+import supermercadoImg from "@assets/stock_images/supermarket_grocery__3232780f.jpg";
+import rotiseriaImg from "@assets/stock_images/rotisserie_chicken_g_2a292b03.jpg";
+import carnicheriaImg from "@assets/stock_images/butcher_shop_fresh_m_a4f41153.jpg";
+
+const categoryDefaultImages: Record<string, string> = {
+  panaderia: panaderiaImg,
+  verduleria: verduleriaImg,
+  supermercado: supermercadoImg,
+  rotiseria: rotiseriaImg,
+  carniceria: carnicheriaImg,
+};
+
 interface OfferCardProps {
   offer: OfferWithBusiness;
 }
@@ -12,14 +27,17 @@ interface OfferCardProps {
 export function OfferCard({ offer }: OfferCardProps) {
   const originalPrice = parseFloat(offer.originalPrice);
   const discountedPrice = parseFloat(offer.discountedPrice);
+  
+  // Use uploaded image, or fall back to category default
+  const displayImage = offer.imageUrl || categoryDefaultImages[offer.category];
 
   return (
     <Link href={`/oferta/${offer.id}`} data-testid={`card-offer-${offer.id}`}>
       <Card className="overflow-hidden hover-elevate active-elevate-2 cursor-pointer transition-all duration-200 group">
         <div className="relative aspect-[4/3] overflow-hidden">
-          {offer.imageUrl ? (
+          {displayImage ? (
             <img
-              src={offer.imageUrl}
+              src={displayImage}
               alt={offer.title}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               data-testid={`img-offer-${offer.id}`}
