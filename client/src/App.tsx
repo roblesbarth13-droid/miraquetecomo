@@ -13,22 +13,35 @@ import BusinessPanel from "@/pages/BusinessPanel";
 import ConvertToBusiness from "@/pages/ConvertToBusiness";
 
 function Router() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, isBusiness } = useAuth();
+
+  // Show loading state while auth is being checked
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-pulse text-muted-foreground">Cargando...</div>
+      </div>
+    );
+  }
 
   return (
     <Switch>
-      {isLoading || !isAuthenticated ? (
-        <Route path="/" component={Landing} />
-      ) : (
+      {/* Public routes - accessible to everyone */}
+      <Route path="/" component={Home} />
+      <Route path="/oferta/:id" component={OfferDetail} />
+      <Route path="/landing" component={Landing} />
+      
+      {/* Auth-required route - page handles its own auth guard */}
+      <Route path="/convertir-comercio" component={ConvertToBusiness} />
+      
+      {/* Business-only routes */}
+      {isAuthenticated && isBusiness && (
         <>
-          <Route path="/" component={Home} />
-          <Route path="/oferta/:id" component={OfferDetail} />
           <Route path="/comercio" component={BusinessPanel} />
           <Route path="/comercio/ofertas/nueva" component={CreateOffer} />
-          <Route path="/convertir-comercio" component={ConvertToBusiness} />
         </>
       )}
-      <Route path="/oferta/:id" component={OfferDetail} />
+      
       <Route component={NotFound} />
     </Switch>
   );

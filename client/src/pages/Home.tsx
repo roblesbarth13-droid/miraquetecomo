@@ -6,14 +6,13 @@ import { OfferCard } from "@/components/OfferCard";
 import { OfferCardSkeleton } from "@/components/OfferCardSkeleton";
 import { EmptyState } from "@/components/EmptyState";
 import { Button } from "@/components/ui/button";
-import { Link } from "wouter";
 import { Store } from "lucide-react";
 import type { OfferWithBusiness } from "@shared/schema";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const { isBusiness } = useAuth();
+  const { isAuthenticated, isBusiness } = useAuth();
 
   const { data: offers, isLoading } = useQuery<OfferWithBusiness[]>({
     queryKey: ["/api/ofertas", selectedCategory],
@@ -61,10 +60,10 @@ export default function Home() {
         <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t p-4">
           <div className="max-w-7xl mx-auto">
             <Button asChild variant="outline" className="w-full md:w-auto" data-testid="button-become-business-cta">
-              <Link href="/convertir-comercio">
+              <a href={isAuthenticated ? "/convertir-comercio" : "/api/login"}>
                 <Store className="mr-2 h-4 w-4" />
-                ¿Sos comercio? Cargá tu oferta acá
-              </Link>
+                {isAuthenticated ? "¿Sos comercio? Cargá tu oferta acá" : "¿Sos comercio? Ingresá y cargá tu oferta"}
+              </a>
             </Button>
           </div>
         </div>
