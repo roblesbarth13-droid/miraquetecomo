@@ -11,6 +11,9 @@ import OfferDetail from "@/pages/OfferDetail";
 import CreateOffer from "@/pages/CreateOffer";
 import BusinessPanel from "@/pages/BusinessPanel";
 import ConvertToBusiness from "@/pages/ConvertToBusiness";
+import PaymentSuccess from "@/pages/PaymentSuccess";
+import PaymentFailure from "@/pages/PaymentFailure";
+import PaymentPending from "@/pages/PaymentPending";
 
 function Router() {
   const { isAuthenticated, isLoading, isBusiness } = useAuth();
@@ -30,6 +33,11 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/oferta/:id" component={OfferDetail} />
       <Route path="/landing" component={Landing} />
+      
+      {/* Payment result routes */}
+      <Route path="/pago/exito" component={PaymentSuccess} />
+      <Route path="/pago/fallo" component={PaymentFailure} />
+      <Route path="/pago/pendiente" component={PaymentPending} />
       
       {/* Auth-required route - page handles its own auth guard */}
       <Route path="/convertir-comercio" component={ConvertToBusiness} />

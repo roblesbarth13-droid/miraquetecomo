@@ -10,7 +10,7 @@ import type { OfferWithBusiness } from "@shared/schema";
 import { categoryDisplayNames, statusDisplayNames } from "@shared/schema";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
 
 export default function OfferDetail() {
@@ -35,11 +35,15 @@ export default function OfferDetail() {
       return response.json();
     },
     onSuccess: (data: any) => {
-      toast({
-        title: "Compra exitosa",
-        description: data.message || "La compra fue procesada exitosamente.",
-      });
-      queryClient.invalidateQueries({ queryKey: ["/api/ofertas"] });
+      if (data.initPoint) {
+        window.location.href = data.initPoint;
+      } else {
+        toast({
+          title: "Error",
+          description: "No se pudo iniciar el proceso de pago.",
+          variant: "destructive",
+        });
+      }
     },
     onError: (error: Error) => {
       if (isUnauthorizedError(error)) {
@@ -163,7 +167,7 @@ export default function OfferDetail() {
                     <span className="text-muted-foreground" data-testid="text-business-name">
                       {offer.business?.businessName || "Comercio"}
                     </span>
-                    <Badge variant="secondary" size="sm">
+                    <Badge variant="secondary" className="text-xs">
                       {categoryDisplayNames[offer.category]}
                     </Badge>
                   </div>
@@ -171,7 +175,7 @@ export default function OfferDetail() {
                     {offer.title}
                   </h1>
                 </div>
-                {!isAvailable && (
+                {!isAvailable && offer.status && (
                   <Badge variant="secondary" className="text-base">
                     {statusDisplayNames[offer.status]}
                   </Badge>

@@ -3,6 +3,7 @@ import { type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { insertOfferSchema, updateBusinessProfileSchema } from "@shared/schema";
+import { createPaymentPreference, getPaymentDetails, isMercadoPagoConfigured } from "./mercadopago";
 
 export async function registerRoutes(httpServer: Server, app: Express): Promise<Server> {
   await setupAuth(app);
@@ -111,6 +112,39 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     }
   });
 
+  // Get purchase status (for payment result pages)
+  app.get('/api/compras/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const purchaseId = parseInt(req.params.id);
+      const userId = req.user.claims.sub;
+      
+      if (isNaN(purchaseId)) {
+        return res.status(400).json({ message: "ID de compra inválido" });
+      }
+      
+      const purchase = await storage.getPurchaseById(purchaseId);
+      if (!purchase) {
+        return res.status(404).json({ message: "Compra no encontrada" });
+      }
+      
+      // Verify the purchase belongs to the authenticated user
+      if (purchase.userId !== userId) {
+        return res.status(403).json({ message: "No tenés acceso a esta compra" });
+      }
+      
+      // Get offer details
+      const offer = await storage.getOfferById(purchase.offerId);
+      
+      res.json({
+        ...purchase,
+        offer: offer,
+      });
+    } catch (error) {
+      console.error("Error fetching purchase:", error);
+      res.status(500).json({ message: "Error al obtener compra" });
+    }
+  });
+
   // Convert user to business
   app.post('/api/perfil/convertir-comercio', isAuthenticated, async (req: any, res) => {
     try {
@@ -129,7 +163,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     }
   });
 
-  // Simulated checkout (without real Mercado Pago integration)
+  // Create checkout preference with Mercado Pago
   app.post('/api/checkout', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
@@ -148,26 +182,89 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
         return res.status(400).json({ message: "Esta oferta ya no está disponible" });
       }
 
-      // Create purchase
+      const user = await storage.getUser(userId);
+      
+      // Create purchase with pending status
       const purchase = await storage.createPurchase({
         offerId,
         userId,
       });
 
-      // Simulate successful payment
-      await storage.updatePurchaseStatus(purchase.id, 'pagado', `MP_${Date.now()}`);
-      
-      // Mark offer as sold
-      await storage.updateOfferStatus(offerId, 'vendida');
+      // Create Mercado Pago preference
+      const preference = await createPaymentPreference({
+        offerId: oferta.id,
+        title: oferta.title,
+        description: `${oferta.title} - ${oferta.business.businessName}`,
+        price: parseFloat(oferta.discountedPrice),
+        buyerEmail: user?.email || undefined,
+        purchaseId: purchase.id,
+      });
 
       res.json({ 
-        success: true, 
-        message: "Compra realizada exitosamente",
+        success: true,
+        preferenceId: preference.id,
+        initPoint: preference.init_point,
+        sandboxInitPoint: preference.sandbox_init_point,
         purchaseId: purchase.id,
+        isSimulated: !isMercadoPagoConfigured(),
       });
     } catch (error) {
       console.error("Error in checkout:", error);
       res.status(500).json({ message: "Error al procesar la compra" });
+    }
+  });
+
+  // Simulated payment completion (when MP is not configured)
+  app.get('/api/checkout/simulate', isAuthenticated, async (req: any, res) => {
+    try {
+      const purchaseId = parseInt(req.query.purchaseId as string);
+      
+      if (isNaN(purchaseId)) {
+        return res.status(400).json({ message: "ID de compra inválido" });
+      }
+
+      const purchase = await storage.getPurchaseById(purchaseId);
+      if (!purchase) {
+        return res.status(404).json({ message: "Compra no encontrada" });
+      }
+
+      // Simulate successful payment
+      await storage.updatePurchaseStatus(purchaseId, 'pagado', `SIM_${Date.now()}`);
+      await storage.updateOfferStatus(purchase.offerId, 'vendida');
+
+      res.redirect(`/pago/exito?purchaseId=${purchaseId}&simulated=true`);
+    } catch (error) {
+      console.error("Error in simulated checkout:", error);
+      res.redirect('/pago/fallo');
+    }
+  });
+
+  // Mercado Pago webhook
+  app.post('/api/webhook/mercadopago', async (req, res) => {
+    try {
+      const { type, data } = req.body;
+      
+      // Respond quickly to MP
+      res.status(200).send('OK');
+      
+      if (type === 'payment') {
+        const paymentId = data.id;
+        const paymentData = await getPaymentDetails(paymentId);
+        
+        const purchaseId = parseInt(paymentData.external_reference);
+        
+        if (paymentData.status === 'approved') {
+          const purchase = await storage.getPurchaseById(purchaseId);
+          if (purchase) {
+            await storage.updatePurchaseStatus(purchaseId, 'pagado', paymentId);
+            await storage.updateOfferStatus(purchase.offerId, 'vendida');
+          }
+        } else if (paymentData.status === 'rejected' || paymentData.status === 'cancelled') {
+          await storage.updatePurchaseStatus(purchaseId, 'fallido', paymentId);
+        }
+      }
+    } catch (error) {
+      console.error("Webhook error:", error);
     }
   });
 

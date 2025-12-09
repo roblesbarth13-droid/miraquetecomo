@@ -26,6 +26,7 @@ export interface IStorage {
   getOffersByBusinessId(businessId: string): Promise<Offer[]>;
   
   createPurchase(purchase: InsertPurchase): Promise<Purchase>;
+  getPurchaseById(id: number): Promise<Purchase | undefined>;
   updatePurchaseStatus(id: number, status: 'pendiente' | 'pagado' | 'fallido', mpPaymentId?: string): Promise<Purchase | undefined>;
   getPurchasesByBusinessId(businessId: string): Promise<PurchaseWithOfferAndUser[]>;
   getPurchasesByUserId(userId: string): Promise<Purchase[]>;
@@ -141,6 +142,11 @@ export class DatabaseStorage implements IStorage {
       .insert(purchases)
       .values(purchaseData)
       .returning();
+    return purchase;
+  }
+
+  async getPurchaseById(id: number): Promise<Purchase | undefined> {
+    const [purchase] = await db.select().from(purchases).where(eq(purchases.id, id));
     return purchase;
   }
 
