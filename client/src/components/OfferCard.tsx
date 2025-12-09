@@ -7,7 +7,7 @@ import { categoryDisplayNames } from "@shared/schema";
 
 // Default category images
 import panaderiaImg from "@assets/stock_images/artisan_bakery_bread_88577d89.jpg";
-import verduleriaImg from "@assets/stock_images/fresh_vegetables_mar_abe5a0bf.jpg";
+import verduleriaImg from "@assets/generated_images/fresh_vegetables_close-up_shot.png";
 import supermercadoImg from "@assets/stock_images/supermarket_grocery__3232780f.jpg";
 import rotiseriaImg from "@assets/stock_images/rotisserie_chicken_g_2a292b03.jpg";
 import carnicheriaImg from "@assets/stock_images/butcher_shop_fresh_m_a4f41153.jpg";
