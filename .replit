@@ -15,10 +15,6 @@ localPort = 5000
 externalPort = 80
 
 [[ports]]
-localPort = 32789
-externalPort = 3001
-
-[[ports]]
 localPort = 38951
 externalPort = 3000
 
@@ -48,3 +44,8 @@ waitForPort = 5000
 
 [agent]
 integrations = ["javascript_log_in_with_replit:1.0.0", "javascript_database:1.0.0"]
+
+[userenv]
+
+[userenv.shared]
+VITE_GOOGLE_MAPS_API_KEY = "AIzaSyBZoVbBqzAHGwXDQA6dIDHBfJ0k3r9LF-E"

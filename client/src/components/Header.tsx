@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Logo } from "./Logo";
 import { useAuth } from "@/hooks/useAuth";
-import { User, LogOut, Store, Package } from "lucide-react";
+import { User, LogOut, Store, Package, MapPin } from "lucide-react";
 
 export function Header() {
   const { user, isAuthenticated, isBusiness } = useAuth();
@@ -34,6 +34,11 @@ export function Header() {
         </Link>
 
         <div className="flex items-center gap-3">
+          <Link href="/mapa">
+            <Button variant="ghost" size="icon" data-testid="button-map">
+              <MapPin className="h-5 w-5" />
+            </Button>
+          </Link>
           {isAuthenticated ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

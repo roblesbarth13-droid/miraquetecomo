@@ -9,6 +9,7 @@ import {
   integer,
   decimal,
   pgEnum,
+  doublePrecision,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -42,6 +43,8 @@ export const users = pgTable("users", {
   phone: varchar("phone"),
   address: varchar("address"),
   category: categoryEnum("category"),
+  latitude: doublePrecision("latitude"),
+  longitude: doublePrecision("longitude"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -138,6 +141,8 @@ export const updateBusinessProfileSchema = z.object({
   phone: z.string().optional(),
   address: z.string().optional(),
   category: z.enum(['panaderia', 'verduleria', 'carniceria', 'rotiseria', 'supermercado']),
+  latitude: z.number().optional(),
+  longitude: z.number().optional(),
 });
 
 // Types
