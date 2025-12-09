@@ -100,7 +100,7 @@ export default function OfferDetail() {
             La oferta que buscás no existe o ya no está disponible.
           </p>
           <Button asChild>
-            <Link href="/">Volver al inicio</Link>
+            <Link href="/home">Volver al inicio</Link>
           </Button>
         </div>
       </div>
@@ -143,7 +143,7 @@ export default function OfferDetail() {
               className="bg-background/80 backdrop-blur-sm"
               data-testid="button-back"
             >
-              <Link href="/">
+              <Link href="/home">
                 <ArrowLeft className="h-5 w-5" />
               </Link>
             </Button>

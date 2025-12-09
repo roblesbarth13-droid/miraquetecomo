@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/useAuth";
 import NotFound from "@/pages/not-found";
 import Landing from "@/pages/Landing";
+import Splash from "@/pages/Splash";
 import Home from "@/pages/Home";
 import OfferDetail from "@/pages/OfferDetail";
 import CreateOffer from "@/pages/CreateOffer";
@@ -30,8 +31,11 @@ function Router() {
 
   return (
     <Switch>
+      {/* Splash screen */}
+      <Route path="/" component={Splash} />
+      
       {/* Public routes - accessible to everyone */}
-      <Route path="/" component={Home} />
+      <Route path="/home" component={Home} />
       <Route path="/mapa" component={MapView} />
       <Route path="/oferta/:id" component={OfferDetail} />
       <Route path="/landing" component={Landing} />

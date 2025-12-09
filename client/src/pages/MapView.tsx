@@ -173,7 +173,7 @@ export default function MapView() {
 
       <div className="flex-1 flex flex-col">
         <div className="p-4 border-b flex items-center justify-between gap-4">
-          <Link href="/">
+          <Link href="/home">
             <Button variant="ghost" size="sm" data-testid="button-back-home">
               <ArrowLeft className="h-4 w-4 mr-2" />
               Volver
