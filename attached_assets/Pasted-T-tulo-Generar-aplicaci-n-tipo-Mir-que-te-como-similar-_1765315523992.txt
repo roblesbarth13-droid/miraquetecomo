@@ -1,0 +1,217 @@
+Título:
+Generar aplicación tipo “Mirá que te como” (similar a Too Good To Go) con backend y frontend completo.
+
+Prompt:
+Quiero que generes una aplicación web completa, con arquitectura profesional, que funcione como un marketplace de ofertas de comida con descuento, similar a Too Good To Go, enfocada en Argentina.
+La app se llama "Mirá que te como".
+
+🔹 OBJETIVO DE LA APP
+
+Conectar comercios (panaderías, rotiserías, verdulerías, supermercados, etc.) que tienen sobrantes del día, con usuarios que quieren comprar esas comidas con un 30–70% de descuento.
+
+🖥️ REQUISITOS DEL FRONTEND
+
+Construir el frontend en React + Vite + Tailwind, mobile-first.
+
+PANTALLAS
+1) Home
+
+Barra superior con logo de “Mirá que te como”.
+
+Filtros por categoría (panadería, verdulería, carnicería, rotisería, supermercado).
+
+Listado de ofertas en tarjetas (cards), con foto, comercio, título, precio original, precio final, % de descuento, horario de retiro.
+
+Botón al pie: "¿Sos comercio? Cargá tu oferta acá".
+
+2) Detalles de oferta
+
+Foto grande
+
+Nombre del comercio
+
+Título de la oferta
+
+Descripción
+
+Horario del retiro
+
+Precio original
+
+Precio con descuento
+
+Botón "Comprar" que inicia proceso con Mercado Pago.
+
+3) Cargar oferta (solo para comercios)
+
+Formulario con:
+
+nombre_comercio
+
+título
+
+descripción
+
+descuento (%)
+
+precio_original
+
+precio_oferta
+
+horario_retiro
+
+imagen (subida)
+
+Botón Guardar → Guarda en base de datos.
+
+4) Panel del comercio
+
+Ver sus ofertas activas
+
+Ver historial de ventas
+
+Ver saldo (si se implementa luego)
+
+🗄️ REQUISITOS DEL BACKEND
+
+Crear backend en Node.js + Express, con endpoints REST.
+
+MODELO DE DATOS (usar PostgreSQL o Supabase)
+Tabla: perfiles
+
+id
+
+tipo_usuario ("comercio" / "usuario")
+
+nombre
+
+email
+
+teléfono
+
+fecha_creación
+
+Tabla: ofertas
+
+id
+
+comercio_id (FK perfiles)
+
+título
+
+descripción
+
+precio_original
+
+precio_oferta
+
+descuento
+
+horario_retiro
+
+url_imagen
+
+estado ("activa", "vendida", "expirada")
+
+fecha_creación
+
+Tabla: compras
+
+id
+
+oferta_id
+
+usuario_id
+
+estado_pago ("pendiente", "pagado", "fallido")
+
+mp_payment_id
+
+fecha_compra
+
+🔌 ENDPOINTS NECESARIOS
+Perfiles
+
+POST /api/perfiles
+
+GET /api/perfiles/:id
+
+Ofertas
+
+POST /api/ofertas
+
+GET /api/ofertas
+
+GET /api/ofertas/:id
+
+PUT /api/ofertas/:id
+
+DELETE /api/ofertas/:id
+
+Compras
+
+POST /api/checkout → Crear preferencia de pago en Mercado Pago
+
+POST /api/webhook → Recibir confirmación del pago
+
+GET /api/compras/:id
+
+💰 INTEGRACIÓN MERCADO PAGO
+
+Usar Checkout Pro con:
+
+Mercado Pago Test Access Token
+
+Callback success → /success
+
+Callback failure → /failure
+
+Callback pending → /pending
+
+Webhook en /api/webhook
+
+Lógica del pago:
+
+Cuando el usuario hace clic en Comprar, enviar POST a /api/checkout.
+
+Crear preferencia con:
+
+título = título de la oferta
+
+unit_price = precio_oferta
+
+cantidad = 1
+
+Redirigir al usuario a Mercado Pago.
+
+Mercado Pago envía webhook → marcar compra como pagada si status = approved.
+
+Cambiar oferta → estado = "vendida".
+
+🧠 REQUISITOS ADICIONALES
+
+Código limpio, modular y documentado.
+
+Arquitectura MVC o similar.
+
+Validaciones (no aceptar precios negativos, descuento entre 1 y 90%, etc.).
+
+Usar JWT para login básico de comercios.
+
+Manejar errores con respuestas JSON claras.
+
+Incluir instrucciones de instalación en README.
+
+📦 ENTREGABLES QUE QUIERO
+
+Carpeta frontend/ completa
+
+Carpeta backend/ completa
+
+Archivo docker-compose.yml para levantar todo junto
+
+Base de datos inicial con SQL para crear todas las tablas
+
+README con instrucciones paso a paso
+
+Generar diseño responsivo, limpio y moderno estilo Too Good To Go
