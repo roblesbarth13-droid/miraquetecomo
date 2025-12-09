@@ -85,7 +85,7 @@ export default function MapView() {
       mapInstanceRef.current = new google.maps.Map(mapRef.current, {
         center,
         zoom: 14,
-        mapId: "DEMO_MAP_ID",
+        mapId: import.meta.env.VITE_GOOGLE_MAPS_MAP_ID || "DEMO_MAP_ID",
         disableDefaultUI: false,
         zoomControl: true,
         mapTypeControl: false,
