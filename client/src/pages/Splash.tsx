@@ -10,7 +10,7 @@ export default function Splash() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsAnimationComplete(true);
-    }, 3000);
+    }, 4500);
 
     return () => clearTimeout(timer);
   }, []);
@@ -41,7 +41,7 @@ export default function Splash() {
           <motion.img
             src={logoImage}
             alt="Mirá que te como logo"
-            className="h-32 w-32 object-contain"
+            className="h-48 w-48 object-contain"
             animate={{
               y: [0, -10, 0],
             }}
@@ -92,20 +92,20 @@ export default function Splash() {
           initial={{ x: "-100%" }}
           animate={{ x: 0 }}
           transition={{ delay: 0.3, duration: 0.8, ease: "easeOut" }}
-          className="h-8 md:h-12 w-full"
+          className="h-2 md:h-3 w-full"
           style={{ backgroundColor: "#74ACDF" }}
         />
         <motion.div
           initial={{ x: "100%" }}
           animate={{ x: 0 }}
           transition={{ delay: 0.5, duration: 0.8, ease: "easeOut" }}
-          className="h-8 md:h-12 w-full bg-white"
+          className="h-2 md:h-3 w-full bg-white"
         />
         <motion.div
           initial={{ x: "-100%" }}
           animate={{ x: 0 }}
           transition={{ delay: 0.7, duration: 0.8, ease: "easeOut" }}
-          className="h-8 md:h-12 w-full"
+          className="h-2 md:h-3 w-full"
           style={{ backgroundColor: "#74ACDF" }}
         />
       </div>
@@ -114,7 +114,7 @@ export default function Splash() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 2, duration: 0.5 }}
-        className="absolute bottom-32 md:bottom-40"
+        className="absolute bottom-16 md:bottom-20"
       >
         <div className="flex items-center gap-2">
           <motion.div
