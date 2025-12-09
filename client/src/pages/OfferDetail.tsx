@@ -9,6 +9,20 @@ import { ArrowLeft, Clock, Store, ShoppingCart, AlertCircle } from "lucide-react
 import type { OfferWithBusiness } from "@shared/schema";
 import { categoryDisplayNames, statusDisplayNames } from "@shared/schema";
 import { useAuth } from "@/hooks/useAuth";
+
+import panaderiaImg from "@assets/stock_images/artisan_bakery_bread_88577d89.jpg";
+import verduleriaImg from "@assets/generated_images/fresh_vegetables_close-up_shot.png";
+import supermercadoImg from "@assets/stock_images/supermarket_grocery__3232780f.jpg";
+import rotiseriaImg from "@assets/stock_images/rotisserie_chicken_g_2a292b03.jpg";
+import carnicheriaImg from "@assets/stock_images/butcher_shop_fresh_m_a4f41153.jpg";
+
+const categoryDefaultImages: Record<string, string> = {
+  panaderia: panaderiaImg,
+  verduleria: verduleriaImg,
+  supermercado: supermercadoImg,
+  rotiseria: rotiseriaImg,
+  carniceria: carnicheriaImg,
+};
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
@@ -118,20 +132,12 @@ export default function OfferDetail() {
       <main className="pb-24">
         <div className="relative">
           <div className="aspect-[16/9] md:aspect-[21/9] max-h-96 overflow-hidden">
-            {offer.imageUrl ? (
-              <img
-                src={offer.imageUrl}
-                alt={offer.title}
-                className="w-full h-full object-cover"
-                data-testid="img-offer-detail"
-              />
-            ) : (
-              <div className="w-full h-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
-                <span className="text-8xl text-muted-foreground/30">
-                  {categoryDisplayNames[offer.category]?.[0] || "?"}
-                </span>
-              </div>
-            )}
+            <img
+              src={offer.imageUrl || categoryDefaultImages[offer.category]}
+              alt={offer.title}
+              className="w-full h-full object-cover"
+              data-testid="img-offer-detail"
+            />
             <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
           </div>
 
