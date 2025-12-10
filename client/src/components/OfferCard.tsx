@@ -1,7 +1,7 @@
 import { Link } from "wouter";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Clock, MapPin } from "lucide-react";
+import { Clock, Package } from "lucide-react";
 import type { OfferWithBusiness } from "@shared/schema";
 import { categoryDisplayNames } from "@shared/schema";
 
@@ -27,6 +27,7 @@ interface OfferCardProps {
 export function OfferCard({ offer }: OfferCardProps) {
   const originalPrice = parseFloat(offer.originalPrice);
   const discountedPrice = parseFloat(offer.discountedPrice);
+  const quantityAvailable = (offer.quantity || 1) - (offer.quantitySold || 0);
   
   // Use uploaded image, or fall back to category default
   const displayImage = offer.imageUrl || categoryDefaultImages[offer.category];
@@ -73,11 +74,19 @@ export function OfferCard({ offer }: OfferCardProps) {
               </span>
             </div>
           </div>
-          <div className="flex items-center gap-1 text-sm text-muted-foreground pt-1">
-            <Clock className="h-4 w-4" />
-            <span data-testid={`text-pickup-${offer.id}`}>
-              Retiro: {offer.pickupTimeStart} - {offer.pickupTimeEnd}
-            </span>
+          <div className="flex items-center justify-between gap-2 text-sm text-muted-foreground pt-1 flex-wrap">
+            <div className="flex items-center gap-1">
+              <Clock className="h-4 w-4" />
+              <span data-testid={`text-pickup-${offer.id}`}>
+                {offer.pickupTimeStart} - {offer.pickupTimeEnd}
+              </span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Package className="h-4 w-4" />
+              <span data-testid={`text-quantity-${offer.id}`}>
+                {quantityAvailable} disponible{quantityAvailable !== 1 ? 's' : ''}
+              </span>
+            </div>
           </div>
         </div>
       </Card>

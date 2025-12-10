@@ -123,9 +123,13 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
         return res.status(400).json({ message: "Datos inválidos", errors: validation.error.errors });
       }
 
+      // Set expiration to 24 hours from now
+      const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
       const oferta = await storage.createOffer({
         ...validation.data,
         businessId: userId,
+        expiresAt,
       });
       res.status(201).json(oferta);
     } catch (error) {
@@ -240,6 +244,12 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
         return res.status(400).json({ message: "Esta oferta ya no está disponible" });
       }
 
+      // Check if there's stock available
+      const quantityAvailable = (oferta.quantity || 1) - (oferta.quantitySold || 0);
+      if (quantityAvailable <= 0) {
+        return res.status(400).json({ message: "Esta oferta se agotó" });
+      }
+
       const user = await storage.getUser(userId);
       
       // Create purchase with pending status
@@ -288,7 +298,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
 
       // Simulate successful payment
       await storage.updatePurchaseStatus(purchaseId, 'pagado', `SIM_${Date.now()}`);
-      await storage.updateOfferStatus(purchase.offerId, 'vendida');
+      await storage.incrementOfferQuantitySold(purchase.offerId);
 
       res.redirect(`/pago/exito?purchaseId=${purchaseId}&simulated=true`);
     } catch (error) {
@@ -315,7 +325,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
           const purchase = await storage.getPurchaseById(purchaseId);
           if (purchase) {
             await storage.updatePurchaseStatus(purchaseId, 'pagado', paymentId);
-            await storage.updateOfferStatus(purchase.offerId, 'vendida');
+            await storage.incrementOfferQuantitySold(purchase.offerId);
           }
         } else if (paymentData.status === 'rejected' || paymentData.status === 'cancelled') {
           await storage.updatePurchaseStatus(purchaseId, 'fallido', paymentId);

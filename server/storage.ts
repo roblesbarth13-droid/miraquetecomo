@@ -12,7 +12,7 @@ import {
   type PurchaseWithOfferAndUser,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, and } from "drizzle-orm";
+import { eq, desc, and, gt, or, lt, sql } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
@@ -21,8 +21,9 @@ export interface IStorage {
   
   getOffers(category?: string): Promise<OfferWithBusiness[]>;
   getOfferById(id: number): Promise<OfferWithBusiness | undefined>;
-  createOffer(offer: InsertOffer & { businessId: string }): Promise<Offer>;
+  createOffer(offer: InsertOffer & { businessId: string; expiresAt?: Date }): Promise<Offer>;
   updateOfferStatus(id: number, status: 'activa' | 'vendida' | 'expirada'): Promise<Offer | undefined>;
+  incrementOfferQuantitySold(id: number): Promise<Offer | undefined>;
   getOffersByBusinessId(businessId: string): Promise<Offer[]>;
   
   createPurchase(purchase: InsertPurchase): Promise<Purchase>;
@@ -73,14 +74,40 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getOffers(category?: string): Promise<OfferWithBusiness[]> {
-    const query = db
+    const now = new Date();
+    
+    // First, update expired offers
+    await db
+      .update(offers)
+      .set({ status: 'expirada' })
+      .where(
+        and(
+          eq(offers.status, 'activa'),
+          lt(offers.expiresAt, now)
+        )
+      );
+    
+    // Build filter conditions: active, not expired, has stock
+    const baseConditions = and(
+      eq(offers.status, 'activa'),
+      or(
+        gt(offers.expiresAt, now),
+        sql`${offers.expiresAt} IS NULL`
+      ),
+      lt(offers.quantitySold, offers.quantity)
+    );
+    
+    const whereCondition = category 
+      ? and(baseConditions, eq(offers.category, category as any))
+      : baseConditions;
+    
+    const results = await db
       .select()
       .from(offers)
       .innerJoin(users, eq(offers.businessId, users.id))
-      .where(category ? and(eq(offers.status, 'activa'), eq(offers.category, category as any)) : eq(offers.status, 'activa'))
+      .where(whereCondition)
       .orderBy(desc(offers.createdAt));
     
-    const results = await query;
     return results.map(row => ({
       ...row.offers,
       business: row.users,
@@ -101,7 +128,7 @@ export class DatabaseStorage implements IStorage {
     };
   }
 
-  async createOffer(offerData: InsertOffer & { businessId: string }): Promise<Offer> {
+  async createOffer(offerData: InsertOffer & { businessId: string; expiresAt?: Date }): Promise<Offer> {
     const [offer] = await db
       .insert(offers)
       .values({
@@ -115,8 +142,26 @@ export class DatabaseStorage implements IStorage {
         pickupTimeStart: offerData.pickupTimeStart,
         pickupTimeEnd: offerData.pickupTimeEnd,
         imageUrl: offerData.imageUrl,
+        quantity: offerData.quantity || 1,
+        expiresAt: offerData.expiresAt,
       })
       .returning();
+    return offer;
+  }
+
+  async incrementOfferQuantitySold(id: number): Promise<Offer | undefined> {
+    const [offer] = await db
+      .update(offers)
+      .set({ quantitySold: sql`${offers.quantitySold} + 1` })
+      .where(eq(offers.id, id))
+      .returning();
+    
+    // Check if sold out
+    if (offer && offer.quantitySold >= offer.quantity) {
+      await db.update(offers).set({ status: 'vendida' }).where(eq(offers.id, id));
+      offer.status = 'vendida';
+    }
+    
     return offer;
   }
 

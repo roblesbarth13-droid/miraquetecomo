@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft, Clock, Store, ShoppingCart, AlertCircle } from "lucide-react";
+import { ArrowLeft, Clock, Store, ShoppingCart, AlertCircle, Package } from "lucide-react";
 import type { OfferWithBusiness } from "@shared/schema";
 import { categoryDisplayNames, statusDisplayNames } from "@shared/schema";
 import { useAuth } from "@/hooks/useAuth";
@@ -123,6 +123,8 @@ export default function OfferDetail() {
 
   const originalPrice = parseFloat(offer.originalPrice);
   const discountedPrice = parseFloat(offer.discountedPrice);
+  const quantityAvailable = (offer.quantity || 1) - (offer.quantitySold || 0);
+  const isSoldOut = quantityAvailable <= 0;
   const isAvailable = offer.status === "activa";
 
   return (
@@ -192,11 +194,19 @@ export default function OfferDetail() {
                 {offer.description}
               </p>
 
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Clock className="h-5 w-5" />
-                <span className="text-lg" data-testid="text-pickup-time">
-                  Horario de retiro: {offer.pickupTimeStart} - {offer.pickupTimeEnd}
-                </span>
+              <div className="flex items-center gap-4 flex-wrap text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <Clock className="h-5 w-5" />
+                  <span className="text-lg" data-testid="text-pickup-time">
+                    Horario de retiro: {offer.pickupTimeStart} - {offer.pickupTimeEnd}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Package className="h-5 w-5" />
+                  <span className="text-lg" data-testid="text-quantity-available">
+                    {isSoldOut ? "Agotado" : `${quantityAvailable} disponible${quantityAvailable !== 1 ? 's' : ''}`}
+                  </span>
+                </div>
               </div>
 
               <div className="flex items-baseline gap-4 py-4 border-t">
@@ -215,12 +225,14 @@ export default function OfferDetail() {
                 size="lg"
                 className="w-full md:w-auto text-lg px-8"
                 onClick={handlePurchase}
-                disabled={!isAvailable || purchaseMutation.isPending}
+                disabled={!isAvailable || isSoldOut || purchaseMutation.isPending}
                 data-testid="button-purchase"
               >
                 <ShoppingCart className="mr-2 h-5 w-5" />
                 {purchaseMutation.isPending
                   ? "Procesando..."
+                  : isSoldOut
+                  ? "Agotado"
                   : isAvailable
                   ? "Comprar"
                   : "No disponible"}

@@ -43,6 +43,7 @@ const formSchema = z.object({
     message: "El precio debe ser mayor a 0",
   }),
   discountPercentage: z.coerce.number().min(1, "El descuento debe ser al menos 1%").max(90, "El descuento no puede superar el 90%"),
+  quantity: z.coerce.number().min(1, "La cantidad debe ser al menos 1").max(100, "La cantidad no puede superar 100"),
   pickupTimeStart: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Formato inválido"),
   pickupTimeEnd: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Formato inválido"),
   imageUrl: z.string().optional(),
@@ -68,6 +69,7 @@ export default function CreateOffer() {
       category: undefined,
       originalPrice: "",
       discountPercentage: 30,
+      quantity: 1,
       pickupTimeStart: "18:00",
       pickupTimeEnd: "20:00",
       imageUrl: "",
@@ -360,6 +362,26 @@ export default function CreateOffer() {
                     </p>
                   </div>
                 )}
+
+                <FormField
+                  control={form.control}
+                  name="quantity"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Cantidad disponible</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min="1"
+                          max="100"
+                          {...field}
+                          data-testid="input-quantity"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
                 <div className="grid grid-cols-2 gap-4">
                   <FormField

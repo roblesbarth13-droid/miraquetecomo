@@ -62,8 +62,11 @@ export const offers = pgTable("offers", {
   pickupTimeStart: varchar("pickup_time_start", { length: 5 }).notNull(),
   pickupTimeEnd: varchar("pickup_time_end", { length: 5 }).notNull(),
   imageUrl: text("image_url"),
+  quantity: integer("quantity").notNull().default(1),
+  quantitySold: integer("quantity_sold").notNull().default(0),
   status: offerStatusEnum("status").default('activa'),
   createdAt: timestamp("created_at").defaultNow(),
+  expiresAt: timestamp("expires_at"),
 });
 
 // Purchases table
@@ -113,11 +116,20 @@ export const upsertUserSchema = createInsertSchema(users).omit({
   updatedAt: true,
 });
 
-export const insertOfferSchema = createInsertSchema(offers).omit({
+export const insertOfferSchema = createInsertSchema(offers, {
+  id: undefined,
+  createdAt: undefined,
+  status: undefined,
+  businessId: undefined,
+  quantitySold: undefined,
+  expiresAt: undefined,
+}).omit({
   id: true,
   createdAt: true,
   status: true,
   businessId: true,
+  quantitySold: true,
+  expiresAt: true,
 }).extend({
   originalPrice: z.string().refine((val) => parseFloat(val) > 0, {
     message: "El precio original debe ser mayor a 0",
@@ -128,6 +140,7 @@ export const insertOfferSchema = createInsertSchema(offers).omit({
   discountPercentage: z.number().min(1, "El descuento debe ser al menos 1%").max(90, "El descuento no puede superar el 90%"),
   pickupTimeStart: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Formato de hora inválido"),
   pickupTimeEnd: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Formato de hora inválido"),
+  quantity: z.number().min(1, "La cantidad debe ser al menos 1").max(100, "La cantidad no puede superar 100"),
 });
 
 export const insertPurchaseSchema = createInsertSchema(purchases).omit({

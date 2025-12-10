@@ -34,9 +34,16 @@ Preferred communication style: Simple, everyday language.
 
 ### Key Data Models
 - **Users**: Support for both regular users and business accounts (comercio)
-- **Offers**: Food deals with pricing, discounts, pickup times, and category classification
+- **Offers**: Food deals with pricing, discounts, pickup times, category classification, quantity tracking (quantity/quantitySold), and automatic 24-hour expiration (expiresAt)
 - **Purchases**: Transaction records linking users to offers with payment status tracking
 - **Sessions**: Authentication session storage
+
+### Key Features
+- **Photo Upload**: Businesses can upload product photos (5MB limit, JPG/PNG/WebP/GIF)
+- **Quantity Tracking**: Each offer has quantity available, decremented on purchase, shows "Agotado" when sold out
+- **Auto-Expiration**: Offers expire 24 hours after creation, automatically filtered from listings
+- **Category Images**: Default stock images per category when no custom photo uploaded
+- **Mercado Pago Integration**: Simulated marketplace payment splitting (platform commission + merchant payout)
 
 ### Route Structure
 - Public routes: Home (`/`), Offer Details (`/oferta/:id`), Landing (`/landing`)
