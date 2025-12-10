@@ -12,6 +12,7 @@ import {
   isMercadoPagoConfigured,
   getOAuthUrl,
   exchangeCodeForToken,
+  refreshAccessToken,
   isOAuthConfigured,
   getCommissionPercent,
 } from "./mercadopago";
@@ -343,8 +344,42 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
       });
 
       // Check if seller has connected Mercado Pago for split payments
-      const sellerAccessToken = oferta.business.mpAccessToken || undefined;
-      const usingSplit = !!sellerAccessToken;
+      let sellerAccessToken = oferta.business.mpAccessToken || undefined;
+      const tokenExpiresAt = oferta.business.mpTokenExpiresAt;
+      const refreshToken = oferta.business.mpRefreshToken;
+      let usingSplit = !!sellerAccessToken;
+      
+      // Check if token is expired and needs refresh
+      if (sellerAccessToken && tokenExpiresAt && refreshToken) {
+        const now = new Date();
+        const expiryDate = new Date(tokenExpiresAt);
+        const bufferMinutes = 10; // Refresh 10 min before expiry
+        
+        if (now >= new Date(expiryDate.getTime() - bufferMinutes * 60 * 1000)) {
+          console.log(`Token expired/expiring for seller ${oferta.business.id}, refreshing...`);
+          try {
+            const tokenResponse = await refreshAccessToken(refreshToken);
+            const newExpiresAt = new Date(Date.now() + tokenResponse.expires_in * 1000);
+            
+            // Update tokens in database
+            await storage.updateUserMpTokens(oferta.business.id, {
+              mpAccessToken: tokenResponse.access_token,
+              mpRefreshToken: tokenResponse.refresh_token,
+              mpUserId: tokenResponse.user_id.toString(),
+              mpTokenExpiresAt: newExpiresAt,
+            });
+            
+            sellerAccessToken = tokenResponse.access_token;
+            console.log(`Token refreshed for seller ${oferta.business.id}`);
+          } catch (refreshError) {
+            console.error("Failed to refresh seller token:", refreshError);
+            // Fall back to platform payment with warning
+            sellerAccessToken = undefined;
+            usingSplit = false;
+            console.warn("Split payment disabled due to token refresh failure");
+          }
+        }
+      }
 
       // Create Mercado Pago preference (with split if seller connected)
       const preference = await createPaymentPreference({
@@ -359,6 +394,8 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
 
       if (usingSplit) {
         console.log(`Split payment created for offer ${oferta.id}, seller: ${oferta.business.mpUserId}`);
+      } else if (oferta.business.mpAccessToken) {
+        console.warn(`Split payment fallback for offer ${oferta.id} - token issues`);
       }
 
       res.json({ 
@@ -506,7 +543,15 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
         : 'http://localhost:5000';
       
       const redirectUri = `${baseUrl}/api/mercadopago/oauth/callback`;
-      const oauthUrl = getOAuthUrl(redirectUri, userId);
+      
+      // Generate CSRF-safe state token by combining userId with a random value
+      const csrfToken = Math.random().toString(36).substring(2, 15);
+      const state = `${userId}:${csrfToken}`;
+      
+      // Store the state in session for validation
+      req.session.mpOAuthState = state;
+      
+      const oauthUrl = getOAuthUrl(redirectUri, state);
       
       res.json({ url: oauthUrl, redirectUri });
     } catch (error) {
@@ -516,14 +561,31 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   });
 
   // OAuth callback from Mercado Pago
-  app.get('/api/mercadopago/oauth/callback', async (req, res) => {
+  app.get('/api/mercadopago/oauth/callback', async (req: any, res) => {
     try {
-      const { code, state: userId } = req.query;
+      const { code, state } = req.query;
       
-      if (!code || !userId) {
+      if (!code || !state) {
         console.error("Missing code or state in OAuth callback");
         return res.redirect('/comercio?mp_error=missing_params');
       }
+      
+      // Validate state against session to prevent CSRF
+      const sessionState = req.session?.mpOAuthState;
+      if (!sessionState || sessionState !== state) {
+        console.error("OAuth state mismatch - possible CSRF attempt");
+        return res.redirect('/comercio?mp_error=invalid_state');
+      }
+      
+      // Extract userId from state (format: "userId:csrfToken")
+      const [userId] = (state as string).split(':');
+      if (!userId) {
+        console.error("Invalid state format in OAuth callback");
+        return res.redirect('/comercio?mp_error=invalid_state');
+      }
+      
+      // Clear the state from session after validation
+      delete req.session.mpOAuthState;
 
       const baseUrl = process.env.REPLIT_DEV_DOMAIN 
         ? `https://${process.env.REPLIT_DEV_DOMAIN}` 
@@ -537,7 +599,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
       const expiresAt = new Date(Date.now() + tokenResponse.expires_in * 1000);
       
       // Save tokens to user
-      await storage.updateUserMpTokens(userId as string, {
+      await storage.updateUserMpTokens(userId, {
         mpAccessToken: tokenResponse.access_token,
         mpRefreshToken: tokenResponse.refresh_token,
         mpUserId: tokenResponse.user_id.toString(),
