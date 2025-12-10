@@ -25,20 +25,27 @@ interface OfferCardProps {
 }
 
 function BusinessRating({ businessId }: { businessId: string }) {
-  const { data } = useQuery<{ average: number; count: number }>({
+  const { data, isLoading } = useQuery<{ average: number; count: number }>({
     queryKey: ['/api/comercios', businessId, 'rating'],
     staleTime: 60000,
   });
 
-  if (!data || data.count === 0) return null;
+  if (isLoading) return null;
 
-  const avgNumber = typeof data.average === 'number' ? data.average : Number(data.average);
+  const avgNumber = typeof data?.average === 'number' ? data.average : Number(data?.average || 0);
+  const hasRatings = data && data.count > 0;
 
   return (
     <div className="flex items-center gap-1 text-xs" data-testid={`rating-business-${businessId}`}>
-      <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-      <span className="font-medium">{avgNumber.toFixed(1)}</span>
-      <span className="text-muted-foreground">({data.count})</span>
+      <Star className={`h-3 w-3 ${hasRatings ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground'}`} />
+      {hasRatings ? (
+        <>
+          <span className="font-medium">{avgNumber.toFixed(1)}</span>
+          <span className="text-muted-foreground">({data.count})</span>
+        </>
+      ) : (
+        <span className="text-muted-foreground">Nuevo</span>
+      )}
     </div>
   );
 }
@@ -69,7 +76,7 @@ export function OfferCard({ offer }: OfferCardProps) {
             </div>
           )}
           <Badge
-            className="absolute top-2 right-2 bg-accent text-accent-foreground text-sm font-bold px-2 py-1 rounded-full"
+            className="absolute top-2 right-2 bg-accent text-accent-foreground text-sm font-bold px-3 py-1.5 rounded-full shadow-md"
             data-testid={`badge-discount-${offer.id}`}
           >
             -{offer.discountPercentage}%
