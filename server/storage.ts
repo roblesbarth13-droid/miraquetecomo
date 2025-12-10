@@ -40,6 +40,13 @@ export interface IStorage {
   getRatingsByBusinessId(businessId: string): Promise<RatingWithUser[]>;
   getBusinessAverageRating(businessId: string): Promise<{ average: number; count: number }>;
   hasUserRatedPurchase(userId: string, purchaseId: number): Promise<boolean>;
+  
+  updateUserMpTokens(userId: string, tokens: {
+    mpAccessToken: string | null;
+    mpRefreshToken: string | null;
+    mpUserId: string | null;
+    mpTokenExpiresAt: Date | null;
+  }): Promise<User>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -290,6 +297,26 @@ export class DatabaseStorage implements IStorage {
         )
       );
     return !!existing;
+  }
+
+  async updateUserMpTokens(userId: string, tokens: {
+    mpAccessToken: string | null;
+    mpRefreshToken: string | null;
+    mpUserId: string | null;
+    mpTokenExpiresAt: Date | null;
+  }): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({
+        mpAccessToken: tokens.mpAccessToken,
+        mpRefreshToken: tokens.mpRefreshToken,
+        mpUserId: tokens.mpUserId,
+        mpTokenExpiresAt: tokens.mpTokenExpiresAt,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, userId))
+      .returning();
+    return user;
   }
 }
 

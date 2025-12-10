@@ -45,6 +45,11 @@ export const users = pgTable("users", {
   category: categoryEnum("category"),
   latitude: doublePrecision("latitude"),
   longitude: doublePrecision("longitude"),
+  // Mercado Pago OAuth fields for marketplace split payments
+  mpAccessToken: text("mp_access_token"),
+  mpRefreshToken: text("mp_refresh_token"),
+  mpUserId: varchar("mp_user_id"),
+  mpTokenExpiresAt: timestamp("mp_token_expires_at"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

@@ -6,7 +6,15 @@ import multer from "multer";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { insertOfferSchema, updateBusinessProfileSchema, insertRatingSchema } from "@shared/schema";
-import { createPaymentPreference, getPaymentDetails, isMercadoPagoConfigured } from "./mercadopago";
+import { 
+  createPaymentPreference, 
+  getPaymentDetails, 
+  isMercadoPagoConfigured,
+  getOAuthUrl,
+  exchangeCodeForToken,
+  isOAuthConfigured,
+  getCommissionPercent,
+} from "./mercadopago";
 
 // Geocoding function using Google Maps API
 async function geocodeAddress(address: string): Promise<{ lat: number; lng: number } | null> {
@@ -334,7 +342,11 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
         userId,
       });
 
-      // Create Mercado Pago preference
+      // Check if seller has connected Mercado Pago for split payments
+      const sellerAccessToken = oferta.business.mpAccessToken || undefined;
+      const usingSplit = !!sellerAccessToken;
+
+      // Create Mercado Pago preference (with split if seller connected)
       const preference = await createPaymentPreference({
         offerId: oferta.id,
         title: oferta.title,
@@ -342,7 +354,12 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
         price: parseFloat(oferta.discountedPrice),
         buyerEmail: user?.email || undefined,
         purchaseId: purchase.id,
+        sellerAccessToken,
       });
+
+      if (usingSplit) {
+        console.log(`Split payment created for offer ${oferta.id}, seller: ${oferta.business.mpUserId}`);
+      }
 
       res.json({ 
         success: true,
@@ -465,6 +482,118 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     } catch (error) {
       console.error("Error checking rating:", error);
       res.status(500).json({ message: "Error al verificar calificación" });
+    }
+  });
+
+  // ===== MERCADO PAGO OAUTH ROUTES =====
+
+  // Get OAuth URL for connecting merchant's Mercado Pago account
+  app.get('/api/mercadopago/oauth/url', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      
+      if (!user || user.userType !== 'comercio') {
+        return res.status(403).json({ message: "Solo comercios pueden conectar Mercado Pago" });
+      }
+
+      if (!isOAuthConfigured()) {
+        return res.status(500).json({ message: "Mercado Pago OAuth no está configurado" });
+      }
+
+      const baseUrl = process.env.REPLIT_DEV_DOMAIN 
+        ? `https://${process.env.REPLIT_DEV_DOMAIN}` 
+        : 'http://localhost:5000';
+      
+      const redirectUri = `${baseUrl}/api/mercadopago/oauth/callback`;
+      const oauthUrl = getOAuthUrl(redirectUri, userId);
+      
+      res.json({ url: oauthUrl, redirectUri });
+    } catch (error) {
+      console.error("Error generating OAuth URL:", error);
+      res.status(500).json({ message: "Error al generar URL de autorización" });
+    }
+  });
+
+  // OAuth callback from Mercado Pago
+  app.get('/api/mercadopago/oauth/callback', async (req, res) => {
+    try {
+      const { code, state: userId } = req.query;
+      
+      if (!code || !userId) {
+        console.error("Missing code or state in OAuth callback");
+        return res.redirect('/comercio?mp_error=missing_params');
+      }
+
+      const baseUrl = process.env.REPLIT_DEV_DOMAIN 
+        ? `https://${process.env.REPLIT_DEV_DOMAIN}` 
+        : 'http://localhost:5000';
+      
+      const redirectUri = `${baseUrl}/api/mercadopago/oauth/callback`;
+      
+      const tokenResponse = await exchangeCodeForToken(code as string, redirectUri);
+      
+      // Calculate token expiration
+      const expiresAt = new Date(Date.now() + tokenResponse.expires_in * 1000);
+      
+      // Save tokens to user
+      await storage.updateUserMpTokens(userId as string, {
+        mpAccessToken: tokenResponse.access_token,
+        mpRefreshToken: tokenResponse.refresh_token,
+        mpUserId: tokenResponse.user_id.toString(),
+        mpTokenExpiresAt: expiresAt,
+      });
+      
+      console.log(`Mercado Pago connected for user ${userId}, MP user ID: ${tokenResponse.user_id}`);
+      
+      res.redirect('/comercio?mp_connected=true');
+    } catch (error) {
+      console.error("Error in OAuth callback:", error);
+      res.redirect('/comercio?mp_error=auth_failed');
+    }
+  });
+
+  // Check if merchant has Mercado Pago connected
+  app.get('/api/mercadopago/status', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "Usuario no encontrado" });
+      }
+
+      const isConnected = !!user.mpAccessToken && !!user.mpUserId;
+      const commission = getCommissionPercent();
+      
+      res.json({ 
+        connected: isConnected,
+        mpUserId: user.mpUserId || null,
+        commission,
+        oauthConfigured: isOAuthConfigured(),
+      });
+    } catch (error) {
+      console.error("Error checking MP status:", error);
+      res.status(500).json({ message: "Error al verificar estado de Mercado Pago" });
+    }
+  });
+
+  // Disconnect Mercado Pago
+  app.post('/api/mercadopago/disconnect', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      
+      await storage.updateUserMpTokens(userId, {
+        mpAccessToken: null,
+        mpRefreshToken: null,
+        mpUserId: null,
+        mpTokenExpiresAt: null,
+      });
+      
+      res.json({ success: true, message: "Mercado Pago desconectado" });
+    } catch (error) {
+      console.error("Error disconnecting MP:", error);
+      res.status(500).json({ message: "Error al desconectar Mercado Pago" });
     }
   });
 

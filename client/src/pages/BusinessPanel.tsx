@@ -22,7 +22,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Link } from "wouter";
-import { Plus, Package, DollarSign, TrendingUp, Loader2, Settings, MapPin } from "lucide-react";
+import { Plus, Package, DollarSign, TrendingUp, Loader2, Settings, MapPin, CreditCard, Check, AlertCircle } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
@@ -69,6 +69,72 @@ export default function BusinessPanel() {
       });
     },
   });
+
+  const { data: mpStatus, isLoading: mpStatusLoading } = useQuery<{
+    connected: boolean;
+    mpUserId: string | null;
+    commission: number;
+    oauthConfigured: boolean;
+  }>({
+    queryKey: ["/api/mercadopago/status"],
+    enabled: isBusiness,
+  });
+
+  const connectMpMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest("GET", "/api/mercadopago/oauth/url");
+      return response.json();
+    },
+    onSuccess: (data: { url: string }) => {
+      window.location.href = data.url;
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "No se pudo conectar con Mercado Pago.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const disconnectMpMutation = useMutation({
+    mutationFn: async () => {
+      return apiRequest("POST", "/api/mercadopago/disconnect");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/mercadopago/status"] });
+      toast({
+        title: "Mercado Pago desconectado",
+        description: "Podés volver a conectarlo cuando quieras.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "No se pudo desconectar Mercado Pago.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("mp_connected") === "true") {
+      toast({
+        title: "Mercado Pago conectado",
+        description: "Ahora recibirás los pagos directamente en tu cuenta.",
+      });
+      window.history.replaceState({}, "", "/comercio");
+      queryClient.invalidateQueries({ queryKey: ["/api/mercadopago/status"] });
+    } else if (params.get("mp_error")) {
+      toast({
+        title: "Error al conectar Mercado Pago",
+        description: "No se pudo completar la autorización. Intentá de nuevo.",
+        variant: "destructive",
+      });
+      window.history.replaceState({}, "", "/comercio");
+    }
+  }, [toast]);
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -260,6 +326,80 @@ export default function BusinessPanel() {
             </CardContent>
           </Card>
         </div>
+
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <CreditCard className="h-5 w-5" />
+              Mercado Pago
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {mpStatusLoading ? (
+              <div className="flex items-center gap-4">
+                <Skeleton className="h-10 w-32" />
+                <Skeleton className="h-4 w-48" />
+              </div>
+            ) : mpStatus?.connected ? (
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                    <Check className="h-5 w-5 text-green-600 dark:text-green-400" />
+                  </div>
+                  <div>
+                    <p className="font-medium">Cuenta conectada</p>
+                    <p className="text-sm text-muted-foreground">
+                      Recibís el {100 - (mpStatus?.commission || 25)}% de cada venta directamente en tu cuenta
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  variant="outline"
+                  onClick={() => disconnectMpMutation.mutate()}
+                  disabled={disconnectMpMutation.isPending}
+                  data-testid="button-disconnect-mp"
+                >
+                  {disconnectMpMutation.isPending ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    "Desconectar"
+                  )}
+                </Button>
+              </div>
+            ) : (
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+                    <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+                  </div>
+                  <div>
+                    <p className="font-medium">Conectá tu cuenta de Mercado Pago</p>
+                    <p className="text-sm text-muted-foreground">
+                      Recibí el {100 - (mpStatus?.commission || 25)}% de cada venta directamente en tu cuenta
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  onClick={() => connectMpMutation.mutate()}
+                  disabled={connectMpMutation.isPending || !mpStatus?.oauthConfigured}
+                  data-testid="button-connect-mp"
+                >
+                  {connectMpMutation.isPending ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Conectando...
+                    </>
+                  ) : (
+                    <>
+                      <CreditCard className="mr-2 h-4 w-4" />
+                      Conectar Mercado Pago
+                    </>
+                  )}
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         <Tabs defaultValue="activas" className="space-y-6">
           <TabsList>
