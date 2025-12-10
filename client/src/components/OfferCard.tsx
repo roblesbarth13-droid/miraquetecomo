@@ -1,7 +1,7 @@
 import { Link } from "wouter";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Clock, Package } from "lucide-react";
+import { Clock, Package, MapPin } from "lucide-react";
 import type { OfferWithBusiness } from "@shared/schema";
 import { categoryDisplayNames } from "@shared/schema";
 
@@ -61,6 +61,14 @@ export function OfferCard({ offer }: OfferCardProps) {
           <p className="text-xs text-muted-foreground truncate" data-testid={`text-business-${offer.id}`}>
             {offer.business?.businessName || "Comercio"}
           </p>
+          {offer.business?.address && (
+            <div className="flex items-center gap-1 text-xs text-muted-foreground/80">
+              <MapPin className="h-3 w-3 shrink-0" />
+              <span className="truncate" data-testid={`text-address-${offer.id}`}>
+                {offer.business.address}
+              </span>
+            </div>
+          )}
           <h3 className="text-sm font-medium line-clamp-2 leading-tight" data-testid={`text-title-${offer.id}`}>
             {offer.title}
           </h3>
