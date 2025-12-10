@@ -17,7 +17,7 @@ export default function Splash() {
 
   useEffect(() => {
     if (isAnimationComplete) {
-      setLocation("/home");
+      setLocation("/home", { replace: true });
     }
   }, [isAnimationComplete, setLocation]);
 

@@ -25,7 +25,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { ArrowLeft, Upload, Loader2, ImagePlus, X } from "lucide-react";
+import { ArrowLeft, Upload, Loader2, ImagePlus, X, Camera, FolderOpen } from "lucide-react";
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
@@ -60,6 +60,7 @@ export default function CreateOffer() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -444,20 +445,49 @@ export default function CreateOffer() {
                         </Button>
                       </div>
                     ) : (
-                      <div
-                        className="w-full aspect-video rounded-lg border-2 border-dashed border-muted-foreground/50 flex flex-col items-center justify-center gap-2 cursor-pointer hover-elevate active-elevate-2 transition-all"
-                        onClick={() => fileInputRef.current?.click()}
-                        data-testid="dropzone-image"
-                      >
-                        <ImagePlus className="h-10 w-10 text-muted-foreground" />
-                        <p className="text-sm text-muted-foreground">
-                          Hacé clic para subir una foto
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          JPG, PNG, WebP o GIF (max 5MB)
-                        </p>
+                      <div className="space-y-3">
+                        <div className="w-full aspect-video rounded-lg border-2 border-dashed border-muted-foreground/50 flex flex-col items-center justify-center gap-2">
+                          <ImagePlus className="h-10 w-10 text-muted-foreground" />
+                          <p className="text-sm text-muted-foreground text-center px-4">
+                            Sacá una foto o elegí de tu galería
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            JPG, PNG, WebP o GIF (max 5MB)
+                          </p>
+                        </div>
+                        <div className="flex gap-3">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            className="flex-1"
+                            onClick={() => cameraInputRef.current?.click()}
+                            data-testid="button-camera"
+                          >
+                            <Camera className="mr-2 h-4 w-4" />
+                            Sacar foto
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            className="flex-1"
+                            onClick={() => fileInputRef.current?.click()}
+                            data-testid="button-gallery"
+                          >
+                            <FolderOpen className="mr-2 h-4 w-4" />
+                            Galería
+                          </Button>
+                        </div>
                       </div>
                     )}
+                    <input
+                      ref={cameraInputRef}
+                      type="file"
+                      accept="image/*"
+                      capture="environment"
+                      onChange={handleFileSelect}
+                      className="hidden"
+                      data-testid="input-camera"
+                    />
                     <input
                       ref={fileInputRef}
                       type="file"
