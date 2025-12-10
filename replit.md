@@ -36,6 +36,7 @@ Preferred communication style: Simple, everyday language.
 - **Users**: Support for both regular users and business accounts (comercio)
 - **Offers**: Food deals with pricing, discounts, pickup times, category classification, quantity tracking (quantity/quantitySold), and automatic 24-hour expiration (expiresAt)
 - **Purchases**: Transaction records linking users to offers with payment status tracking
+- **Ratings**: Business ratings (1-5 stars with optional comment) linked to purchases and users
 - **Sessions**: Authentication session storage
 
 ### Key Features
@@ -43,6 +44,9 @@ Preferred communication style: Simple, everyday language.
 - **Quantity Tracking**: Each offer has quantity available, decremented on purchase, shows "Agotado" when sold out
 - **Auto-Expiration**: Offers expire 24 hours after creation, automatically filtered from listings
 - **Category Images**: Default stock images per category when no custom photo uploaded
+- **Business Ratings**: Users can rate businesses after completing a purchase (1-5 stars + optional comment), displayed on offer cards and detail pages
+- **Geocoding**: Business addresses are geocoded using Google Maps API for map display
+- **Edit Business Profile**: Businesses can update their address/phone from the panel to enable geocoding
 - **Mercado Pago Integration**: Simulated marketplace payment splitting (platform commission + merchant payout)
 
 ### Route Structure

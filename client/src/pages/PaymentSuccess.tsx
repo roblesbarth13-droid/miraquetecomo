@@ -83,11 +83,7 @@ export default function PaymentSuccess() {
 
   const submitRatingMutation = useMutation({
     mutationFn: async (data: { businessId: string; purchaseId: number; stars: number; comment?: string }) => {
-      return apiRequest('/api/calificaciones', {
-        method: 'POST',
-        body: JSON.stringify(data),
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return apiRequest('POST', '/api/calificaciones', data);
     },
     onSuccess: () => {
       toast({

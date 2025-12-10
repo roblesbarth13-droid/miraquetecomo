@@ -1,11 +1,11 @@
 import { Link } from "wouter";
+import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Clock, Package, MapPin } from "lucide-react";
+import { Clock, Package, MapPin, Star } from "lucide-react";
 import type { OfferWithBusiness } from "@shared/schema";
 import { categoryDisplayNames } from "@shared/schema";
 
-// Default category images
 import panaderiaImg from "@assets/stock_images/artisan_bakery_bread_88577d89.jpg";
 import verduleriaImg from "@assets/generated_images/fresh_vegetables_close-up_shot.png";
 import supermercadoImg from "@assets/stock_images/supermarket_grocery__3232780f.jpg";
@@ -24,12 +24,30 @@ interface OfferCardProps {
   offer: OfferWithBusiness;
 }
 
+function BusinessRating({ businessId }: { businessId: string }) {
+  const { data } = useQuery<{ average: number; count: number }>({
+    queryKey: ['/api/comercios', businessId, 'rating'],
+    staleTime: 60000,
+  });
+
+  if (!data || data.count === 0) return null;
+
+  const avgNumber = typeof data.average === 'number' ? data.average : Number(data.average);
+
+  return (
+    <div className="flex items-center gap-1 text-xs" data-testid={`rating-business-${businessId}`}>
+      <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+      <span className="font-medium">{avgNumber.toFixed(1)}</span>
+      <span className="text-muted-foreground">({data.count})</span>
+    </div>
+  );
+}
+
 export function OfferCard({ offer }: OfferCardProps) {
   const originalPrice = parseFloat(offer.originalPrice);
   const discountedPrice = parseFloat(offer.discountedPrice);
   const quantityAvailable = (offer.quantity || 1) - (offer.quantitySold || 0);
   
-  // Use uploaded image, or fall back to category default
   const displayImage = offer.imageUrl || categoryDefaultImages[offer.category];
 
   return (
@@ -58,9 +76,12 @@ export function OfferCard({ offer }: OfferCardProps) {
           </Badge>
         </div>
         <div className="p-3 space-y-1">
-          <p className="text-xs text-muted-foreground truncate" data-testid={`text-business-${offer.id}`}>
-            {offer.business?.businessName || "Comercio"}
-          </p>
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-xs text-muted-foreground truncate flex-1" data-testid={`text-business-${offer.id}`}>
+              {offer.business?.businessName || "Comercio"}
+            </p>
+            {offer.business?.id && <BusinessRating businessId={offer.business.id} />}
+          </div>
           {offer.business?.address && (
             <div className="flex items-center gap-1 text-xs text-muted-foreground/80">
               <MapPin className="h-3 w-3 shrink-0" />

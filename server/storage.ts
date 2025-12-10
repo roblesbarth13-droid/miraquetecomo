@@ -267,15 +267,15 @@ export class DatabaseStorage implements IStorage {
   async getBusinessAverageRating(businessId: string): Promise<{ average: number; count: number }> {
     const result = await db
       .select({
-        avg: sql<number>`COALESCE(AVG(${ratings.stars}), 0)`,
-        count: sql<number>`COUNT(*)::int`,
+        avg: sql<string>`COALESCE(AVG(${ratings.stars}), 0)`,
+        count: sql<string>`COUNT(*)::int`,
       })
       .from(ratings)
       .where(eq(ratings.businessId, businessId));
     
     return {
-      average: result[0]?.avg || 0,
-      count: result[0]?.count || 0,
+      average: parseFloat(result[0]?.avg || "0"),
+      count: parseInt(result[0]?.count || "0", 10),
     };
   }
 

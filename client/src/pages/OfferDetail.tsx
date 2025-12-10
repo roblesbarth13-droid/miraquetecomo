@@ -3,10 +3,11 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft, Clock, Store, ShoppingCart, AlertCircle, Package } from "lucide-react";
-import type { OfferWithBusiness } from "@shared/schema";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { ArrowLeft, Clock, Store, ShoppingCart, AlertCircle, Package, Star, MessageSquare } from "lucide-react";
+import type { OfferWithBusiness, RatingWithUser } from "@shared/schema";
 import { categoryDisplayNames, statusDisplayNames } from "@shared/schema";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -41,6 +42,16 @@ export default function OfferDetail() {
       return res.json();
     },
     enabled: !!offerId,
+  });
+
+  const { data: businessRating } = useQuery<{ average: number; count: number }>({
+    queryKey: ['/api/comercios', offer?.businessId, 'rating'],
+    enabled: !!offer?.businessId,
+  });
+
+  const { data: reviews } = useQuery<RatingWithUser[]>({
+    queryKey: ['/api/comercios', offer?.businessId, 'calificaciones'],
+    enabled: !!offer?.businessId,
   });
 
   const purchaseMutation = useMutation({
@@ -170,11 +181,18 @@ export default function OfferDetail() {
             <CardContent className="p-6 space-y-6">
               <div className="flex items-start justify-between gap-4 flex-wrap">
                 <div className="space-y-2">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <Store className="h-4 w-4 text-muted-foreground" />
                     <span className="text-muted-foreground" data-testid="text-business-name">
                       {offer.business?.businessName || "Comercio"}
                     </span>
+                    {businessRating && businessRating.count > 0 && (
+                      <div className="flex items-center gap-1" data-testid="text-business-rating">
+                        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                        <span className="font-medium">{Number(businessRating.average).toFixed(1)}</span>
+                        <span className="text-muted-foreground text-sm">({businessRating.count})</span>
+                      </div>
+                    )}
                     <Badge variant="secondary" className="text-xs">
                       {categoryDisplayNames[offer.category]}
                     </Badge>
@@ -239,6 +257,55 @@ export default function OfferDetail() {
               </Button>
             </CardContent>
           </Card>
+
+          {reviews && reviews.length > 0 && (
+            <Card className="mt-6" data-testid="section-reviews">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <MessageSquare className="h-5 w-5" />
+                  Calificaciones ({reviews.length})
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {reviews.slice(0, 5).map((review) => (
+                  <div key={review.id} className="flex gap-3 p-3 rounded-lg bg-muted/50" data-testid={`review-${review.id}`}>
+                    <Avatar className="h-10 w-10">
+                      <AvatarFallback>
+                        {review.user?.firstName?.[0] || review.user?.email?.[0]?.toUpperCase() || "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 space-y-1">
+                      <div className="flex items-center justify-between gap-2 flex-wrap">
+                        <span className="font-medium">
+                          {review.user?.firstName || review.user?.email?.split("@")[0] || "Usuario"}
+                        </span>
+                        <div className="flex items-center gap-0.5">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <Star
+                              key={star}
+                              className={`h-4 w-4 ${
+                                star <= review.stars
+                                  ? "fill-yellow-400 text-yellow-400"
+                                  : "text-muted-foreground"
+                              }`}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                      {review.comment && (
+                        <p className="text-muted-foreground text-sm">{review.comment}</p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+                {reviews.length > 5 && (
+                  <p className="text-center text-sm text-muted-foreground">
+                    Y {reviews.length - 5} calificaciones más...
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+          )}
         </div>
       </main>
     </div>
