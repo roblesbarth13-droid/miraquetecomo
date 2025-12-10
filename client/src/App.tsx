@@ -16,6 +16,7 @@ import PaymentSuccess from "@/pages/PaymentSuccess";
 import PaymentFailure from "@/pages/PaymentFailure";
 import PaymentPending from "@/pages/PaymentPending";
 import MapView from "@/pages/MapView";
+import HowItWorks from "@/pages/HowItWorks";
 
 function Router() {
   const { isAuthenticated, isLoading, isBusiness } = useAuth();
@@ -37,6 +38,7 @@ function Router() {
       {/* Public routes - accessible to everyone */}
       <Route path="/home" component={Home} />
       <Route path="/mapa" component={MapView} />
+      <Route path="/como-funciona" component={HowItWorks} />
       <Route path="/oferta/:id" component={OfferDetail} />
       <Route path="/landing" component={Landing} />
       

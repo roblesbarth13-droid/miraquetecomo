@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Logo } from "./Logo";
 import { useAuth } from "@/hooks/useAuth";
-import { User, LogOut, Store, Package, MapPin } from "lucide-react";
+import { User, LogOut, Store, Package, MapPin, HelpCircle } from "lucide-react";
 
 export function Header() {
   const { user, isAuthenticated, isBusiness } = useAuth();
@@ -33,7 +33,16 @@ export function Header() {
           <Logo size="md" />
         </Link>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
+          <Link href="/como-funciona">
+            <Button variant="ghost" size="sm" className="hidden sm:flex" data-testid="button-how-it-works">
+              <HelpCircle className="h-4 w-4 mr-1" />
+              Cómo funciona
+            </Button>
+            <Button variant="ghost" size="icon" className="sm:hidden" data-testid="button-how-it-works-mobile">
+              <HelpCircle className="h-5 w-5" />
+            </Button>
+          </Link>
           <Link href="/mapa">
             <Button variant="ghost" size="icon" data-testid="button-map">
               <MapPin className="h-5 w-5" />
