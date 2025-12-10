@@ -30,7 +30,7 @@ export function Header() {
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b" data-testid="header">
       <div className="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between gap-4">
         <Link href="/home" data-testid="link-home">
-          <Logo size="md" />
+          <Logo size="md" showFlag />
         </Link>
 
         <div className="flex items-center gap-2">
