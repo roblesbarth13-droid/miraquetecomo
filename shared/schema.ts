@@ -79,10 +79,22 @@ export const purchases = pgTable("purchases", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Ratings table
+export const ratings = pgTable("ratings", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  businessId: varchar("business_id").notNull().references(() => users.id),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  purchaseId: integer("purchase_id").notNull().references(() => purchases.id),
+  stars: integer("stars").notNull(),
+  comment: text("comment"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   offers: many(offers),
   purchases: many(purchases),
+  ratingsGiven: many(ratings),
 }));
 
 export const offersRelations = relations(offers, ({ one, many }) => ({
@@ -101,6 +113,21 @@ export const purchasesRelations = relations(purchases, ({ one }) => ({
   user: one(users, {
     fields: [purchases.userId],
     references: [users.id],
+  }),
+}));
+
+export const ratingsRelations = relations(ratings, ({ one }) => ({
+  business: one(users, {
+    fields: [ratings.businessId],
+    references: [users.id],
+  }),
+  user: one(users, {
+    fields: [ratings.userId],
+    references: [users.id],
+  }),
+  purchase: one(purchases, {
+    fields: [ratings.purchaseId],
+    references: [purchases.id],
   }),
 }));
 
@@ -150,6 +177,14 @@ export const insertPurchaseSchema = createInsertSchema(purchases).omit({
   mpPaymentId: true,
 });
 
+export const insertRatingSchema = createInsertSchema(ratings).omit({
+  id: true,
+  createdAt: true,
+}).extend({
+  stars: z.number().min(1, "Mínimo 1 estrella").max(5, "Máximo 5 estrellas"),
+  comment: z.string().max(500, "Máximo 500 caracteres").optional(),
+});
+
 export const updateBusinessProfileSchema = z.object({
   businessName: z.string().min(2, "El nombre del comercio debe tener al menos 2 caracteres"),
   phone: z.string().optional(),
@@ -170,6 +205,9 @@ export type InsertOffer = z.infer<typeof insertOfferSchema>;
 export type Purchase = typeof purchases.$inferSelect;
 export type InsertPurchase = z.infer<typeof insertPurchaseSchema>;
 
+export type Rating = typeof ratings.$inferSelect;
+export type InsertRating = z.infer<typeof insertRatingSchema>;
+
 // Extended types with relations
 export type OfferWithBusiness = Offer & {
   business: User;
@@ -177,6 +215,10 @@ export type OfferWithBusiness = Offer & {
 
 export type PurchaseWithOfferAndUser = Purchase & {
   offer: OfferWithBusiness;
+  user: User;
+};
+
+export type RatingWithUser = Rating & {
   user: User;
 };
 
