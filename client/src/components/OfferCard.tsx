@@ -84,7 +84,7 @@ export function OfferCard({ offer }: OfferCardProps) {
         </div>
         <div className="p-3 space-y-1">
           <div className="flex items-center justify-between gap-2">
-            <p className="text-xs text-muted-foreground truncate flex-1" data-testid={`text-business-${offer.id}`}>
+            <p className="text-sm font-semibold truncate flex-1" data-testid={`text-business-${offer.id}`}>
               {offer.business?.businessName || "Comercio"}
             </p>
             {offer.business?.id && <BusinessRating businessId={offer.business.id} />}
