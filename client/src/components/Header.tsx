@@ -8,7 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Logo } from "./Logo";
+import { Logo, ArgentinaStripes } from "./Logo";
 import { useAuth } from "@/hooks/useAuth";
 import { User, LogOut, Store, Package, MapPin, HelpCircle } from "lucide-react";
 
@@ -29,9 +29,12 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b" data-testid="header">
       <div className="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between gap-4">
-        <Link href="/home" data-testid="link-home">
-          <Logo size="md" showFlag />
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link href="/home" data-testid="link-home">
+            <Logo size="md" />
+          </Link>
+          <ArgentinaStripes />
+        </div>
 
         <div className="flex items-center gap-2">
           <Link href="/como-funciona">
