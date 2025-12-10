@@ -18,9 +18,9 @@ const categories = [
 
 export function CategoryFilter({ selectedCategory, onCategoryChange }: CategoryFilterProps) {
   return (
-    <div className="py-4" data-testid="category-filter">
+    <div data-testid="category-filter">
       <ScrollArea className="w-full whitespace-nowrap">
-        <div className="flex gap-3 px-4">
+        <div className="flex gap-2 px-4 max-w-7xl mx-auto">
           <Button
             variant={selectedCategory === null ? "default" : "outline"}
             className="rounded-full px-6 py-3 flex-shrink-0"

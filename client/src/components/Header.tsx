@@ -28,7 +28,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b" data-testid="header">
-      <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
+      <div className="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between gap-4">
         <Link href="/home" data-testid="link-home">
           <Logo size="md" />
         </Link>
@@ -44,7 +44,11 @@ export function Header() {
             </Button>
           </Link>
           <Link href="/mapa">
-            <Button variant="ghost" size="icon" data-testid="button-map">
+            <Button variant="ghost" size="sm" className="hidden sm:flex" data-testid="button-map">
+              <MapPin className="h-4 w-4 mr-1" />
+              Ofertas cerca tuyo
+            </Button>
+            <Button variant="ghost" size="icon" className="sm:hidden" data-testid="button-map-mobile">
               <MapPin className="h-5 w-5" />
             </Button>
           </Link>

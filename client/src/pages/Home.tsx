@@ -30,15 +30,17 @@ export default function Home() {
     <div className="min-h-screen bg-background" data-testid="page-home">
       <Header />
 
-      <CategoryFilter
-        selectedCategory={selectedCategory}
-        onCategoryChange={setSelectedCategory}
-      />
+      <div className="py-6">
+        <CategoryFilter
+          selectedCategory={selectedCategory}
+          onCategoryChange={setSelectedCategory}
+        />
+      </div>
 
-      <main className="max-w-7xl mx-auto px-4 pb-24">
+      <main className="max-w-7xl mx-auto px-4 pb-24 pt-2">
         {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {Array.from({ length: 6 }).map((_, i) => (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {Array.from({ length: 8 }).map((_, i) => (
               <OfferCardSkeleton key={i} />
             ))}
           </div>
@@ -48,7 +50,7 @@ export default function Home() {
             onClearFilters={() => setSelectedCategory(null)}
           />
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" data-testid="offers-grid">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" data-testid="offers-grid">
             {offers.map((offer) => (
               <OfferCard key={offer.id} offer={offer} />
             ))}

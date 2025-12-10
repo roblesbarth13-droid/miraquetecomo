@@ -35,7 +35,7 @@ export function OfferCard({ offer }: OfferCardProps) {
   return (
     <Link href={`/oferta/${offer.id}`} data-testid={`card-offer-${offer.id}`}>
       <Card className="overflow-hidden hover-elevate active-elevate-2 cursor-pointer transition-all duration-200 group">
-        <div className="relative aspect-[4/3] overflow-hidden">
+        <div className="relative aspect-square overflow-hidden">
           {displayImage ? (
             <img
               src={displayImage}
@@ -45,46 +45,44 @@ export function OfferCard({ offer }: OfferCardProps) {
             />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
-              <span className="text-4xl text-muted-foreground">
+              <span className="text-3xl text-muted-foreground">
                 {categoryDisplayNames[offer.category]?.[0] || "?"}
               </span>
             </div>
           )}
           <Badge
-            className="absolute top-3 right-3 bg-accent text-accent-foreground text-lg font-bold px-4 py-2 rounded-full"
+            className="absolute top-2 right-2 bg-accent text-accent-foreground text-sm font-bold px-2 py-1 rounded-full"
             data-testid={`badge-discount-${offer.id}`}
           >
             -{offer.discountPercentage}%
           </Badge>
         </div>
-        <div className="p-4 space-y-2">
-          <p className="text-sm text-muted-foreground" data-testid={`text-business-${offer.id}`}>
+        <div className="p-3 space-y-1">
+          <p className="text-xs text-muted-foreground truncate" data-testid={`text-business-${offer.id}`}>
             {offer.business?.businessName || "Comercio"}
           </p>
-          <h3 className="text-lg font-medium line-clamp-2" data-testid={`text-title-${offer.id}`}>
+          <h3 className="text-sm font-medium line-clamp-2 leading-tight" data-testid={`text-title-${offer.id}`}>
             {offer.title}
           </h3>
-          <div className="flex items-center justify-between gap-2 flex-wrap">
-            <div className="flex items-baseline gap-2">
-              <span className="text-2xl font-bold text-primary" data-testid={`text-price-${offer.id}`}>
-                ${discountedPrice.toLocaleString('es-AR')}
-              </span>
-              <span className="text-sm line-through text-muted-foreground" data-testid={`text-original-price-${offer.id}`}>
-                ${originalPrice.toLocaleString('es-AR')}
-              </span>
-            </div>
+          <div className="flex items-baseline gap-1.5 pt-1">
+            <span className="text-lg font-bold text-primary" data-testid={`text-price-${offer.id}`}>
+              ${discountedPrice.toLocaleString('es-AR')}
+            </span>
+            <span className="text-xs line-through text-muted-foreground" data-testid={`text-original-price-${offer.id}`}>
+              ${originalPrice.toLocaleString('es-AR')}
+            </span>
           </div>
-          <div className="flex items-center justify-between gap-2 text-sm text-muted-foreground pt-1 flex-wrap">
+          <div className="flex items-center justify-between gap-1 text-xs text-muted-foreground pt-1 flex-wrap">
             <div className="flex items-center gap-1">
-              <Clock className="h-4 w-4" />
+              <Clock className="h-3 w-3" />
               <span data-testid={`text-pickup-${offer.id}`}>
                 {offer.pickupTimeStart} - {offer.pickupTimeEnd}
               </span>
             </div>
             <div className="flex items-center gap-1">
-              <Package className="h-4 w-4" />
+              <Package className="h-3 w-3" />
               <span data-testid={`text-quantity-${offer.id}`}>
-                {quantityAvailable} disponible{quantityAvailable !== 1 ? 's' : ''}
+                {quantityAvailable}
               </span>
             </div>
           </div>
