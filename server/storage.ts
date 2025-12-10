@@ -2,14 +2,18 @@ import {
   users,
   offers,
   purchases,
+  ratings,
   type User,
   type UpsertUser,
   type Offer,
   type InsertOffer,
   type Purchase,
   type InsertPurchase,
+  type Rating,
+  type InsertRating,
   type OfferWithBusiness,
   type PurchaseWithOfferAndUser,
+  type RatingWithUser,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, gt, or, lt, sql } from "drizzle-orm";
@@ -31,6 +35,11 @@ export interface IStorage {
   updatePurchaseStatus(id: number, status: 'pendiente' | 'pagado' | 'fallido', mpPaymentId?: string): Promise<Purchase | undefined>;
   getPurchasesByBusinessId(businessId: string): Promise<PurchaseWithOfferAndUser[]>;
   getPurchasesByUserId(userId: string): Promise<Purchase[]>;
+  
+  createRating(rating: InsertRating): Promise<Rating>;
+  getRatingsByBusinessId(businessId: string): Promise<RatingWithUser[]>;
+  getBusinessAverageRating(businessId: string): Promise<{ average: number; count: number }>;
+  hasUserRatedPurchase(userId: string, purchaseId: number): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -231,6 +240,56 @@ export class DatabaseStorage implements IStorage {
       .from(purchases)
       .where(eq(purchases.userId, userId))
       .orderBy(desc(purchases.createdAt));
+  }
+
+  async createRating(ratingData: InsertRating): Promise<Rating> {
+    const [rating] = await db
+      .insert(ratings)
+      .values(ratingData)
+      .returning();
+    return rating;
+  }
+
+  async getRatingsByBusinessId(businessId: string): Promise<RatingWithUser[]> {
+    const results = await db
+      .select()
+      .from(ratings)
+      .innerJoin(users, eq(ratings.userId, users.id))
+      .where(eq(ratings.businessId, businessId))
+      .orderBy(desc(ratings.createdAt));
+    
+    return results.map(row => ({
+      ...row.ratings,
+      user: row.users,
+    }));
+  }
+
+  async getBusinessAverageRating(businessId: string): Promise<{ average: number; count: number }> {
+    const result = await db
+      .select({
+        avg: sql<number>`COALESCE(AVG(${ratings.stars}), 0)`,
+        count: sql<number>`COUNT(*)::int`,
+      })
+      .from(ratings)
+      .where(eq(ratings.businessId, businessId));
+    
+    return {
+      average: result[0]?.avg || 0,
+      count: result[0]?.count || 0,
+    };
+  }
+
+  async hasUserRatedPurchase(userId: string, purchaseId: number): Promise<boolean> {
+    const [existing] = await db
+      .select()
+      .from(ratings)
+      .where(
+        and(
+          eq(ratings.userId, userId),
+          eq(ratings.purchaseId, purchaseId)
+        )
+      );
+    return !!existing;
   }
 }
 

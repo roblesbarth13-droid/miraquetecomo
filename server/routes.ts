@@ -5,7 +5,7 @@ import fs from "fs";
 import multer from "multer";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
-import { insertOfferSchema, updateBusinessProfileSchema } from "@shared/schema";
+import { insertOfferSchema, updateBusinessProfileSchema, insertRatingSchema } from "@shared/schema";
 import { createPaymentPreference, getPaymentDetails, isMercadoPagoConfigured } from "./mercadopago";
 
 // Geocoding function using Google Maps API
@@ -380,6 +380,91 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     } catch (error) {
       console.error("Error in simulated checkout:", error);
       res.redirect('/pago/fallo');
+    }
+  });
+
+  // ===== RATINGS ROUTES =====
+  
+  // Create a rating for a business (after purchase)
+  app.post('/api/calificaciones', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { businessId, purchaseId, stars, comment } = req.body;
+      
+      // Validate with schema
+      const validatedData = insertRatingSchema.parse({
+        businessId,
+        userId,
+        purchaseId,
+        stars,
+        comment,
+      });
+      
+      // Check if user has already rated this purchase
+      const hasRated = await storage.hasUserRatedPurchase(userId, purchaseId);
+      if (hasRated) {
+        return res.status(400).json({ message: "Ya calificaste esta compra" });
+      }
+      
+      // Verify the purchase belongs to this user and is paid
+      const purchase = await storage.getPurchaseById(purchaseId);
+      if (!purchase) {
+        return res.status(404).json({ message: "Compra no encontrada" });
+      }
+      if (purchase.userId !== userId) {
+        return res.status(403).json({ message: "No podés calificar una compra que no es tuya" });
+      }
+      if (purchase.paymentStatus !== 'pagado') {
+        return res.status(400).json({ message: "Solo podés calificar compras pagadas" });
+      }
+      
+      const rating = await storage.createRating(validatedData);
+      res.json(rating);
+    } catch (error) {
+      console.error("Error creating rating:", error);
+      res.status(500).json({ message: "Error al crear la calificación" });
+    }
+  });
+  
+  // Get ratings for a business
+  app.get('/api/comercios/:businessId/calificaciones', async (req, res) => {
+    try {
+      const { businessId } = req.params;
+      const ratings = await storage.getRatingsByBusinessId(businessId);
+      res.json(ratings);
+    } catch (error) {
+      console.error("Error fetching ratings:", error);
+      res.status(500).json({ message: "Error al obtener calificaciones" });
+    }
+  });
+  
+  // Get average rating for a business
+  app.get('/api/comercios/:businessId/rating', async (req, res) => {
+    try {
+      const { businessId } = req.params;
+      const rating = await storage.getBusinessAverageRating(businessId);
+      res.json(rating);
+    } catch (error) {
+      console.error("Error fetching business rating:", error);
+      res.status(500).json({ message: "Error al obtener rating del comercio" });
+    }
+  });
+  
+  // Check if user can rate a purchase
+  app.get('/api/calificaciones/check/:purchaseId', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const purchaseId = parseInt(req.params.purchaseId);
+      
+      if (isNaN(purchaseId)) {
+        return res.status(400).json({ message: "ID de compra inválido" });
+      }
+      
+      const hasRated = await storage.hasUserRatedPurchase(userId, purchaseId);
+      res.json({ hasRated });
+    } catch (error) {
+      console.error("Error checking rating:", error);
+      res.status(500).json({ message: "Error al verificar calificación" });
     }
   });
 
