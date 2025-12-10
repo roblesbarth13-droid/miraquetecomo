@@ -1,9 +1,9 @@
 import { MercadoPagoConfig, Preference, Payment } from 'mercadopago';
 
-const accessToken = process.env.MERCADO_PAGO_ACCESS_TOKEN;
+const accessToken = process.env.MP_ACCESS_TOKEN;
 
 if (!accessToken) {
-  console.warn('MERCADO_PAGO_ACCESS_TOKEN not set - payments will be simulated');
+  console.warn('MP_ACCESS_TOKEN not set - payments will be simulated');
 }
 
 const client = accessToken ? new MercadoPagoConfig({ accessToken }) : null;
