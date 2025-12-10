@@ -17,7 +17,7 @@ import { eq, desc, and, gt, or, lt, sql } from "drizzle-orm";
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
-  updateUserToBusiness(id: string, businessData: { businessName: string; phone?: string; address?: string; category: string }): Promise<User>;
+  updateUserToBusiness(id: string, businessData: { businessName: string; phone?: string; address?: string; category: string; latitude?: number | null; longitude?: number | null }): Promise<User>;
   
   getOffers(category?: string): Promise<OfferWithBusiness[]>;
   getOfferById(id: number): Promise<OfferWithBusiness | undefined>;
@@ -57,7 +57,7 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
-  async updateUserToBusiness(id: string, businessData: { businessName: string; phone?: string; address?: string; category: string }): Promise<User> {
+  async updateUserToBusiness(id: string, businessData: { businessName: string; phone?: string; address?: string; category: string; latitude?: number | null; longitude?: number | null }): Promise<User> {
     const [user] = await db
       .update(users)
       .set({
@@ -66,6 +66,8 @@ export class DatabaseStorage implements IStorage {
         phone: businessData.phone,
         address: businessData.address,
         category: businessData.category as any,
+        latitude: businessData.latitude,
+        longitude: businessData.longitude,
         updatedAt: new Date(),
       })
       .where(eq(users.id, id))

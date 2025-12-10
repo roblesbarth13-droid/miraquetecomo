@@ -1,6 +1,6 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Header } from "@/components/Header";
 import { OfferCard } from "@/components/OfferCard";
 import { OfferCardSkeleton } from "@/components/OfferCardSkeleton";
@@ -10,10 +10,22 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Link } from "wouter";
-import { Plus, Package, DollarSign, TrendingUp, Loader2 } from "lucide-react";
+import { Plus, Package, DollarSign, TrendingUp, Loader2, Settings, MapPin } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { queryClient, apiRequest } from "@/lib/queryClient";
 import type { OfferWithBusiness, PurchaseWithOfferAndUser } from "@shared/schema";
 import { statusDisplayNames, categoryDisplayNames } from "@shared/schema";
 
@@ -21,6 +33,42 @@ export default function BusinessPanel() {
   const [, navigate] = useLocation();
   const { user, isAuthenticated, isLoading: authLoading, isBusiness } = useAuth();
   const { toast } = useToast();
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editAddress, setEditAddress] = useState("");
+  const [editPhone, setEditPhone] = useState("");
+
+  useEffect(() => {
+    if (user) {
+      setEditAddress(user.address || "");
+      setEditPhone(user.phone || "");
+    }
+  }, [user]);
+
+  const updateProfileMutation = useMutation({
+    mutationFn: async (data: { address: string; phone: string }) => {
+      return apiRequest("PUT", "/api/comercio/perfil", {
+        businessName: user?.businessName,
+        category: user?.category,
+        address: data.address,
+        phone: data.phone,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      toast({
+        title: "Perfil actualizado",
+        description: "Tu dirección fue geocodificada y ahora aparecerás en el mapa.",
+      });
+      setIsEditDialogOpen(false);
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "No se pudo actualizar el perfil.",
+        variant: "destructive",
+      });
+    },
+  });
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -72,16 +120,91 @@ export default function BusinessPanel() {
             <h1 className="text-2xl md:text-3xl font-bold" data-testid="text-business-name-panel">
               {user?.businessName || "Mi comercio"}
             </h1>
-            <p className="text-muted-foreground">
-              Panel de administración de tu comercio
-            </p>
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <span>Panel de administración de tu comercio</span>
+              {user?.address && (
+                <span className="flex items-center gap-1 text-sm">
+                  <MapPin className="h-3 w-3" />
+                  {user.address}
+                  {!user.latitude && (
+                    <Badge variant="outline" className="text-xs ml-1">Sin ubicación</Badge>
+                  )}
+                </span>
+              )}
+            </div>
           </div>
-          <Button asChild data-testid="button-new-offer">
-            <Link href="/comercio/ofertas/nueva">
-              <Plus className="mr-2 h-4 w-4" />
-              Nueva oferta
-            </Link>
-          </Button>
+          <div className="flex items-center gap-2 flex-wrap">
+            <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline" data-testid="button-edit-profile">
+                  <Settings className="mr-2 h-4 w-4" />
+                  Editar perfil
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Editar perfil del comercio</DialogTitle>
+                  <DialogDescription>
+                    Actualizá tu dirección para aparecer en el mapa
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-address">Dirección completa</Label>
+                    <Input
+                      id="edit-address"
+                      placeholder="Ej: Av. Corrientes 1234, Buenos Aires"
+                      value={editAddress}
+                      onChange={(e) => setEditAddress(e.target.value)}
+                      data-testid="input-edit-address"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Incluí calle, número, ciudad y provincia para mejor precisión en el mapa
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-phone">Teléfono (opcional)</Label>
+                    <Input
+                      id="edit-phone"
+                      placeholder="Ej: 11-5555-1234"
+                      value={editPhone}
+                      onChange={(e) => setEditPhone(e.target.value)}
+                      data-testid="input-edit-phone"
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsEditDialogOpen(false)}
+                    data-testid="button-cancel-edit"
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    onClick={() => updateProfileMutation.mutate({ address: editAddress, phone: editPhone })}
+                    disabled={updateProfileMutation.isPending}
+                    data-testid="button-save-profile"
+                  >
+                    {updateProfileMutation.isPending ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Guardando...
+                      </>
+                    ) : (
+                      "Guardar"
+                    )}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+            <Button asChild data-testid="button-new-offer">
+              <Link href="/comercio/ofertas/nueva">
+                <Plus className="mr-2 h-4 w-4" />
+                Nueva oferta
+              </Link>
+            </Button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

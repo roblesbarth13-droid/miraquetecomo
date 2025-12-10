@@ -8,6 +8,35 @@ import { setupAuth, isAuthenticated } from "./replitAuth";
 import { insertOfferSchema, updateBusinessProfileSchema } from "@shared/schema";
 import { createPaymentPreference, getPaymentDetails, isMercadoPagoConfigured } from "./mercadopago";
 
+// Geocoding function using Google Maps API
+async function geocodeAddress(address: string): Promise<{ lat: number; lng: number } | null> {
+  const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+  if (!apiKey) {
+    console.log("GOOGLE_MAPS_API_KEY not configured, skipping geocoding");
+    return null;
+  }
+
+  try {
+    const encodedAddress = encodeURIComponent(address + ", Argentina");
+    const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodedAddress}&key=${apiKey}`;
+    
+    const response = await fetch(url);
+    const data = await response.json();
+    
+    if (data.status === "OK" && data.results && data.results.length > 0) {
+      const location = data.results[0].geometry.location;
+      console.log(`Geocoded "${address}" to: ${location.lat}, ${location.lng}`);
+      return { lat: location.lat, lng: location.lng };
+    } else {
+      console.log(`Geocoding failed for "${address}": ${data.status}`);
+      return null;
+    }
+  } catch (error) {
+    console.error("Error geocoding address:", error);
+    return null;
+  }
+}
+
 // Configure multer for image uploads
 const uploadDir = path.join(process.cwd(), "uploads");
 if (!fs.existsSync(uploadDir)) {
@@ -217,11 +246,58 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
         return res.status(400).json({ message: "Datos inválidos", errors: validation.error.errors });
       }
 
-      const user = await storage.updateUserToBusiness(userId, validation.data);
+      // Geocode address if provided
+      let coordinates: { lat: number; lng: number } | null = null;
+      if (validation.data.address) {
+        coordinates = await geocodeAddress(validation.data.address);
+      }
+
+      const dataWithCoordinates = {
+        ...validation.data,
+        latitude: coordinates?.lat || null,
+        longitude: coordinates?.lng || null,
+      };
+
+      const user = await storage.updateUserToBusiness(userId, dataWithCoordinates);
       res.json(user);
     } catch (error) {
       console.error("Error converting to business:", error);
       res.status(500).json({ message: "Error al convertir a comercio" });
+    }
+  });
+
+  // Update business profile (for existing businesses)
+  app.put('/api/comercio/perfil', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      
+      if (!user || user.userType !== 'comercio') {
+        return res.status(403).json({ message: "Solo comercios pueden actualizar su perfil" });
+      }
+
+      const validation = updateBusinessProfileSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ message: "Datos inválidos", errors: validation.error.errors });
+      }
+
+      // Geocode address if provided
+      let coordinates: { lat: number; lng: number } | null = null;
+      if (validation.data.address) {
+        coordinates = await geocodeAddress(validation.data.address);
+      }
+
+      const dataWithCoordinates = {
+        ...validation.data,
+        latitude: coordinates?.lat || null,
+        longitude: coordinates?.lng || null,
+      };
+
+      const updatedUser = await storage.updateUserToBusiness(userId, dataWithCoordinates);
+      res.json(updatedUser);
+    } catch (error) {
+      console.error("Error updating business profile:", error);
+      res.status(500).json({ message: "Error al actualizar perfil" });
     }
   });
 
