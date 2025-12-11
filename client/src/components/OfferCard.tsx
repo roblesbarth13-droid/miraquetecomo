@@ -59,8 +59,8 @@ export function OfferCard({ offer }: OfferCardProps) {
 
   return (
     <Link href={`/oferta/${offer.id}`} data-testid={`card-offer-${offer.id}`}>
-      <Card className="overflow-hidden hover-elevate active-elevate-2 cursor-pointer transition-all duration-200 group">
-        <div className="relative aspect-square overflow-hidden">
+      <Card className="overflow-hidden hover-elevate active-elevate-2 cursor-pointer transition-all duration-200 group shadow-md hover:shadow-lg border border-border/50">
+        <div className="relative aspect-[4/3] overflow-hidden">
           {displayImage ? (
             <img
               src={displayImage}
@@ -70,53 +70,45 @@ export function OfferCard({ offer }: OfferCardProps) {
             />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
-              <span className="text-3xl text-muted-foreground">
+              <span className="text-2xl text-muted-foreground">
                 {categoryDisplayNames[offer.category]?.[0] || "?"}
               </span>
             </div>
           )}
           <Badge
-            className="absolute top-2 right-2 bg-accent text-accent-foreground text-sm font-bold px-3 py-1.5 rounded-full shadow-md"
+            className="absolute top-1.5 right-1.5 bg-accent text-accent-foreground text-xs font-bold px-2 py-0.5 rounded-full shadow-md"
             data-testid={`badge-discount-${offer.id}`}
           >
             -{offer.discountPercentage}%
           </Badge>
         </div>
-        <div className="p-3 space-y-1">
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-sm font-semibold truncate flex-1" data-testid={`text-business-${offer.id}`}>
+        <div className="p-2 space-y-0.5">
+          <div className="flex items-center justify-between gap-1">
+            <p className="text-xs font-semibold truncate flex-1" data-testid={`text-business-${offer.id}`}>
               {offer.business?.businessName || "Comercio"}
             </p>
             {offer.business?.id && <BusinessRating businessId={offer.business.id} />}
           </div>
-          {offer.business?.address && (
-            <div className="flex items-center gap-1 text-xs text-muted-foreground/80">
-              <MapPin className="h-3 w-3 shrink-0" />
-              <span className="truncate" data-testid={`text-address-${offer.id}`}>
-                {offer.business.address}
-              </span>
-            </div>
-          )}
-          <h3 className="text-sm font-medium line-clamp-2 leading-tight" data-testid={`text-title-${offer.id}`}>
+          <h3 className="text-xs font-medium line-clamp-1 leading-tight" data-testid={`text-title-${offer.id}`}>
             {offer.title}
           </h3>
-          <div className="flex items-baseline gap-1.5 pt-1">
-            <span className="text-lg font-bold text-primary" data-testid={`text-price-${offer.id}`}>
+          <div className="flex items-baseline gap-1 pt-0.5">
+            <span className="text-sm font-bold text-primary" data-testid={`text-price-${offer.id}`}>
               ${discountedPrice.toLocaleString('es-AR')}
             </span>
-            <span className="text-xs line-through text-muted-foreground" data-testid={`text-original-price-${offer.id}`}>
+            <span className="text-[10px] line-through text-muted-foreground" data-testid={`text-original-price-${offer.id}`}>
               ${originalPrice.toLocaleString('es-AR')}
             </span>
           </div>
-          <div className="flex items-center justify-between gap-1 text-xs text-muted-foreground pt-1 flex-wrap">
-            <div className="flex items-center gap-1">
-              <Clock className="h-3 w-3" />
+          <div className="flex items-center justify-between gap-1 text-[10px] text-muted-foreground pt-0.5 flex-wrap">
+            <div className="flex items-center gap-0.5">
+              <Clock className="h-2.5 w-2.5" />
               <span data-testid={`text-pickup-${offer.id}`}>
-                {offer.pickupTimeStart} - {offer.pickupTimeEnd}
+                {offer.pickupTimeStart}-{offer.pickupTimeEnd}
               </span>
             </div>
-            <div className="flex items-center gap-1">
-              <Package className="h-3 w-3" />
+            <div className="flex items-center gap-0.5">
+              <Package className="h-2.5 w-2.5" />
               <span data-testid={`text-quantity-${offer.id}`}>
                 {quantityAvailable}
               </span>

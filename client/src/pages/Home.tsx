@@ -76,7 +76,7 @@ export default function Home() {
 
       <main className="max-w-7xl mx-auto px-4 pb-24 pt-2">
         {isLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3">
             {Array.from({ length: 8 }).map((_, i) => (
               <OfferCardSkeleton key={i} />
             ))}
@@ -90,7 +90,7 @@ export default function Home() {
             }}
           />
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" data-testid="offers-grid">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3" data-testid="offers-grid">
             {filteredOffers.map((offer) => (
               <OfferCard key={offer.id} offer={offer} />
             ))}
