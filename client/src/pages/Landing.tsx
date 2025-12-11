@@ -2,16 +2,37 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Logo } from "@/components/Logo";
 import { ArrowRight, Store, Users, Percent, Clock } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { Link } from "wouter";
 
 export default function Landing() {
+  const { isAuthenticated, isBusiness } = useAuth();
+
+  const getBusinessLink = () => {
+    if (isBusiness) return "/comercio/ofertas/nueva";
+    if (isAuthenticated) return "/convertir-comercio";
+    return "/api/login";
+  };
+
+  const getUserLink = () => {
+    if (isAuthenticated) return "/home";
+    return "/api/login";
+  };
+
   return (
     <div className="min-h-screen bg-background" data-testid="page-landing">
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
           <Logo size="md" />
-          <Button asChild data-testid="button-landing-login">
-            <a href="/api/login">Ingresar</a>
-          </Button>
+          {isAuthenticated ? (
+            <Button asChild data-testid="button-landing-home">
+              <Link href="/home">Ver ofertas</Link>
+            </Button>
+          ) : (
+            <Button asChild data-testid="button-landing-login">
+              <a href="/api/login">Ingresar</a>
+            </Button>
+          )}
         </div>
       </header>
 
@@ -30,16 +51,30 @@ export default function Landing() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button size="lg" asChild className="text-lg px-8" data-testid="button-start">
-                  <a href="/api/login">
-                    Empezar a ahorrar
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </a>
+                  {getUserLink().startsWith('/api') ? (
+                    <a href={getUserLink()}>
+                      Empezar a ahorrar
+                      <ArrowRight className="ml-2 h-5 w-5" />
+                    </a>
+                  ) : (
+                    <Link href={getUserLink()}>
+                      Empezar a ahorrar
+                      <ArrowRight className="ml-2 h-5 w-5" />
+                    </Link>
+                  )}
                 </Button>
                 <Button size="lg" variant="outline" asChild className="text-lg px-8" data-testid="button-business">
-                  <a href="/api/login">
-                    <Store className="mr-2 h-5 w-5" />
-                    Soy comercio
-                  </a>
+                  {getBusinessLink().startsWith('/api') ? (
+                    <a href={getBusinessLink()}>
+                      <Store className="mr-2 h-5 w-5" />
+                      Soy comercio
+                    </a>
+                  ) : (
+                    <Link href={getBusinessLink()}>
+                      <Store className="mr-2 h-5 w-5" />
+                      Soy comercio
+                    </Link>
+                  )}
                 </Button>
               </div>
             </div>
@@ -129,10 +164,17 @@ export default function Landing() {
                   </li>
                 </ul>
                 <Button size="lg" asChild data-testid="button-become-business">
-                  <a href="/api/login">
-                    Registrar mi comercio
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </a>
+                  {getBusinessLink().startsWith('/api') ? (
+                    <a href={getBusinessLink()}>
+                      Registrar mi comercio
+                      <ArrowRight className="ml-2 h-5 w-5" />
+                    </a>
+                  ) : (
+                    <Link href={getBusinessLink()}>
+                      Registrar mi comercio
+                      <ArrowRight className="ml-2 h-5 w-5" />
+                    </Link>
+                  )}
                 </Button>
               </div>
               <div className="relative">
@@ -153,9 +195,15 @@ export default function Landing() {
               Únite a la comunidad que ahorra dinero y reduce el desperdicio de comida.
             </p>
             <Button size="lg" variant="secondary" asChild className="text-lg px-8" data-testid="button-join">
-              <a href="/api/login">
-                Crear cuenta gratis
-              </a>
+              {getUserLink().startsWith('/api') ? (
+                <a href={getUserLink()}>
+                  Crear cuenta gratis
+                </a>
+              ) : (
+                <Link href={getUserLink()}>
+                  Ver ofertas
+                </Link>
+              )}
             </Button>
           </div>
         </section>
