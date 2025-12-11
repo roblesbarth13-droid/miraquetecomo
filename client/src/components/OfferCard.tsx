@@ -6,19 +6,44 @@ import { Clock, Package, MapPin, Star } from "lucide-react";
 import type { OfferWithBusiness } from "@shared/schema";
 import { categoryDisplayNames } from "@shared/schema";
 
-import panaderiaImg from "@assets/stock_images/artisan_bakery_bread_88577d89.jpg";
-import verduleriaImg from "@assets/generated_images/fresh_vegetables_close-up_shot.png";
-import supermercadoImg from "@assets/stock_images/supermarket_grocery__3232780f.jpg";
-import rotiseriaImg from "@assets/stock_images/rotisserie_chicken_g_2a292b03.jpg";
-import carnicheriaImg from "@assets/stock_images/butcher_shop_fresh_m_a4f41153.jpg";
+import panaderiaImg1 from "@assets/stock_images/artisan_bakery_bread_88577d89.jpg";
+import panaderiaImg2 from "@assets/stock_images/artisan_bakery_fresh_ed0a1418.jpg";
+import panaderiaImg3 from "@assets/stock_images/artisan_bakery_fresh_59da5186.jpg";
+import panaderiaImg4 from "@assets/stock_images/artisan_bakery_fresh_315fbdae.jpg";
 
-const categoryDefaultImages: Record<string, string> = {
-  panaderia: panaderiaImg,
-  verduleria: verduleriaImg,
-  supermercado: supermercadoImg,
-  rotiseria: rotiseriaImg,
-  carniceria: carnicheriaImg,
+import verduleriaImg1 from "@assets/generated_images/fresh_vegetables_close-up_shot.png";
+import verduleriaImg2 from "@assets/stock_images/fresh_vegetables_pro_7ff67616.jpg";
+import verduleriaImg3 from "@assets/stock_images/fresh_vegetables_pro_7535dd22.jpg";
+import verduleriaImg4 from "@assets/stock_images/fresh_vegetables_pro_c3e5218f.jpg";
+
+import supermercadoImg1 from "@assets/stock_images/supermarket_grocery__3232780f.jpg";
+import supermercadoImg2 from "@assets/stock_images/supermarket_grocery__28ff4c56.jpg";
+import supermercadoImg3 from "@assets/stock_images/supermarket_grocery__ec9d428d.jpg";
+import supermercadoImg4 from "@assets/stock_images/supermarket_grocery__3f448503.jpg";
+
+import rotiseriaImg1 from "@assets/stock_images/rotisserie_chicken_g_2a292b03.jpg";
+import rotiseriaImg2 from "@assets/stock_images/rotisserie_grilled_c_cf907a9d.jpg";
+import rotiseriaImg3 from "@assets/stock_images/rotisserie_grilled_c_c1705c2f.jpg";
+import rotiseriaImg4 from "@assets/stock_images/rotisserie_grilled_c_29064e0f.jpg";
+
+import carnicheriaImg1 from "@assets/stock_images/butcher_shop_fresh_m_a4f41153.jpg";
+import carnicheriaImg2 from "@assets/stock_images/butcher_shop_fresh_m_2c42e0b0.jpg";
+import carnicheriaImg3 from "@assets/stock_images/butcher_shop_fresh_m_fcdafb88.jpg";
+import carnicheriaImg4 from "@assets/stock_images/butcher_shop_fresh_m_5c03fbee.jpg";
+
+const categoryDefaultImages: Record<string, string[]> = {
+  panaderia: [panaderiaImg1, panaderiaImg2, panaderiaImg3, panaderiaImg4],
+  verduleria: [verduleriaImg1, verduleriaImg2, verduleriaImg3, verduleriaImg4],
+  supermercado: [supermercadoImg1, supermercadoImg2, supermercadoImg3, supermercadoImg4],
+  rotiseria: [rotiseriaImg1, rotiseriaImg2, rotiseriaImg3, rotiseriaImg4],
+  carniceria: [carnicheriaImg1, carnicheriaImg2, carnicheriaImg3, carnicheriaImg4],
 };
+
+function getDefaultImage(category: string, offerId: number): string | undefined {
+  const images = categoryDefaultImages[category];
+  if (!images || images.length === 0) return undefined;
+  return images[offerId % images.length];
+}
 
 interface OfferCardProps {
   offer: OfferWithBusiness;
@@ -55,7 +80,7 @@ export function OfferCard({ offer }: OfferCardProps) {
   const discountedPrice = parseFloat(offer.discountedPrice);
   const quantityAvailable = (offer.quantity || 1) - (offer.quantitySold || 0);
   
-  const displayImage = offer.imageUrl || categoryDefaultImages[offer.category];
+  const displayImage = offer.imageUrl || getDefaultImage(offer.category, offer.id);
 
   return (
     <Link href={`/oferta/${offer.id}`} data-testid={`card-offer-${offer.id}`}>
