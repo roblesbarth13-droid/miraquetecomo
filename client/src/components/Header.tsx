@@ -1,6 +1,8 @@
 import { Link, useLocation } from "wouter";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,11 +12,17 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Logo, ArgentinaStripes } from "./Logo";
 import { useAuth } from "@/hooks/useAuth";
-import { User, LogOut, Store, Package, MapPin, HelpCircle, QrCode } from "lucide-react";
+import { User, LogOut, Store, Package, MapPin, HelpCircle, QrCode, Bell } from "lucide-react";
 
 export function Header() {
   const { user, isAuthenticated, isBusiness } = useAuth();
   const [location] = useLocation();
+
+  const { data: notificationCount } = useQuery<{ count: number }>({
+    queryKey: ["/api/notificaciones/count"],
+    enabled: isBusiness,
+    refetchInterval: 30000,
+  });
 
   const getInitials = () => {
     if (user?.firstName && user?.lastName) {
@@ -55,6 +63,21 @@ export function Header() {
               <MapPin className="h-5 w-5" />
             </Button>
           </Link>
+          {isBusiness && (
+            <Link href="/comercio">
+              <Button variant="ghost" size="icon" className="relative" data-testid="button-notifications">
+                <Bell className="h-5 w-5" />
+                {(notificationCount?.count ?? 0) > 0 && (
+                  <Badge 
+                    className="absolute -top-1 -right-1 h-5 min-w-5 p-0 flex items-center justify-center text-xs bg-destructive text-destructive-foreground"
+                    data-testid="badge-notification-count"
+                  >
+                    {notificationCount!.count > 9 ? "9+" : notificationCount!.count}
+                  </Badge>
+                )}
+              </Button>
+            </Link>
+          )}
           {isAuthenticated ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

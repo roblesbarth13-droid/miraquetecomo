@@ -97,6 +97,18 @@ export const ratings = pgTable("ratings", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Notifications table
+export const notifications = pgTable("notifications", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  type: varchar("type", { length: 50 }).notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  message: text("message").notNull(),
+  relatedId: integer("related_id"),
+  read: timestamp("read"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   offers: many(offers),
@@ -192,6 +204,12 @@ export const insertRatingSchema = createInsertSchema(ratings).omit({
   comment: z.string().max(500, "Máximo 500 caracteres").optional(),
 });
 
+export const insertNotificationSchema = createInsertSchema(notifications).omit({
+  id: true,
+  createdAt: true,
+  read: true,
+});
+
 export const updateBusinessProfileSchema = z.object({
   businessName: z.string().min(2, "El nombre del comercio debe tener al menos 2 caracteres"),
   phone: z.string().optional(),
@@ -214,6 +232,9 @@ export type InsertPurchase = z.infer<typeof insertPurchaseSchema>;
 
 export type Rating = typeof ratings.$inferSelect;
 export type InsertRating = z.infer<typeof insertRatingSchema>;
+
+export type Notification = typeof notifications.$inferSelect;
+export type InsertNotification = z.infer<typeof insertNotificationSchema>;
 
 // Extended types with relations
 export type OfferWithBusiness = Offer & {

@@ -111,17 +111,47 @@ export default function MapView() {
       markerContent.className = 'marker-content';
       markerContent.innerHTML = `
         <div style="
-          background: hsl(var(--primary));
-          color: white;
-          padding: 8px 12px;
+          background: white;
           border-radius: 8px;
-          font-weight: 600;
-          font-size: 14px;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+          box-shadow: 0 2px 12px rgba(0,0,0,0.25);
           cursor: pointer;
-          white-space: nowrap;
+          width: 140px;
+          overflow: hidden;
+          font-family: system-ui, sans-serif;
         ">
-          -${offer.discountPercentage}%
+          <div style="
+            background: hsl(var(--primary));
+            color: white;
+            padding: 4px 8px;
+            font-weight: 600;
+            font-size: 12px;
+            text-align: center;
+          ">
+            -${offer.discountPercentage}%
+          </div>
+          <div style="padding: 6px 8px;">
+            <div style="
+              font-size: 11px;
+              font-weight: 600;
+              color: #333;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+            ">${offer.title}</div>
+            <div style="
+              font-size: 10px;
+              color: #666;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+            ">${offer.business.businessName || 'Comercio'}</div>
+            <div style="
+              font-size: 12px;
+              font-weight: 700;
+              color: hsl(var(--primary));
+              margin-top: 2px;
+            ">$${parseFloat(offer.discountedPrice).toLocaleString('es-AR')}</div>
+          </div>
         </div>
       `;
 

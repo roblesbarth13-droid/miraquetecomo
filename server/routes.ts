@@ -822,9 +822,22 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
         
         if (paymentData.status === 'approved') {
           const purchase = await storage.getPurchaseById(purchaseId);
-          if (purchase) {
+          if (purchase && purchase.paymentStatus !== 'pagado') {
             await storage.updatePurchaseStatus(purchaseId, 'pagado', paymentId);
             await storage.incrementOfferQuantitySold(purchase.offerId);
+            
+            // Get offer details for notification
+            const offer = await storage.getOfferById(purchase.offerId);
+            if (offer) {
+              // Create notification for the business
+              await storage.createNotification({
+                userId: offer.business.id,
+                type: 'nueva_venta',
+                title: 'Nueva venta',
+                message: `Vendiste "${offer.title}" por $${parseFloat(offer.discountedPrice).toLocaleString('es-AR')}`,
+                relatedId: purchaseId,
+              });
+            }
           }
         } else if (paymentData.status === 'rejected' || paymentData.status === 'cancelled') {
           await storage.updatePurchaseStatus(purchaseId, 'fallido', paymentId);
@@ -832,6 +845,50 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
       }
     } catch (error) {
       console.error("Webhook error:", error);
+    }
+  });
+
+  // Notifications API
+  app.get('/api/notificaciones', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const notificaciones = await storage.getNotificationsByUserId(userId);
+      res.json(notificaciones);
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+      res.status(500).json({ message: "Error al obtener notificaciones" });
+    }
+  });
+
+  app.get('/api/notificaciones/count', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const count = await storage.getUnreadNotificationsCount(userId);
+      res.json({ count });
+    } catch (error) {
+      console.error("Error fetching notification count:", error);
+      res.status(500).json({ message: "Error al obtener conteo" });
+    }
+  });
+
+  app.post('/api/notificaciones/:id/read', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const notificationId = parseInt(req.params.id);
+      
+      // Verify notification belongs to user
+      const notificaciones = await storage.getNotificationsByUserId(userId);
+      const notification = notificaciones.find(n => n.id === notificationId);
+      
+      if (!notification) {
+        return res.status(404).json({ message: "Notificación no encontrada" });
+      }
+      
+      const updated = await storage.markNotificationAsRead(notificationId);
+      res.json(updated);
+    } catch (error) {
+      console.error("Error marking notification as read:", error);
+      res.status(500).json({ message: "Error al marcar como leída" });
     }
   });
 

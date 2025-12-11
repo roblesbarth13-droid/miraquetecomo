@@ -3,6 +3,7 @@ import {
   offers,
   purchases,
   ratings,
+  notifications,
   type User,
   type UpsertUser,
   type Offer,
@@ -11,6 +12,8 @@ import {
   type InsertPurchase,
   type Rating,
   type InsertRating,
+  type Notification,
+  type InsertNotification,
   type OfferWithBusiness,
   type PurchaseWithOfferAndUser,
   type RatingWithUser,
@@ -49,6 +52,11 @@ export interface IStorage {
     mpUserId: string | null;
     mpTokenExpiresAt: Date | null;
   }): Promise<User>;
+  
+  createNotification(notification: InsertNotification): Promise<Notification>;
+  getNotificationsByUserId(userId: string): Promise<Notification[]>;
+  markNotificationAsRead(id: number): Promise<Notification | undefined>;
+  getUnreadNotificationsCount(userId: string): Promise<number>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -371,6 +379,44 @@ export class DatabaseStorage implements IStorage {
       .where(eq(users.id, userId))
       .returning();
     return user;
+  }
+
+  async createNotification(notificationData: InsertNotification): Promise<Notification> {
+    const [notification] = await db
+      .insert(notifications)
+      .values(notificationData)
+      .returning();
+    return notification;
+  }
+
+  async getNotificationsByUserId(userId: string): Promise<Notification[]> {
+    return db
+      .select()
+      .from(notifications)
+      .where(eq(notifications.userId, userId))
+      .orderBy(desc(notifications.createdAt));
+  }
+
+  async markNotificationAsRead(id: number): Promise<Notification | undefined> {
+    const [notification] = await db
+      .update(notifications)
+      .set({ read: new Date() })
+      .where(eq(notifications.id, id))
+      .returning();
+    return notification;
+  }
+
+  async getUnreadNotificationsCount(userId: string): Promise<number> {
+    const result = await db
+      .select({ count: sql<string>`COUNT(*)::int` })
+      .from(notifications)
+      .where(
+        and(
+          eq(notifications.userId, userId),
+          sql`${notifications.read} IS NULL`
+        )
+      );
+    return parseInt(result[0]?.count || "0", 10);
   }
 }
 
