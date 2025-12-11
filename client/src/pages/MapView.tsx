@@ -121,10 +121,10 @@ export default function MapView() {
       markerContent.innerHTML = `
         <div style="
           background: white;
-          border-radius: 6px;
-          box-shadow: 0 1px 6px rgba(0,0,0,0.25);
+          border-radius: 5px;
+          box-shadow: 0 1px 4px rgba(0,0,0,0.25);
           cursor: pointer;
-          width: 52px;
+          width: 42px;
           overflow: hidden;
           font-family: system-ui, sans-serif;
           text-align: center;
@@ -132,22 +132,21 @@ export default function MapView() {
           <div style="
             background: hsl(var(--primary));
             color: white;
-            padding: 2px 4px;
+            padding: 1px 3px;
             font-weight: 700;
-            font-size: 10px;
+            font-size: 9px;
           ">
             -${offer.discountPercentage}%
           </div>
           <div style="
-            padding: 2px 3px;
+            padding: 2px 2px 1px;
             font-size: 8px;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
+            font-weight: 700;
+            color: #333;
           ">${categoryLabel}</div>
           <div style="
-            padding: 0 3px 3px;
-            font-size: 9px;
+            padding: 0 2px 2px;
+            font-size: 8px;
             font-weight: 600;
             color: hsl(var(--primary));
           ">$${Math.round(parseFloat(offer.discountedPrice)).toLocaleString('es-AR')}</div>
