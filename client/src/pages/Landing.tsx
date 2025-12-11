@@ -52,9 +52,10 @@ export default function Landing() {
               ¿Cómo funciona?
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-8">
-              <Card className="text-center shadow-md hover:shadow-lg transition-shadow border-t-4 border-t-primary">
+              <Card className="text-center overflow-hidden">
+                <div className="h-1 bg-primary" />
                 <CardContent className="pt-4 md:pt-8 pb-4 md:pb-6 px-2 md:px-6 space-y-2 md:space-y-4">
-                  <div className="h-12 w-12 md:h-16 md:w-16 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center mx-auto shadow-sm">
+                  <div className="h-12 w-12 md:h-16 md:w-16 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center mx-auto">
                     <Store className="h-6 w-6 md:h-8 md:w-8 text-primary" />
                   </div>
                   <h3 className="text-sm md:text-xl font-semibold">1. Explorá ofertas</h3>
@@ -63,9 +64,10 @@ export default function Landing() {
                   </p>
                 </CardContent>
               </Card>
-              <Card className="text-center shadow-md hover:shadow-lg transition-shadow border-t-4 border-t-accent">
+              <Card className="text-center overflow-hidden">
+                <div className="h-1 bg-accent" />
                 <CardContent className="pt-4 md:pt-8 pb-4 md:pb-6 px-2 md:px-6 space-y-2 md:space-y-4">
-                  <div className="h-12 w-12 md:h-16 md:w-16 rounded-full bg-gradient-to-br from-accent/20 to-accent/5 flex items-center justify-center mx-auto shadow-sm">
+                  <div className="h-12 w-12 md:h-16 md:w-16 rounded-full bg-gradient-to-br from-accent/20 to-accent/5 flex items-center justify-center mx-auto">
                     <Percent className="h-6 w-6 md:h-8 md:w-8 text-accent" />
                   </div>
                   <h3 className="text-sm md:text-xl font-semibold">2. Reservá y pagá</h3>
@@ -74,9 +76,10 @@ export default function Landing() {
                   </p>
                 </CardContent>
               </Card>
-              <Card className="text-center shadow-md hover:shadow-lg transition-shadow border-t-4 border-t-primary col-span-2 md:col-span-1">
+              <Card className="text-center overflow-hidden col-span-2 md:col-span-1">
+                <div className="h-1 bg-primary" />
                 <CardContent className="pt-4 md:pt-8 pb-4 md:pb-6 px-2 md:px-6 space-y-2 md:space-y-4">
-                  <div className="h-12 w-12 md:h-16 md:w-16 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center mx-auto shadow-sm">
+                  <div className="h-12 w-12 md:h-16 md:w-16 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center mx-auto">
                     <Clock className="h-6 w-6 md:h-8 md:w-8 text-primary" />
                   </div>
                   <h3 className="text-sm md:text-xl font-semibold">3. Retirá tu pedido</h3>
