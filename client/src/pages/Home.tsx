@@ -99,16 +99,24 @@ export default function Home() {
       </main>
 
       {!isBusiness && (
-        <div className="fixed bottom-0 left-0 right-0 bg-primary p-3 shadow-lg z-50">
-          <div className="max-w-7xl mx-auto">
-            <a 
-              href={isAuthenticated ? "/convertir-comercio" : "/api/login"}
-              className="flex items-center justify-center gap-2 text-primary-foreground font-semibold"
-              data-testid="button-become-business-cta"
-            >
-              <Store className="h-5 w-5" />
-              <span>{isAuthenticated ? "¿Sos comercio? Cargá tu oferta acá" : "¿Sos comercio? Ingresá y cargá tu oferta"}</span>
-            </a>
+        <div className="fixed bottom-0 left-0 right-0 shadow-lg z-50">
+          {/* Argentine flag stripe */}
+          <div className="h-1 flex">
+            <div className="flex-1 bg-[#74ACDF]" />
+            <div className="flex-1 bg-white" />
+            <div className="flex-1 bg-[#74ACDF]" />
+          </div>
+          <div className="bg-primary p-3">
+            <div className="max-w-7xl mx-auto">
+              <a 
+                href={isAuthenticated ? "/convertir-comercio" : "/api/login"}
+                className="flex items-center justify-center gap-2 text-primary-foreground font-semibold"
+                data-testid="button-become-business-cta"
+              >
+                <Store className="h-5 w-5" />
+                <span>{isAuthenticated ? "¿Sos comercio? Cargá tu oferta acá" : "¿Sos comercio? Ingresá y cargá tu oferta"}</span>
+              </a>
+            </div>
           </div>
         </div>
       )}
