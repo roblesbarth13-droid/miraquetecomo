@@ -17,6 +17,7 @@ import PaymentFailure from "@/pages/PaymentFailure";
 import PaymentPending from "@/pages/PaymentPending";
 import MapView from "@/pages/MapView";
 import HowItWorks from "@/pages/HowItWorks";
+import MisCompras from "@/pages/MisCompras";
 
 function Router() {
   const { isAuthenticated, isLoading, isBusiness } = useAuth();
@@ -46,6 +47,9 @@ function Router() {
       <Route path="/pago/exito" component={PaymentSuccess} />
       <Route path="/pago/fallo" component={PaymentFailure} />
       <Route path="/pago/pendiente" component={PaymentPending} />
+      
+      {/* User purchases */}
+      <Route path="/mis-compras" component={MisCompras} />
       
       {/* Auth-required route - page handles its own auth guard */}
       <Route path="/convertir-comercio" component={ConvertToBusiness} />

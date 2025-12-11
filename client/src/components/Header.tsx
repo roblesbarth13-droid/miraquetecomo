@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Logo, ArgentinaStripes } from "./Logo";
 import { useAuth } from "@/hooks/useAuth";
-import { User, LogOut, Store, Package, MapPin, HelpCircle } from "lucide-react";
+import { User, LogOut, Store, Package, MapPin, HelpCircle, QrCode } from "lucide-react";
 
 export function Header() {
   const { user, isAuthenticated, isBusiness } = useAuth();
@@ -96,6 +96,12 @@ export function Header() {
                     </Link>
                   </DropdownMenuItem>
                 )}
+                <DropdownMenuItem asChild>
+                  <Link href="/mis-compras" className="flex items-center gap-2 cursor-pointer" data-testid="link-mis-compras">
+                    <QrCode className="h-4 w-4" />
+                    Mis compras
+                  </Link>
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <a href="/api/logout" className="flex items-center gap-2 cursor-pointer text-destructive" data-testid="link-logout">

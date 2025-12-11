@@ -81,6 +81,8 @@ export const purchases = pgTable("purchases", {
   userId: varchar("user_id").notNull().references(() => users.id),
   paymentStatus: paymentStatusEnum("payment_status").default('pendiente'),
   mpPaymentId: varchar("mp_payment_id"),
+  pickupCode: varchar("pickup_code", { length: 8 }),
+  pickedUp: timestamp("picked_up"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

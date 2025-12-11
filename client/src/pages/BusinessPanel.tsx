@@ -22,7 +22,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Link } from "wouter";
-import { Plus, Package, DollarSign, TrendingUp, Loader2, Settings, MapPin, CreditCard, Check, AlertCircle } from "lucide-react";
+import { Plus, Package, DollarSign, TrendingUp, Loader2, Settings, MapPin, CreditCard, Check, AlertCircle, QrCode, CheckCircle, XCircle, Clock } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
@@ -36,6 +36,20 @@ export default function BusinessPanel() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editAddress, setEditAddress] = useState("");
   const [editPhone, setEditPhone] = useState("");
+  const [pickupCode, setPickupCode] = useState("");
+  const [verificationResult, setVerificationResult] = useState<{
+    valid: boolean;
+    purchase?: {
+      id: number;
+      pickupCode: string;
+      pickedUp: string | null;
+      offer: { title: string; discountedPrice: string };
+      user: { firstName: string | null; lastName: string | null };
+      createdAt: string;
+    };
+    message?: string;
+  } | null>(null);
+  const [isVerifying, setIsVerifying] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -112,6 +126,52 @@ export default function BusinessPanel() {
       toast({
         title: "Error",
         description: "No se pudo desconectar Mercado Pago.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleVerifyCode = async () => {
+    if (!pickupCode.trim()) return;
+    
+    setIsVerifying(true);
+    setVerificationResult(null);
+    
+    try {
+      const response = await fetch(`/api/comercio/verificar/${pickupCode.toUpperCase()}`, {
+        credentials: "include",
+      });
+      const data = await response.json();
+      
+      if (response.ok) {
+        setVerificationResult(data);
+      } else {
+        setVerificationResult({ valid: false, message: data.message });
+      }
+    } catch (error) {
+      setVerificationResult({ valid: false, message: "Error al verificar el código" });
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
+  const markAsPickedUpMutation = useMutation({
+    mutationFn: async (purchaseId: number) => {
+      return apiRequest("POST", `/api/comercio/retirar/${purchaseId}`);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Retiro confirmado",
+        description: "El pedido fue marcado como retirado.",
+      });
+      setVerificationResult(null);
+      setPickupCode("");
+      queryClient.invalidateQueries({ queryKey: ["/api/comercio/ventas"] });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "No se pudo marcar el retiro.",
         variant: "destructive",
       });
     },
@@ -402,7 +462,7 @@ export default function BusinessPanel() {
         </Card>
 
         <Tabs defaultValue="activas" className="space-y-6">
-          <TabsList>
+          <TabsList className="flex-wrap h-auto gap-1">
             <TabsTrigger value="activas" data-testid="tab-active">
               Activas ({activeOffers.length})
             </TabsTrigger>
@@ -410,7 +470,11 @@ export default function BusinessPanel() {
               Vendidas ({soldOffers.length})
             </TabsTrigger>
             <TabsTrigger value="historial" data-testid="tab-history">
-              Historial de ventas
+              Historial
+            </TabsTrigger>
+            <TabsTrigger value="verificar" data-testid="tab-verify">
+              <QrCode className="h-4 w-4 mr-1" />
+              Verificar retiro
             </TabsTrigger>
           </TabsList>
 
@@ -522,6 +586,126 @@ export default function BusinessPanel() {
                 </CardContent>
               </Card>
             )}
+          </TabsContent>
+
+          <TabsContent value="verificar">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <QrCode className="h-5 w-5" />
+                  Verificar código de retiro
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="pickup-code">Código del cliente</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="pickup-code"
+                      placeholder="Ej: AB12CD"
+                      value={pickupCode}
+                      onChange={(e) => setPickupCode(e.target.value.toUpperCase())}
+                      className="font-mono text-lg tracking-widest uppercase"
+                      maxLength={6}
+                      data-testid="input-pickup-code"
+                    />
+                    <Button 
+                      onClick={handleVerifyCode}
+                      disabled={!pickupCode.trim() || isVerifying}
+                      data-testid="button-verify-code"
+                    >
+                      {isVerifying ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        "Verificar"
+                      )}
+                    </Button>
+                  </div>
+                </div>
+
+                {verificationResult && (
+                  <div className="space-y-4">
+                    {verificationResult.valid && verificationResult.purchase ? (
+                      <Card className={verificationResult.purchase.pickedUp ? "border-amber-500" : "border-green-500"}>
+                        <CardContent className="pt-6">
+                          <div className="flex items-start gap-4">
+                            <div className={`h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0 ${
+                              verificationResult.purchase.pickedUp 
+                                ? "bg-amber-100 text-amber-600 dark:bg-amber-900 dark:text-amber-400"
+                                : "bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-400"
+                            }`}>
+                              {verificationResult.purchase.pickedUp ? (
+                                <Clock className="h-6 w-6" />
+                              ) : (
+                                <CheckCircle className="h-6 w-6" />
+                              )}
+                            </div>
+                            <div className="flex-1 space-y-2">
+                              <div className="flex items-center gap-2">
+                                <span className="font-mono font-bold text-lg">{verificationResult.purchase.pickupCode}</span>
+                                {verificationResult.purchase.pickedUp ? (
+                                  <Badge variant="secondary">Ya retirado</Badge>
+                                ) : (
+                                  <Badge className="bg-green-600">Válido</Badge>
+                                )}
+                              </div>
+                              <p className="font-medium">{verificationResult.purchase.offer.title}</p>
+                              <p className="text-sm text-muted-foreground">
+                                Cliente: {verificationResult.purchase.user.firstName} {verificationResult.purchase.user.lastName}
+                              </p>
+                              <p className="text-lg font-bold text-primary">
+                                ${parseFloat(verificationResult.purchase.offer.discountedPrice).toLocaleString('es-AR')}
+                              </p>
+                              {verificationResult.purchase.pickedUp && (
+                                <p className="text-sm text-muted-foreground">
+                                  Retirado: {new Date(verificationResult.purchase.pickedUp).toLocaleString('es-AR')}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                          {!verificationResult.purchase.pickedUp && (
+                            <Button
+                              className="w-full mt-4"
+                              onClick={() => markAsPickedUpMutation.mutate(verificationResult.purchase!.id)}
+                              disabled={markAsPickedUpMutation.isPending}
+                              data-testid="button-confirm-pickup"
+                            >
+                              {markAsPickedUpMutation.isPending ? (
+                                <>
+                                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                  Confirmando...
+                                </>
+                              ) : (
+                                <>
+                                  <CheckCircle className="mr-2 h-4 w-4" />
+                                  Confirmar retiro
+                                </>
+                              )}
+                            </Button>
+                          )}
+                        </CardContent>
+                      </Card>
+                    ) : (
+                      <Card className="border-destructive">
+                        <CardContent className="pt-6">
+                          <div className="flex items-center gap-4">
+                            <div className="h-12 w-12 rounded-full bg-destructive/10 text-destructive flex items-center justify-center flex-shrink-0">
+                              <XCircle className="h-6 w-6" />
+                            </div>
+                            <div>
+                              <p className="font-medium text-destructive">Código no válido</p>
+                              <p className="text-sm text-muted-foreground">
+                                {verificationResult.message || "El código ingresado no corresponde a una compra válida de tu comercio."}
+                              </p>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </main>

@@ -32,9 +32,11 @@ export interface IStorage {
   
   createPurchase(purchase: InsertPurchase): Promise<Purchase>;
   getPurchaseById(id: number): Promise<Purchase | undefined>;
+  getPurchaseByPickupCode(code: string): Promise<PurchaseWithOfferAndUser | undefined>;
   updatePurchaseStatus(id: number, status: 'pendiente' | 'pagado' | 'fallido', mpPaymentId?: string): Promise<Purchase | undefined>;
+  markPurchaseAsPickedUp(id: number): Promise<Purchase | undefined>;
   getPurchasesByBusinessId(businessId: string): Promise<PurchaseWithOfferAndUser[]>;
-  getPurchasesByUserId(userId: string): Promise<Purchase[]>;
+  getPurchasesByUserId(userId: string): Promise<PurchaseWithOfferAndUser[]>;
   
   createRating(rating: InsertRating): Promise<Rating>;
   getRatingsByBusinessId(businessId: string): Promise<RatingWithUser[]>;
@@ -200,16 +202,56 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(offers.createdAt));
   }
 
+  private generatePickupCode(): string {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let code = '';
+    for (let i = 0; i < 6; i++) {
+      code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return code;
+  }
+
   async createPurchase(purchaseData: InsertPurchase): Promise<Purchase> {
+    const pickupCode = this.generatePickupCode();
     const [purchase] = await db
       .insert(purchases)
-      .values(purchaseData)
+      .values({ ...purchaseData, pickupCode })
       .returning();
     return purchase;
   }
 
   async getPurchaseById(id: number): Promise<Purchase | undefined> {
     const [purchase] = await db.select().from(purchases).where(eq(purchases.id, id));
+    return purchase;
+  }
+
+  async getPurchaseByPickupCode(code: string): Promise<PurchaseWithOfferAndUser | undefined> {
+    const [result] = await db
+      .select()
+      .from(purchases)
+      .innerJoin(offers, eq(purchases.offerId, offers.id))
+      .innerJoin(users, eq(purchases.userId, users.id))
+      .where(eq(purchases.pickupCode, code.toUpperCase()));
+    
+    if (!result) return undefined;
+    
+    const business = await this.getUser(result.offers.businessId);
+    return {
+      ...result.purchases,
+      offer: {
+        ...result.offers,
+        business: business!,
+      },
+      user: result.users,
+    };
+  }
+
+  async markPurchaseAsPickedUp(id: number): Promise<Purchase | undefined> {
+    const [purchase] = await db
+      .update(purchases)
+      .set({ pickedUp: new Date() })
+      .where(eq(purchases.id, id))
+      .returning();
     return purchase;
   }
 
@@ -241,12 +283,24 @@ export class DatabaseStorage implements IStorage {
     }));
   }
 
-  async getPurchasesByUserId(userId: string): Promise<Purchase[]> {
-    return await db
+  async getPurchasesByUserId(userId: string): Promise<PurchaseWithOfferAndUser[]> {
+    const results = await db
       .select()
       .from(purchases)
+      .innerJoin(offers, eq(purchases.offerId, offers.id))
+      .innerJoin(users, eq(offers.businessId, users.id))
       .where(eq(purchases.userId, userId))
       .orderBy(desc(purchases.createdAt));
+    
+    const buyer = await this.getUser(userId);
+    return results.map(row => ({
+      ...row.purchases,
+      offer: {
+        ...row.offers,
+        business: row.users,
+      },
+      user: buyer!,
+    }));
   }
 
   async createRating(ratingData: InsertRating): Promise<Rating> {

@@ -3,6 +3,7 @@ import { type Server } from "http";
 import path from "path";
 import fs from "fs";
 import multer from "multer";
+import QRCode from "qrcode";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { insertOfferSchema, updateBusinessProfileSchema, insertRatingSchema } from "@shared/schema";
@@ -242,6 +243,152 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     } catch (error) {
       console.error("Error fetching purchase:", error);
       res.status(500).json({ message: "Error al obtener compra" });
+    }
+  });
+
+  // Get user's purchases with QR codes
+  app.get('/api/mis-compras', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const compras = await storage.getPurchasesByUserId(userId);
+      res.json(compras);
+    } catch (error) {
+      console.error("Error fetching user purchases:", error);
+      res.status(500).json({ message: "Error al obtener compras" });
+    }
+  });
+
+  // Generate QR code for a purchase
+  app.get('/api/compras/:id/qr', isAuthenticated, async (req: any, res) => {
+    try {
+      const purchaseId = parseInt(req.params.id);
+      const userId = req.user.claims.sub;
+      
+      if (isNaN(purchaseId)) {
+        return res.status(400).json({ message: "ID de compra inválido" });
+      }
+      
+      const purchase = await storage.getPurchaseById(purchaseId);
+      if (!purchase) {
+        return res.status(404).json({ message: "Compra no encontrada" });
+      }
+      
+      if (purchase.userId !== userId) {
+        return res.status(403).json({ message: "No tenés acceso a esta compra" });
+      }
+      
+      if (purchase.paymentStatus !== 'pagado') {
+        return res.status(400).json({ message: "El pago de esta compra no fue completado" });
+      }
+      
+      if (!purchase.pickupCode) {
+        return res.status(400).json({ message: "Esta compra no tiene código de retiro" });
+      }
+      
+      const qrDataUrl = await QRCode.toDataURL(purchase.pickupCode, {
+        width: 300,
+        margin: 2,
+        color: {
+          dark: '#000000',
+          light: '#ffffff'
+        }
+      });
+      
+      res.json({ 
+        qrCode: qrDataUrl, 
+        pickupCode: purchase.pickupCode,
+        pickedUp: purchase.pickedUp
+      });
+    } catch (error) {
+      console.error("Error generating QR code:", error);
+      res.status(500).json({ message: "Error al generar código QR" });
+    }
+  });
+
+  // Verify pickup code (for businesses)
+  app.get('/api/comercio/verificar/:code', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      
+      if (!user || user.userType !== 'comercio') {
+        return res.status(403).json({ message: "Solo comercios pueden verificar códigos" });
+      }
+      
+      const code = req.params.code.toUpperCase();
+      const purchase = await storage.getPurchaseByPickupCode(code);
+      
+      if (!purchase) {
+        return res.status(404).json({ message: "Código no encontrado", valid: false });
+      }
+      
+      // Verify this purchase is for this business's offer
+      if (purchase.offer.businessId !== userId) {
+        return res.status(403).json({ message: "Este código no corresponde a tu comercio", valid: false });
+      }
+      
+      if (purchase.paymentStatus !== 'pagado') {
+        return res.status(400).json({ message: "El pago no fue completado", valid: false });
+      }
+      
+      res.json({
+        valid: true,
+        purchase: {
+          id: purchase.id,
+          pickupCode: purchase.pickupCode,
+          pickedUp: purchase.pickedUp,
+          offer: {
+            title: purchase.offer.title,
+            discountedPrice: purchase.offer.discountedPrice,
+          },
+          user: {
+            firstName: purchase.user.firstName,
+            lastName: purchase.user.lastName,
+          },
+          createdAt: purchase.createdAt,
+        }
+      });
+    } catch (error) {
+      console.error("Error verifying pickup code:", error);
+      res.status(500).json({ message: "Error al verificar código" });
+    }
+  });
+
+  // Mark purchase as picked up (for businesses)
+  app.post('/api/comercio/retirar/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const purchaseId = parseInt(req.params.id);
+      const user = await storage.getUser(userId);
+      
+      if (!user || user.userType !== 'comercio') {
+        return res.status(403).json({ message: "Solo comercios pueden marcar retiros" });
+      }
+      
+      if (isNaN(purchaseId)) {
+        return res.status(400).json({ message: "ID de compra inválido" });
+      }
+      
+      const purchase = await storage.getPurchaseById(purchaseId);
+      if (!purchase) {
+        return res.status(404).json({ message: "Compra no encontrada" });
+      }
+      
+      // Verify this purchase is for this business's offer
+      const offer = await storage.getOfferById(purchase.offerId);
+      if (!offer || offer.businessId !== userId) {
+        return res.status(403).json({ message: "Esta compra no corresponde a tu comercio" });
+      }
+      
+      if (purchase.pickedUp) {
+        return res.status(400).json({ message: "Este pedido ya fue retirado" });
+      }
+      
+      const updatedPurchase = await storage.markPurchaseAsPickedUp(purchaseId);
+      res.json({ success: true, purchase: updatedPurchase });
+    } catch (error) {
+      console.error("Error marking pickup:", error);
+      res.status(500).json({ message: "Error al marcar retiro" });
     }
   });
 
