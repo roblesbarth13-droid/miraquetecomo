@@ -99,14 +99,16 @@ export default function Home() {
       </main>
 
       {!isBusiness && (
-        <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t p-4">
+        <div className="fixed bottom-0 left-0 right-0 bg-primary p-3 shadow-lg z-50">
           <div className="max-w-7xl mx-auto">
-            <Button asChild variant="outline" className="w-full md:w-auto" data-testid="button-become-business-cta">
-              <a href={isAuthenticated ? "/convertir-comercio" : "/api/login"}>
-                <Store className="mr-2 h-4 w-4" />
-                {isAuthenticated ? "¿Sos comercio? Cargá tu oferta acá" : "¿Sos comercio? Ingresá y cargá tu oferta"}
-              </a>
-            </Button>
+            <a 
+              href={isAuthenticated ? "/convertir-comercio" : "/api/login"}
+              className="flex items-center justify-center gap-2 text-primary-foreground font-semibold"
+              data-testid="button-become-business-cta"
+            >
+              <Store className="h-5 w-5" />
+              <span>{isAuthenticated ? "¿Sos comercio? Cargá tu oferta acá" : "¿Sos comercio? Ingresá y cargá tu oferta"}</span>
+            </a>
           </div>
         </div>
       )}
