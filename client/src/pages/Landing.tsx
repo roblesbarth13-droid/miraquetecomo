@@ -46,42 +46,42 @@ export default function Landing() {
           </div>
         </section>
 
-        <section className="py-16 md:py-24 bg-card">
+        <section className="py-12 md:py-24 bg-card">
           <div className="max-w-7xl mx-auto px-4">
-            <h2 className="text-2xl md:text-3xl font-bold text-center mb-12">
+            <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 md:mb-12">
               ¿Cómo funciona?
             </h2>
-            <div className="grid md:grid-cols-3 gap-8">
-              <Card className="text-center">
-                <CardContent className="pt-8 pb-6 space-y-4">
-                  <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
-                    <Store className="h-8 w-8 text-primary" />
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-8">
+              <Card className="text-center shadow-md hover:shadow-lg transition-shadow border-t-4 border-t-primary">
+                <CardContent className="pt-4 md:pt-8 pb-4 md:pb-6 px-2 md:px-6 space-y-2 md:space-y-4">
+                  <div className="h-12 w-12 md:h-16 md:w-16 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center mx-auto shadow-sm">
+                    <Store className="h-6 w-6 md:h-8 md:w-8 text-primary" />
                   </div>
-                  <h3 className="text-xl font-semibold">1. Explorá ofertas</h3>
-                  <p className="text-muted-foreground">
-                    Navegá por las ofertas disponibles cerca tuyo. Filtrá por categoría para encontrar lo que buscás.
+                  <h3 className="text-sm md:text-xl font-semibold">1. Explorá ofertas</h3>
+                  <p className="text-xs md:text-base text-muted-foreground leading-relaxed">
+                    Navegá por las ofertas cerca tuyo y filtrá por categoría.
                   </p>
                 </CardContent>
               </Card>
-              <Card className="text-center">
-                <CardContent className="pt-8 pb-6 space-y-4">
-                  <div className="h-16 w-16 rounded-full bg-accent/10 flex items-center justify-center mx-auto">
-                    <Percent className="h-8 w-8 text-accent" />
+              <Card className="text-center shadow-md hover:shadow-lg transition-shadow border-t-4 border-t-accent">
+                <CardContent className="pt-4 md:pt-8 pb-4 md:pb-6 px-2 md:px-6 space-y-2 md:space-y-4">
+                  <div className="h-12 w-12 md:h-16 md:w-16 rounded-full bg-gradient-to-br from-accent/20 to-accent/5 flex items-center justify-center mx-auto shadow-sm">
+                    <Percent className="h-6 w-6 md:h-8 md:w-8 text-accent" />
                   </div>
-                  <h3 className="text-xl font-semibold">2. Reservá y pagá</h3>
-                  <p className="text-muted-foreground">
-                    Elegí la oferta que más te guste y pagá de forma segura con Mercado Pago.
+                  <h3 className="text-sm md:text-xl font-semibold">2. Reservá y pagá</h3>
+                  <p className="text-xs md:text-base text-muted-foreground leading-relaxed">
+                    Elegí tu oferta y pagá seguro con Mercado Pago.
                   </p>
                 </CardContent>
               </Card>
-              <Card className="text-center">
-                <CardContent className="pt-8 pb-6 space-y-4">
-                  <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
-                    <Clock className="h-8 w-8 text-primary" />
+              <Card className="text-center shadow-md hover:shadow-lg transition-shadow border-t-4 border-t-primary col-span-2 md:col-span-1">
+                <CardContent className="pt-4 md:pt-8 pb-4 md:pb-6 px-2 md:px-6 space-y-2 md:space-y-4">
+                  <div className="h-12 w-12 md:h-16 md:w-16 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center mx-auto shadow-sm">
+                    <Clock className="h-6 w-6 md:h-8 md:w-8 text-primary" />
                   </div>
-                  <h3 className="text-xl font-semibold">3. Retirá tu pedido</h3>
-                  <p className="text-muted-foreground">
-                    Pasá por el comercio en el horario indicado y disfrutá de tu comida con descuento.
+                  <h3 className="text-sm md:text-xl font-semibold">3. Retirá tu pedido</h3>
+                  <p className="text-xs md:text-base text-muted-foreground leading-relaxed">
+                    Pasá por el comercio en el horario indicado.
                   </p>
                 </CardContent>
               </Card>
