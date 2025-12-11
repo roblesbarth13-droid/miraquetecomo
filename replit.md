@@ -48,10 +48,11 @@ Preferred communication style: Simple, everyday language.
 - **Geocoding**: Business addresses are geocoded using Google Maps API for map display
 - **Edit Business Profile**: Businesses can update their address/phone from the panel to enable geocoding
 - **Mercado Pago Integration**: Simulated marketplace payment splitting (platform commission + merchant payout)
+- **QR Pickup Verification**: Each purchase generates a unique 6-character alphanumeric code; users see QR code on "Mis Compras" page; businesses verify codes in "Verificar retiro" tab
 
 ### Route Structure
 - Public routes: Home (`/`), Offer Details (`/oferta/:id`), Landing (`/landing`)
-- Auth-required: Convert to Business (`/convertir-comercio`)
+- Auth-required: Convert to Business (`/convertir-comercio`), My Purchases (`/mis-compras`)
 - Business-only: Business Panel (`/comercio`), Create Offer (`/comercio/ofertas/nueva`)
 
 ### Build System
