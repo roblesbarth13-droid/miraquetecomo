@@ -155,7 +155,7 @@ export default function MisCompras() {
                       )}
                     </div>
                     
-                    {!compra.pickedUp && compra.pickupCode && (
+                    {!compra.pickedUp && (
                       <Button 
                         onClick={() => setSelectedPurchase(compra.id)}
                         className="flex-shrink-0"

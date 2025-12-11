@@ -281,11 +281,20 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
         return res.status(400).json({ message: "El pago de esta compra no fue completado" });
       }
       
-      if (!purchase.pickupCode) {
-        return res.status(400).json({ message: "Esta compra no tiene código de retiro" });
+      // Generate pickup code if missing (for legacy purchases)
+      let pickupCode = purchase.pickupCode;
+      if (!pickupCode) {
+        const updatedPurchase = await storage.ensurePickupCode(purchaseId);
+        if (updatedPurchase) {
+          pickupCode = updatedPurchase.pickupCode;
+        }
       }
       
-      const qrDataUrl = await QRCode.toDataURL(purchase.pickupCode, {
+      if (!pickupCode) {
+        return res.status(400).json({ message: "Error al generar código de retiro" });
+      }
+      
+      const qrDataUrl = await QRCode.toDataURL(pickupCode, {
         width: 300,
         margin: 2,
         color: {
@@ -296,7 +305,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
       
       res.json({ 
         qrCode: qrDataUrl, 
-        pickupCode: purchase.pickupCode,
+        pickupCode: pickupCode,
         pickedUp: purchase.pickedUp
       });
     } catch (error) {

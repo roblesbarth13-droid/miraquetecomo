@@ -263,6 +263,21 @@ export class DatabaseStorage implements IStorage {
     return purchase;
   }
 
+  async ensurePickupCode(id: number): Promise<Purchase | undefined> {
+    const purchase = await this.getPurchaseById(id);
+    if (!purchase) return undefined;
+    
+    if (purchase.pickupCode) return purchase;
+    
+    const pickupCode = this.generatePickupCode();
+    const [updated] = await db
+      .update(purchases)
+      .set({ pickupCode })
+      .where(eq(purchases.id, id))
+      .returning();
+    return updated;
+  }
+
   async updatePurchaseStatus(id: number, status: 'pendiente' | 'pagado' | 'fallido', mpPaymentId?: string): Promise<Purchase | undefined> {
     const [purchase] = await db
       .update(purchases)
