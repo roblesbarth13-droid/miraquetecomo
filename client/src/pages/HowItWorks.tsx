@@ -18,8 +18,7 @@ import {
   Heart,
   TrendingDown,
   Store,
-  Utensils,
-  ArrowRight
+  Utensils
 } from "lucide-react";
 
 const userSteps = [
@@ -140,25 +139,21 @@ export default function HowItWorks() {
             </h2>
           </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
             {userSteps.map((step, index) => (
-              <div key={index} className="relative">
-                <Card className="h-full">
-                  <CardContent className="p-6 space-y-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-lg">
-                        {index + 1}
-                      </div>
-                      <step.icon className="w-6 h-6 text-primary" />
+              <Card key={index} className="h-full overflow-hidden">
+                <div className="h-1 bg-primary" />
+                <CardContent className="p-3 md:p-6 space-y-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm md:text-lg flex-shrink-0">
+                      {index + 1}
                     </div>
-                    <h3 className="font-semibold text-lg">{step.title}</h3>
-                    <p className="text-sm text-muted-foreground">{step.description}</p>
-                  </CardContent>
-                </Card>
-                {index < userSteps.length - 1 && (
-                  <ArrowRight className="hidden lg:block absolute top-1/2 -right-3 transform -translate-y-1/2 w-6 h-6 text-muted-foreground z-10" />
-                )}
-              </div>
+                    <step.icon className="w-5 h-5 md:w-6 md:h-6 text-primary" />
+                  </div>
+                  <h3 className="font-semibold text-sm md:text-lg leading-tight">{step.title}</h3>
+                  <p className="text-xs md:text-sm text-muted-foreground leading-relaxed">{step.description}</p>
+                </CardContent>
+              </Card>
             ))}
           </div>
 
@@ -188,25 +183,21 @@ export default function HowItWorks() {
             </p>
           </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
             {businessSteps.map((step, index) => (
-              <div key={index} className="relative">
-                <Card className="h-full border-accent/30">
-                  <CardContent className="p-6 space-y-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-accent text-accent-foreground flex items-center justify-center font-bold text-lg">
-                        {index + 1}
-                      </div>
-                      <step.icon className="w-6 h-6 text-accent-foreground" />
+              <Card key={index} className="h-full overflow-hidden">
+                <div className="h-1 bg-accent" />
+                <CardContent className="p-3 md:p-6 space-y-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-accent text-accent-foreground flex items-center justify-center font-bold text-sm md:text-lg flex-shrink-0">
+                      {index + 1}
                     </div>
-                    <h3 className="font-semibold text-lg">{step.title}</h3>
-                    <p className="text-sm text-muted-foreground">{step.description}</p>
-                  </CardContent>
-                </Card>
-                {index < businessSteps.length - 1 && (
-                  <ArrowRight className="hidden lg:block absolute top-1/2 -right-3 transform -translate-y-1/2 w-6 h-6 text-muted-foreground z-10" />
-                )}
-              </div>
+                    <step.icon className="w-5 h-5 md:w-6 md:h-6 text-accent-foreground" />
+                  </div>
+                  <h3 className="font-semibold text-sm md:text-lg leading-tight">{step.title}</h3>
+                  <p className="text-xs md:text-sm text-muted-foreground leading-relaxed">{step.description}</p>
+                </CardContent>
+              </Card>
             ))}
           </div>
 
