@@ -107,6 +107,15 @@ export default function MapView() {
         lng: offer.business.longitude,
       };
 
+      const categoryLabels: Record<string, string> = {
+        panaderia: 'Pan',
+        verduleria: 'Verdura',
+        carniceria: 'Carne',
+        rotiseria: 'Roti',
+        supermercado: 'Super',
+      };
+      const categoryLabel = categoryLabels[offer.category] || offer.category;
+      
       const markerContent = document.createElement('div');
       markerContent.className = 'marker-content';
       markerContent.innerHTML = `
@@ -115,7 +124,7 @@ export default function MapView() {
           border-radius: 6px;
           box-shadow: 0 1px 6px rgba(0,0,0,0.25);
           cursor: pointer;
-          width: 48px;
+          width: 52px;
           overflow: hidden;
           font-family: system-ui, sans-serif;
           text-align: center;
@@ -131,6 +140,13 @@ export default function MapView() {
           </div>
           <div style="
             padding: 2px 3px;
+            font-size: 8px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+          ">${categoryLabel}</div>
+          <div style="
+            padding: 0 3px 3px;
             font-size: 9px;
             font-weight: 600;
             color: hsl(var(--primary));
