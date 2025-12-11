@@ -112,46 +112,29 @@ export default function MapView() {
       markerContent.innerHTML = `
         <div style="
           background: white;
-          border-radius: 8px;
-          box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+          border-radius: 6px;
+          box-shadow: 0 1px 6px rgba(0,0,0,0.25);
           cursor: pointer;
-          width: 140px;
+          width: 48px;
           overflow: hidden;
           font-family: system-ui, sans-serif;
+          text-align: center;
         ">
           <div style="
             background: hsl(var(--primary));
             color: white;
-            padding: 4px 8px;
-            font-weight: 600;
-            font-size: 12px;
-            text-align: center;
+            padding: 2px 4px;
+            font-weight: 700;
+            font-size: 10px;
           ">
             -${offer.discountPercentage}%
           </div>
-          <div style="padding: 6px 8px;">
-            <div style="
-              font-size: 11px;
-              font-weight: 600;
-              color: #333;
-              overflow: hidden;
-              text-overflow: ellipsis;
-              white-space: nowrap;
-            ">${offer.title}</div>
-            <div style="
-              font-size: 10px;
-              color: #666;
-              overflow: hidden;
-              text-overflow: ellipsis;
-              white-space: nowrap;
-            ">${offer.business.businessName || 'Comercio'}</div>
-            <div style="
-              font-size: 12px;
-              font-weight: 700;
-              color: hsl(var(--primary));
-              margin-top: 2px;
-            ">$${parseFloat(offer.discountedPrice).toLocaleString('es-AR')}</div>
-          </div>
+          <div style="
+            padding: 2px 3px;
+            font-size: 9px;
+            font-weight: 600;
+            color: hsl(var(--primary));
+          ">$${Math.round(parseFloat(offer.discountedPrice)).toLocaleString('es-AR')}</div>
         </div>
       `;
 
