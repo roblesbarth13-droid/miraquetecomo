@@ -21,10 +21,10 @@ import supermercadoImg2 from "@assets/stock_images/supermarket_grocery__28ff4c56
 import supermercadoImg3 from "@assets/stock_images/supermarket_grocery__ec9d428d.jpg";
 import supermercadoImg4 from "@assets/stock_images/supermarket_grocery__3f448503.jpg";
 
-import rotiseriaImg1 from "@assets/stock_images/rotisserie_chicken_g_2a292b03.jpg";
-import rotiseriaImg2 from "@assets/stock_images/rotisserie_grilled_c_cf907a9d.jpg";
-import rotiseriaImg3 from "@assets/stock_images/rotisserie_grilled_c_c1705c2f.jpg";
-import rotiseriaImg4 from "@assets/stock_images/rotisserie_grilled_c_29064e0f.jpg";
+import rotiseriaImg1 from "@assets/stock_images/rotisserie_grilled_c_cf907a9d.jpg";
+import rotiseriaImg2 from "@assets/stock_images/rotisserie_grilled_c_c1705c2f.jpg";
+import rotiseriaImg3 from "@assets/stock_images/delicious_prepared_f_ac55d082.jpg";
+import rotiseriaImg4 from "@assets/stock_images/delicious_prepared_f_8b6b41f5.jpg";
 
 import carnicheriaImg1 from "@assets/stock_images/butcher_shop_fresh_m_a4f41153.jpg";
 import carnicheriaImg2 from "@assets/stock_images/butcher_shop_fresh_m_2c42e0b0.jpg";
