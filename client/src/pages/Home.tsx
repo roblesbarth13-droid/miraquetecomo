@@ -102,7 +102,7 @@ export default function Home() {
         <div className="fixed bottom-0 left-0 right-0 shadow-lg z-50">
           {/* Argentine flag banner */}
           <div className="flex flex-col">
-            <div className="h-2 bg-[#74ACDF]" />
+            <div className="h-3 bg-[#74ACDF]" />
             <div className="bg-white py-2.5">
               <div className="max-w-7xl mx-auto px-4">
                 <a 
@@ -115,7 +115,7 @@ export default function Home() {
                 </a>
               </div>
             </div>
-            <div className="h-2 bg-[#74ACDF]" />
+            <div className="h-3 bg-[#74ACDF]" />
           </div>
         </div>
       )}
