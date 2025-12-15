@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { ArrowLeft, Clock, Store, ShoppingCart, AlertCircle, Package, Star, MessageSquare } from "lucide-react";
+import { ArrowLeft, Clock, Store, ShoppingCart, AlertCircle, Package, Star, MessageSquare, MapPin } from "lucide-react";
 import type { OfferWithBusiness, RatingWithUser } from "@shared/schema";
 import { categoryDisplayNames, statusDisplayNames } from "@shared/schema";
 import { useAuth } from "@/hooks/useAuth";
@@ -212,18 +212,28 @@ export default function OfferDetail() {
                 {offer.description}
               </p>
 
-              <div className="flex items-center gap-4 flex-wrap text-muted-foreground">
-                <div className="flex items-center gap-2">
-                  <Clock className="h-5 w-5" />
-                  <span className="text-lg" data-testid="text-pickup-time">
-                    Horario de retiro: {offer.pickupTimeStart} - {offer.pickupTimeEnd}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Package className="h-5 w-5" />
-                  <span className="text-lg" data-testid="text-quantity-available">
-                    {isSoldOut ? "Agotado" : `${quantityAvailable} disponible${quantityAvailable !== 1 ? 's' : ''}`}
-                  </span>
+              <div className="space-y-3 text-muted-foreground">
+                {offer.business?.address && (
+                  <div className="flex items-start gap-2">
+                    <MapPin className="h-5 w-5 mt-0.5 flex-shrink-0" />
+                    <span className="text-lg" data-testid="text-business-address">
+                      {offer.business.address}
+                    </span>
+                  </div>
+                )}
+                <div className="flex items-center gap-4 flex-wrap">
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-5 w-5" />
+                    <span className="text-lg" data-testid="text-pickup-time">
+                      Horario de retiro: {offer.pickupTimeStart} - {offer.pickupTimeEnd}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Package className="h-5 w-5" />
+                    <span className="text-lg" data-testid="text-quantity-available">
+                      {isSoldOut ? "Agotado" : `${quantityAvailable} disponible${quantityAvailable !== 1 ? 's' : ''}`}
+                    </span>
+                  </div>
                 </div>
               </div>
 
