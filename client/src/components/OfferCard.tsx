@@ -80,7 +80,9 @@ export function OfferCard({ offer }: OfferCardProps) {
   const discountedPrice = parseFloat(offer.discountedPrice);
   const quantityAvailable = (offer.quantity || 1) - (offer.quantitySold || 0);
   
-  const displayImage = offer.imageUrl || getDefaultImage(offer.category, offer.id);
+  const displayImage = (offer.imageUrl && offer.imageUrl.trim() !== '') 
+    ? offer.imageUrl 
+    : getDefaultImage(offer.category, offer.id);
 
   return (
     <Link href={`/oferta/${offer.id}`} data-testid={`card-offer-${offer.id}`}>

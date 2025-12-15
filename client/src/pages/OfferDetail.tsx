@@ -137,6 +137,10 @@ export default function OfferDetail() {
   const quantityAvailable = (offer.quantity || 1) - (offer.quantitySold || 0);
   const isSoldOut = quantityAvailable <= 0;
   const isAvailable = offer.status === "activa";
+  
+  const displayImage = (offer.imageUrl && offer.imageUrl.trim() !== '') 
+    ? offer.imageUrl 
+    : categoryDefaultImages[offer.category];
 
   return (
     <div className="min-h-screen bg-background" data-testid="page-offer-detail">
@@ -146,7 +150,7 @@ export default function OfferDetail() {
         <div className="relative">
           <div className="aspect-[16/9] md:aspect-[21/9] max-h-96 overflow-hidden">
             <img
-              src={offer.imageUrl || categoryDefaultImages[offer.category]}
+              src={displayImage}
               alt={offer.title}
               className="w-full h-full object-cover"
               data-testid="img-offer-detail"
