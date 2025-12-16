@@ -196,11 +196,11 @@ export default function MapView() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col" data-testid="page-map">
+    <div className="h-screen bg-background flex flex-col overflow-hidden" data-testid="page-map">
       <Header />
 
-      <div className="flex-1 flex flex-col">
-        <div className="p-4 border-b flex items-center justify-between gap-4">
+      <div className="flex-1 flex flex-col min-h-0">
+        <div className="p-4 border-b flex items-center justify-between gap-4 shrink-0">
           <Link href="/home">
             <Button variant="ghost" size="sm" data-testid="button-back-home">
               <ArrowLeft className="h-4 w-4 mr-2" />
@@ -222,7 +222,7 @@ export default function MapView() {
           {!userLocation && <div className="w-24" />}
         </div>
 
-        <div className="flex-1 relative">
+        <div className="flex-1 relative min-h-0">
           {!GOOGLE_MAPS_API_KEY ? (
             <div className="flex items-center justify-center h-full">
               <Card className="p-6 text-center max-w-md mx-4">
@@ -241,7 +241,7 @@ export default function MapView() {
             </div>
           ) : (
             <>
-              <div ref={mapRef} className="w-full h-full min-h-[400px]" data-testid="google-map" />
+              <div ref={mapRef} className="absolute inset-0" data-testid="google-map" />
               
               {selectedOffer && (
                 <div className="absolute bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-80 z-10">
