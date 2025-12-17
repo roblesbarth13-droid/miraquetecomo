@@ -130,13 +130,21 @@ export default function MapView() {
           rotiseria: 'Roti',
           supermercado: 'Super',
         };
+        const categoryColors: Record<string, { bg: string; border: string }> = {
+          panaderia: { bg: '#d97706', border: '#b45309' },
+          verduleria: { bg: '#16a34a', border: '#15803d' },
+          carniceria: { bg: '#dc2626', border: '#b91c1c' },
+          rotiseria: { bg: '#ca8a04', border: '#a16207' },
+          supermercado: { bg: '#2563eb', border: '#1d4ed8' },
+        };
         const catLabel = categoryShort[offer.category] || offer.category.slice(0, 4);
+        const colors = categoryColors[offer.category] || { bg: '#16a34a', border: '#15803d' };
         const discountText = `-${offer.discountPercentage}%`;
         
         const svgMarker = `
           <svg xmlns="http://www.w3.org/2000/svg" width="70" height="36" viewBox="0 0 70 36">
-            <rect x="0" y="0" width="70" height="28" rx="4" fill="#16a34a" stroke="#15803d" stroke-width="1"/>
-            <polygon points="35,28 30,36 40,36" fill="#16a34a"/>
+            <rect x="0" y="0" width="70" height="28" rx="4" fill="${colors.bg}" stroke="${colors.border}" stroke-width="1"/>
+            <polygon points="35,28 30,36 40,36" fill="${colors.bg}"/>
             <text x="35" y="12" text-anchor="middle" fill="white" font-size="9" font-weight="bold" font-family="Arial">${catLabel}</text>
             <text x="35" y="23" text-anchor="middle" fill="white" font-size="10" font-weight="bold" font-family="Arial">${discountText}</text>
           </svg>
