@@ -131,45 +131,30 @@ export default function MapView() {
           supermercado: 'Super',
         };
         const catLabel = categoryShort[offer.category] || offer.category.slice(0, 4);
+        const discountText = `-${offer.discountPercentage}%`;
+        
+        const svgMarker = `
+          <svg xmlns="http://www.w3.org/2000/svg" width="70" height="36" viewBox="0 0 70 36">
+            <rect x="0" y="0" width="70" height="28" rx="4" fill="#16a34a" stroke="#15803d" stroke-width="1"/>
+            <polygon points="35,28 30,36 40,36" fill="#16a34a"/>
+            <text x="35" y="12" text-anchor="middle" fill="white" font-size="9" font-weight="bold" font-family="Arial">${catLabel}</text>
+            <text x="35" y="23" text-anchor="middle" fill="white" font-size="10" font-weight="bold" font-family="Arial">${discountText}</text>
+          </svg>
+        `;
+        const encodedSvg = encodeURIComponent(svgMarker);
 
         const marker = new google.maps.Marker({
           map: mapInstanceRef.current,
           position,
           title: `${offer.title} - ${categoryDisplayNames[offer.category]} - $${offer.discountedPrice}`,
-          label: {
-            text: `-${offer.discountPercentage}%`,
-            color: 'white',
-            fontWeight: 'bold',
-            fontSize: '11px',
-          },
           icon: {
-            path: google.maps.SymbolPath.CIRCLE,
-            scale: 20,
-            fillColor: '#16a34a',
-            fillOpacity: 1,
-            strokeColor: '#15803d',
-            strokeWeight: 2,
+            url: `data:image/svg+xml,${encodedSvg}`,
+            scaledSize: new google.maps.Size(70, 36),
+            anchor: new google.maps.Point(35, 36),
           },
-        });
-
-        const infoContent = `
-          <div style="padding: 8px; min-width: 150px;">
-            <div style="font-weight: bold; font-size: 14px; margin-bottom: 4px;">${offer.title}</div>
-            <div style="color: #666; font-size: 12px; margin-bottom: 4px;">${categoryDisplayNames[offer.category]}</div>
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <span style="font-weight: bold; color: #16a34a; font-size: 16px;">$${offer.discountedPrice}</span>
-              <span style="text-decoration: line-through; color: #999; font-size: 12px;">$${offer.originalPrice}</span>
-              <span style="background: #dc2626; color: white; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: bold;">-${offer.discountPercentage}%</span>
-            </div>
-          </div>
-        `;
-        
-        const infoWindow = new google.maps.InfoWindow({
-          content: infoContent,
         });
 
         marker.addListener('click', () => {
-          infoWindow.open(mapInstanceRef.current, marker);
           setSelectedOffer(offer);
           if (mapInstanceRef.current) {
             mapInstanceRef.current.panTo(position);
