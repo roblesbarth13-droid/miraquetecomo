@@ -123,10 +123,19 @@ export default function MapView() {
           lng: offer.business.longitude,
         };
 
+        const categoryShort: Record<string, string> = {
+          panaderia: 'Pan',
+          verduleria: 'Verd',
+          carniceria: 'Carn',
+          rotiseria: 'Roti',
+          supermercado: 'Super',
+        };
+        const catLabel = categoryShort[offer.category] || offer.category.slice(0, 4);
+
         const marker = new google.maps.Marker({
           map: mapInstanceRef.current,
           position,
-          title: offer.title,
+          title: `${offer.title} - ${categoryDisplayNames[offer.category]} - $${offer.discountedPrice}`,
           label: {
             text: `-${offer.discountPercentage}%`,
             color: 'white',
@@ -143,7 +152,24 @@ export default function MapView() {
           },
         });
 
+        const infoContent = `
+          <div style="padding: 8px; min-width: 150px;">
+            <div style="font-weight: bold; font-size: 14px; margin-bottom: 4px;">${offer.title}</div>
+            <div style="color: #666; font-size: 12px; margin-bottom: 4px;">${categoryDisplayNames[offer.category]}</div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-weight: bold; color: #16a34a; font-size: 16px;">$${offer.discountedPrice}</span>
+              <span style="text-decoration: line-through; color: #999; font-size: 12px;">$${offer.originalPrice}</span>
+              <span style="background: #dc2626; color: white; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: bold;">-${offer.discountPercentage}%</span>
+            </div>
+          </div>
+        `;
+        
+        const infoWindow = new google.maps.InfoWindow({
+          content: infoContent,
+        });
+
         marker.addListener('click', () => {
+          infoWindow.open(mapInstanceRef.current, marker);
           setSelectedOffer(offer);
           if (mapInstanceRef.current) {
             mapInstanceRef.current.panTo(position);
