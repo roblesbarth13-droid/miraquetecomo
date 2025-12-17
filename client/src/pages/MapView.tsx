@@ -22,11 +22,12 @@ const DEFAULT_CENTER = { lat: -34.6037, lng: -58.3816 };
 export default function MapView() {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
-  const markersRef = useRef<google.maps.marker.AdvancedMarkerElement[]>([]);
-  const infoWindowRef = useRef<google.maps.InfoWindow | null>(null);
+  const markersRef = useRef<google.maps.Marker[]>([]);
+  const userMarkerRef = useRef<google.maps.Marker | null>(null);
   const [selectedOffer, setSelectedOffer] = useState<OfferWithBusiness | null>(null);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
+  const [mapError, setMapError] = useState<string | null>(null);
 
   const { data: offers, isLoading } = useQuery<OfferWithBusiness[]>({
     queryKey: ["/api/ofertas"],
@@ -49,15 +50,20 @@ export default function MapView() {
     }
 
     const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=marker&callback=initMap`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&callback=initMap`;
     script.async = true;
     script.defer = true;
+    script.onerror = () => {
+      setMapError("Error al cargar Google Maps. Verificá tu conexión a internet.");
+    };
     window.initMap = () => setIsMapLoaded(true);
     document.head.appendChild(script);
   }, []);
 
   useEffect(() => {
-    loadGoogleMapsScript();
+    if (GOOGLE_MAPS_API_KEY) {
+      loadGoogleMapsScript();
+    }
   }, [loadGoogleMapsScript]);
 
   useEffect(() => {
@@ -81,110 +87,98 @@ export default function MapView() {
 
     const center = userLocation || DEFAULT_CENTER;
 
-    if (!mapInstanceRef.current) {
-      mapInstanceRef.current = new google.maps.Map(mapRef.current, {
-        center,
-        zoom: 14,
-        mapId: import.meta.env.VITE_GOOGLE_MAPS_MAP_ID || "DEMO_MAP_ID",
-        disableDefaultUI: false,
-        zoomControl: true,
-        mapTypeControl: false,
-        streetViewControl: false,
-        fullscreenControl: true,
-      });
-      
-      infoWindowRef.current = new google.maps.InfoWindow();
-    }
-
-    markersRef.current.forEach((marker) => (marker.map = null));
-    markersRef.current = [];
-
-    offersWithLocation.forEach((offer) => {
-      if (!offer.business.latitude || !offer.business.longitude) return;
-
-      const position = {
-        lat: offer.business.latitude,
-        lng: offer.business.longitude,
-      };
-
-      const categoryLabels: Record<string, string> = {
-        panaderia: 'Pan',
-        verduleria: 'Verdura',
-        carniceria: 'Carne',
-        rotiseria: 'Roti',
-        supermercado: 'Super',
-      };
-      const categoryLabel = categoryLabels[offer.category] || offer.category;
-      
-      const markerContent = document.createElement('div');
-      markerContent.className = 'marker-content';
-      markerContent.innerHTML = `
-        <div style="
-          background: white;
-          border-radius: 5px;
-          box-shadow: 0 1px 4px rgba(0,0,0,0.25);
-          cursor: pointer;
-          width: 42px;
-          overflow: hidden;
-          font-family: system-ui, sans-serif;
-          text-align: center;
-        ">
-          <div style="
-            background: hsl(var(--primary));
-            color: white;
-            padding: 1px 3px;
-            font-weight: 700;
-            font-size: 9px;
-          ">
-            -${offer.discountPercentage}%
-          </div>
-          <div style="
-            padding: 2px 2px 1px;
-            font-size: 8px;
-            font-weight: 700;
-            color: #333;
-          ">${categoryLabel}</div>
-          <div style="
-            padding: 0 2px 2px;
-            font-size: 8px;
-            font-weight: 600;
-            color: hsl(var(--primary));
-          ">$${Math.round(parseFloat(offer.discountedPrice)).toLocaleString('es-AR')}</div>
-        </div>
-      `;
-
-      const marker = new google.maps.marker.AdvancedMarkerElement({
-        map: mapInstanceRef.current,
-        position,
-        content: markerContent,
-        title: offer.title,
-      });
-
-      marker.addListener('click', () => {
-        setSelectedOffer(offer);
-        
-        if (mapInstanceRef.current) {
-          mapInstanceRef.current.panTo(position);
-        }
-      });
-
-      markersRef.current.push(marker);
-    });
-
-    if (offersWithLocation.length > 0 && mapInstanceRef.current) {
-      const bounds = new google.maps.LatLngBounds();
-      offersWithLocation.forEach((offer) => {
-        if (offer.business.latitude && offer.business.longitude) {
-          bounds.extend({
-            lat: offer.business.latitude,
-            lng: offer.business.longitude,
-          });
-        }
-      });
-      if (userLocation) {
-        bounds.extend(userLocation);
+    try {
+      if (!mapInstanceRef.current) {
+        mapInstanceRef.current = new google.maps.Map(mapRef.current, {
+          center,
+          zoom: 14,
+          disableDefaultUI: false,
+          zoomControl: true,
+          mapTypeControl: false,
+          streetViewControl: false,
+          fullscreenControl: true,
+        });
       }
-      mapInstanceRef.current.fitBounds(bounds, { padding: 50 });
+
+      markersRef.current.forEach((marker) => marker.setMap(null));
+      markersRef.current = [];
+
+      offersWithLocation.forEach((offer) => {
+        if (!offer.business.latitude || !offer.business.longitude) return;
+
+        const position = {
+          lat: offer.business.latitude,
+          lng: offer.business.longitude,
+        };
+
+        const marker = new google.maps.Marker({
+          map: mapInstanceRef.current,
+          position,
+          title: offer.title,
+          label: {
+            text: `-${offer.discountPercentage}%`,
+            color: 'white',
+            fontWeight: 'bold',
+            fontSize: '11px',
+          },
+          icon: {
+            path: google.maps.SymbolPath.CIRCLE,
+            scale: 20,
+            fillColor: '#16a34a',
+            fillOpacity: 1,
+            strokeColor: '#15803d',
+            strokeWeight: 2,
+          },
+        });
+
+        marker.addListener('click', () => {
+          setSelectedOffer(offer);
+          if (mapInstanceRef.current) {
+            mapInstanceRef.current.panTo(position);
+          }
+        });
+
+        markersRef.current.push(marker);
+      });
+
+      if (userLocation) {
+        if (userMarkerRef.current) {
+          userMarkerRef.current.setMap(null);
+        }
+        userMarkerRef.current = new google.maps.Marker({
+          map: mapInstanceRef.current,
+          position: userLocation,
+          title: "Tu ubicación",
+          icon: {
+            path: google.maps.SymbolPath.CIRCLE,
+            scale: 10,
+            fillColor: '#3b82f6',
+            fillOpacity: 1,
+            strokeColor: '#ffffff',
+            strokeWeight: 3,
+          },
+          zIndex: 1000,
+        });
+      }
+
+      if (offersWithLocation.length > 0 && mapInstanceRef.current) {
+        const bounds = new google.maps.LatLngBounds();
+        offersWithLocation.forEach((offer) => {
+          if (offer.business.latitude && offer.business.longitude) {
+            bounds.extend({
+              lat: offer.business.latitude,
+              lng: offer.business.longitude,
+            });
+          }
+        });
+        if (userLocation) {
+          bounds.extend(userLocation);
+        }
+        mapInstanceRef.current.fitBounds(bounds, { padding: 50 });
+      }
+    } catch (error) {
+      console.error("Error initializing map:", error);
+      setMapError("Error al inicializar el mapa.");
     }
   }, [isMapLoaded, offersWithLocation, userLocation]);
 
@@ -231,6 +225,14 @@ export default function MapView() {
                 <p className="text-muted-foreground">
                   La API de Google Maps no está configurada. Contactá al administrador.
                 </p>
+              </Card>
+            </div>
+          ) : mapError ? (
+            <div className="flex items-center justify-center h-full">
+              <Card className="p-6 text-center max-w-md mx-4">
+                <MapPin className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                <h2 className="text-lg font-semibold mb-2">Error en el mapa</h2>
+                <p className="text-muted-foreground">{mapError}</p>
               </Card>
             </div>
           ) : isLoading || !isMapLoaded ? (
