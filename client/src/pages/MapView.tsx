@@ -16,7 +16,6 @@ declare global {
   }
 }
 
-const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 const DEFAULT_CENTER = { lat: -34.6037, lng: -58.3816 };
 
 export default function MapView() {
@@ -28,16 +27,29 @@ export default function MapView() {
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
+  const [apiKey, setApiKey] = useState<string | null>(null);
 
   const { data: offers, isLoading } = useQuery<OfferWithBusiness[]>({
     queryKey: ["/api/ofertas"],
   });
+
+  const { data: config } = useQuery<{ googleMapsApiKey: string }>({
+    queryKey: ["/api/config"],
+  });
+
+  useEffect(() => {
+    if (config?.googleMapsApiKey) {
+      setApiKey(config.googleMapsApiKey);
+    }
+  }, [config]);
 
   const offersWithLocation = offers?.filter(
     (offer) => offer.business.latitude && offer.business.longitude
   ) || [];
 
   const loadGoogleMapsScript = useCallback(() => {
+    if (!apiKey) return;
+    
     if (window.google?.maps) {
       setIsMapLoaded(true);
       return;
@@ -50,7 +62,7 @@ export default function MapView() {
     }
 
     const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&callback=initMap`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initMap`;
     script.async = true;
     script.defer = true;
     script.onerror = () => {
@@ -58,13 +70,13 @@ export default function MapView() {
     };
     window.initMap = () => setIsMapLoaded(true);
     document.head.appendChild(script);
-  }, []);
+  }, [apiKey]);
 
   useEffect(() => {
-    if (GOOGLE_MAPS_API_KEY) {
+    if (apiKey) {
       loadGoogleMapsScript();
     }
-  }, [loadGoogleMapsScript]);
+  }, [apiKey, loadGoogleMapsScript]);
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -189,6 +201,8 @@ export default function MapView() {
     }
   };
 
+  const isApiKeyMissing = config && !config.googleMapsApiKey;
+
   return (
     <div className="h-screen bg-background flex flex-col overflow-hidden" data-testid="page-map">
       <Header />
@@ -217,7 +231,7 @@ export default function MapView() {
         </div>
 
         <div className="flex-1 relative min-h-0">
-          {!GOOGLE_MAPS_API_KEY ? (
+          {isApiKeyMissing ? (
             <div className="flex items-center justify-center h-full">
               <Card className="p-6 text-center max-w-md mx-4">
                 <MapPin className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
@@ -235,7 +249,7 @@ export default function MapView() {
                 <p className="text-muted-foreground">{mapError}</p>
               </Card>
             </div>
-          ) : isLoading || !isMapLoaded ? (
+          ) : isLoading || !isMapLoaded || !apiKey ? (
             <div className="flex items-center justify-center h-full">
               <div className="animate-pulse text-muted-foreground">
                 Cargando mapa...

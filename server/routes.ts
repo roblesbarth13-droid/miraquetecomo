@@ -80,6 +80,13 @@ const upload = multer({
 export async function registerRoutes(httpServer: Server, app: Express): Promise<Server> {
   await setupAuth(app);
 
+  // Public config endpoint for frontend (maps API key)
+  app.get('/api/config', (req, res) => {
+    res.json({
+      googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY || process.env.VITE_GOOGLE_MAPS_API_KEY || '',
+    });
+  });
+
   // Serve uploaded images
   app.use('/uploads', (req, res, next) => {
     const filePath = path.join(uploadDir, req.path);
