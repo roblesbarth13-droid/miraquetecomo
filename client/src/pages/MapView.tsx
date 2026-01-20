@@ -228,12 +228,15 @@ export default function MapView() {
 
       <div className="flex-1 flex flex-col min-h-0">
         <div className="p-4 border-b flex items-center justify-between gap-4 shrink-0">
-          <Link href="/home">
-            <Button variant="ghost" size="sm" data-testid="button-back-home">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Volver
-            </Button>
-          </Link>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => window.history.back()}
+            data-testid="button-back-home"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Volver
+          </Button>
           <h1 className="text-lg font-semibold">Ofertas cerca tuyo</h1>
           {userLocation && (
             <Button

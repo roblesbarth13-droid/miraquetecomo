@@ -162,13 +162,11 @@ export default function OfferDetail() {
             <Button
               variant="secondary"
               size="icon"
-              asChild
               className="bg-background/80 backdrop-blur-sm"
               data-testid="button-back"
+              onClick={() => window.history.back()}
             >
-              <Link href="/home">
-                <ArrowLeft className="h-5 w-5" />
-              </Link>
+              <ArrowLeft className="h-5 w-5" />
             </Button>
           </div>
 
