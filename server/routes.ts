@@ -1,12 +1,31 @@
-import type { Express } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
 import { type Server } from "http";
 import path from "path";
 import fs from "fs";
 import multer from "multer";
 import QRCode from "qrcode";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated } from "./replitAuth";
+import { setupAuth, isAuthenticated as isAuthenticatedReplit } from "./replitAuth";
+import { setupLocalAuth, isAuthenticatedLocal } from "./auth";
 import { insertOfferSchema, updateBusinessProfileSchema, insertRatingSchema } from "@shared/schema";
+
+function isAuthenticated(req: Request, res: Response, next: NextFunction) {
+  if (req.session?.userId) {
+    return next();
+  }
+  
+  return isAuthenticatedReplit(req, res, next);
+}
+
+function getUserId(req: any): string {
+  if (req.session?.userId) {
+    return req.session.userId;
+  }
+  if (req.user?.claims?.sub) {
+    return req.user.claims.sub;
+  }
+  throw new Error("Usuario no autenticado");
+}
 import { 
   createPaymentPreference, 
   getPaymentDetails, 
@@ -79,6 +98,7 @@ const upload = multer({
 
 export async function registerRoutes(httpServer: Server, app: Express): Promise<Server> {
   await setupAuth(app);
+  setupLocalAuth(app);
 
   // Public config endpoint for frontend (maps API key)
   app.get('/api/config', (req, res) => {
@@ -115,9 +135,8 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   // Auth routes
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req);
       
-      // In development mode with mock user, return mock user data directly
       if (process.env.NODE_ENV === 'development' && userId === 'dev-user-123') {
         return res.json({
           id: 'dev-user-123',
@@ -130,6 +149,9 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
       }
       
       const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "Usuario no encontrado" });
+      }
       res.json(user);
     } catch (error) {
       console.error("Error fetching user:", error);
@@ -170,7 +192,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   // Create new offer (business only)
   app.post('/api/ofertas', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req);
       const user = await storage.getUser(userId);
       
       if (!user || user.userType !== 'comercio') {
@@ -200,7 +222,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   // Get business offers
   app.get('/api/comercio/ofertas', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req);
       const user = await storage.getUser(userId);
       
       if (!user || user.userType !== 'comercio') {
@@ -218,7 +240,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   // Get business sales
   app.get('/api/comercio/ventas', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req);
       const user = await storage.getUser(userId);
       
       if (!user || user.userType !== 'comercio') {
@@ -237,7 +259,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   app.get('/api/compras/:id', isAuthenticated, async (req: any, res) => {
     try {
       const purchaseId = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req);
       
       if (isNaN(purchaseId)) {
         return res.status(400).json({ message: "ID de compra inválido" });
@@ -269,7 +291,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   // Get user's purchases with QR codes
   app.get('/api/mis-compras', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req);
       const compras = await storage.getPurchasesByUserId(userId);
       res.json(compras);
     } catch (error) {
@@ -282,7 +304,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   app.get('/api/compras/:id/qr', isAuthenticated, async (req: any, res) => {
     try {
       const purchaseId = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req);
       
       if (isNaN(purchaseId)) {
         return res.status(400).json({ message: "ID de compra inválido" });
@@ -337,7 +359,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   // Verify pickup code (for businesses)
   app.get('/api/comercio/verificar/:code', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req);
       const user = await storage.getUser(userId);
       
       if (!user || user.userType !== 'comercio') {
@@ -386,7 +408,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   // Mark purchase as picked up (for businesses)
   app.post('/api/comercio/retirar/:id', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req);
       const purchaseId = parseInt(req.params.id);
       const user = await storage.getUser(userId);
       
@@ -424,7 +446,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   // Convert user to business
   app.post('/api/perfil/convertir-comercio', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req);
       
       const validation = updateBusinessProfileSchema.safeParse(req.body);
       if (!validation.success) {
@@ -454,7 +476,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   // Update business profile (for existing businesses)
   app.put('/api/comercio/perfil', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req);
       const user = await storage.getUser(userId);
       
       if (!user || user.userType !== 'comercio') {
@@ -489,7 +511,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   // Create checkout preference with Mercado Pago
   app.post('/api/checkout', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req);
       const { offerId } = req.body;
 
       if (!offerId) {
@@ -618,7 +640,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   // Create a rating for a business (after purchase)
   app.post('/api/calificaciones', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req);
       const { businessId, purchaseId, stars, comment } = req.body;
       
       // Validate with schema
@@ -683,7 +705,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   // Check if user can rate a purchase
   app.get('/api/calificaciones/check/:purchaseId', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req);
       const purchaseId = parseInt(req.params.purchaseId);
       
       if (isNaN(purchaseId)) {
@@ -703,7 +725,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   // Get OAuth URL for connecting merchant's Mercado Pago account
   app.get('/api/mercadopago/oauth/url', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req);
       const user = await storage.getUser(userId);
       
       if (!user || user.userType !== 'comercio') {
@@ -794,7 +816,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   // Check if merchant has Mercado Pago connected
   app.get('/api/mercadopago/status', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req);
       const user = await storage.getUser(userId);
       
       if (!user) {
@@ -819,7 +841,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   // Disconnect Mercado Pago
   app.post('/api/mercadopago/disconnect', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req);
       
       await storage.updateUserMpTokens(userId, {
         mpAccessToken: null,
@@ -880,7 +902,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   // Notifications API
   app.get('/api/notificaciones', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req);
       const notificaciones = await storage.getNotificationsByUserId(userId);
       res.json(notificaciones);
     } catch (error) {
@@ -891,7 +913,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
 
   app.get('/api/notificaciones/count', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req);
       const count = await storage.getUnreadNotificationsCount(userId);
       res.json({ count });
     } catch (error) {
@@ -902,7 +924,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
 
   app.post('/api/notificaciones/:id/read', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req);
       const notificationId = parseInt(req.params.id);
       
       // Verify notification belongs to user
