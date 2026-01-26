@@ -133,26 +133,40 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   });
 
   // Auth routes
-  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+  app.get('/api/auth/user', async (req: any, res) => {
     try {
-      const userId = getUserId(req);
-      
-      if (process.env.NODE_ENV === 'development' && userId === 'dev-user-123') {
-        return res.json({
-          id: 'dev-user-123',
-          email: 'dev@test.com',
-          firstName: 'Usuario',
-          lastName: 'Prueba',
-          userType: 'usuario',
-          profileImageUrl: null,
-        });
+      // First check for local session (email/password login)
+      if (req.session?.userId) {
+        const user = await storage.getUser(req.session.userId);
+        if (user) {
+          return res.json(user);
+        }
       }
       
-      const user = await storage.getUser(userId);
-      if (!user) {
-        return res.status(404).json({ message: "Usuario no encontrado" });
+      // Then check for Replit Auth
+      if (req.user?.claims?.sub) {
+        const userId = req.user.claims.sub;
+        
+        // Skip dev user in development if we have a real session
+        if (process.env.NODE_ENV === 'development' && userId === 'dev-user-123') {
+          return res.json({
+            id: 'dev-user-123',
+            email: 'dev@test.com',
+            firstName: 'Usuario',
+            lastName: 'Prueba',
+            userType: 'usuario',
+            profileImageUrl: null,
+          });
+        }
+        
+        const user = await storage.getUser(userId);
+        if (user) {
+          return res.json(user);
+        }
       }
-      res.json(user);
+      
+      // No authentication found
+      return res.status(401).json({ message: "No autenticado" });
     } catch (error) {
       console.error("Error fetching user:", error);
       res.status(500).json({ message: "Error al obtener usuario" });
