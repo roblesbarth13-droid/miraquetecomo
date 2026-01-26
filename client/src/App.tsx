@@ -18,6 +18,8 @@ import PaymentPending from "@/pages/PaymentPending";
 import MapView from "@/pages/MapView";
 import HowItWorks from "@/pages/HowItWorks";
 import MisCompras from "@/pages/MisCompras";
+import RegisterBusiness from "@/pages/RegisterBusiness";
+import Login from "@/pages/Login";
 
 function Router() {
   const { isAuthenticated, isLoading, isBusiness } = useAuth();
@@ -42,6 +44,8 @@ function Router() {
       <Route path="/como-funciona" component={HowItWorks} />
       <Route path="/oferta/:id" component={OfferDetail} />
       <Route path="/landing" component={Landing} />
+      <Route path="/registro-comercio" component={RegisterBusiness} />
+      <Route path="/login" component={Login} />
       
       {/* Payment result routes */}
       <Route path="/pago/exito" component={PaymentSuccess} />
@@ -54,13 +58,9 @@ function Router() {
       {/* Auth-required route - page handles its own auth guard */}
       <Route path="/convertir-comercio" component={ConvertToBusiness} />
       
-      {/* Business-only routes */}
-      {isAuthenticated && isBusiness && (
-        <>
-          <Route path="/comercio" component={BusinessPanel} />
-          <Route path="/comercio/ofertas/nueva" component={CreateOffer} />
-        </>
-      )}
+      {/* Business-only routes - pages handle their own auth guards */}
+      <Route path="/comercio" component={BusinessPanel} />
+      <Route path="/comercio/ofertas/nueva" component={CreateOffer} />
       
       <Route component={NotFound} />
     </Switch>

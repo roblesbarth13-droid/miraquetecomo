@@ -106,12 +106,12 @@ export default function Home() {
             <div className="bg-white py-2.5">
               <div className="max-w-7xl mx-auto px-4">
                 <a 
-                  href={isAuthenticated ? "/convertir-comercio" : "/api/login"}
+                  href="/registro-comercio"
                   className="flex items-center justify-center gap-2 text-gray-800 font-semibold"
                   data-testid="button-become-business-cta"
                 >
                   <Store className="h-5 w-5 text-[#74ACDF]" />
-                  <span>{isAuthenticated ? "¿Sos comercio? Cargá tu oferta acá" : "¿Sos comercio? Ingresá y cargá tu oferta"}</span>
+                  <span>¿Sos comercio? Registrate y cargá tu oferta</span>
                 </a>
               </div>
             </div>
