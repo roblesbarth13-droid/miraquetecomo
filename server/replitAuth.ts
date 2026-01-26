@@ -133,24 +133,15 @@ export async function setupAuth(app: Express) {
 }
 
 export const isAuthenticated: RequestHandler = async (req, res, next) => {
-  // Development mode: allow testing without authentication
-  if (process.env.NODE_ENV === 'development' && !req.isAuthenticated()) {
-    // Create a mock user for development testing
-    (req as any).user = {
-      claims: {
-        sub: 'dev-user-123',
-        email: 'dev@test.com',
-        first_name: 'Usuario',
-        last_name: 'Prueba',
-      },
-      expires_at: Math.floor(Date.now() / 1000) + 3600,
-    };
+  // First check for local session (email/password login)
+  if ((req.session as any)?.userId) {
     return next();
   }
 
+  // Then check for Replit Auth
   const user = req.user as any;
 
-  if (!req.isAuthenticated() || !user.expires_at) {
+  if (!req.isAuthenticated() || !user?.expires_at) {
     return res.status(401).json({ message: "Unauthorized" });
   }
 

@@ -94,14 +94,21 @@ export function setupLocalAuth(app: Express) {
 
       req.session.userId = user.id;
       
-      res.status(201).json({
-        message: "Comercio registrado exitosamente",
-        user: {
-          id: user.id,
-          email: user.email,
-          userType: user.userType,
-          businessName: user.businessName,
+      // Force session save before responding to avoid race condition
+      req.session.save((err) => {
+        if (err) {
+          console.error("Error saving session:", err);
+          return res.status(500).json({ message: "Error al guardar sesión" });
         }
+        res.status(201).json({
+          message: "Comercio registrado exitosamente",
+          user: {
+            id: user.id,
+            email: user.email,
+            userType: user.userType,
+            businessName: user.businessName,
+          }
+        });
       });
     } catch (error) {
       console.error("Error registering business:", error);
@@ -138,15 +145,22 @@ export function setupLocalAuth(app: Express) {
 
       req.session.userId = user.id;
       
-      res.status(201).json({
-        message: "Usuario registrado exitosamente",
-        user: {
-          id: user.id,
-          email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          userType: user.userType,
+      // Force session save before responding to avoid race condition
+      req.session.save((err) => {
+        if (err) {
+          console.error("Error saving session:", err);
+          return res.status(500).json({ message: "Error al guardar sesión" });
         }
+        res.status(201).json({
+          message: "Usuario registrado exitosamente",
+          user: {
+            id: user.id,
+            email: user.email,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            userType: user.userType,
+          }
+        });
       });
     } catch (error) {
       console.error("Error registering user:", error);
@@ -178,16 +192,23 @@ export function setupLocalAuth(app: Express) {
 
       req.session.userId = user.id;
       
-      res.json({
-        message: "Inicio de sesión exitoso",
-        user: {
-          id: user.id,
-          email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          userType: user.userType,
-          businessName: user.businessName,
+      // Force session save before responding to avoid race condition
+      req.session.save((err) => {
+        if (err) {
+          console.error("Error saving session:", err);
+          return res.status(500).json({ message: "Error al guardar sesión" });
         }
+        res.json({
+          message: "Inicio de sesión exitoso",
+          user: {
+            id: user.id,
+            email: user.email,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            userType: user.userType,
+            businessName: user.businessName,
+          }
+        });
       });
     } catch (error) {
       console.error("Error during login:", error);
