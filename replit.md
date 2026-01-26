@@ -23,7 +23,7 @@ Preferred communication style: Simple, everyday language.
 - **Runtime**: Node.js with Express.js
 - **Language**: TypeScript (ES Modules)
 - **API Pattern**: RESTful JSON API under `/api` prefix
-- **Authentication**: Replit Auth (OpenID Connect) with Passport.js
+- **Authentication**: Custom email/password auth with bcrypt password hashing + legacy Replit Auth support
 - **Session Management**: Express sessions stored in PostgreSQL via connect-pg-simple
 
 ### Data Layer
@@ -51,7 +51,8 @@ Preferred communication style: Simple, everyday language.
 - **QR Pickup Verification**: Each purchase generates a unique 6-character alphanumeric code; users see QR code on "Mis Compras" page; businesses verify codes in "Verificar retiro" tab
 
 ### Route Structure
-- Public routes: Home (`/`), Offer Details (`/oferta/:id`), Landing (`/landing`)
+- Public routes: Home (`/`), Offer Details (`/oferta/:id`), Landing (`/landing`), Map (`/mapa`), How it Works (`/como-funciona`)
+- Auth routes: Login (`/login`), Business Registration (`/registro-comercio`)
 - Auth-required: Convert to Business (`/convertir-comercio`), My Purchases (`/mis-compras`)
 - Business-only: Business Panel (`/comercio`), Create Offer (`/comercio/ofertas/nueva`)
 
@@ -66,8 +67,10 @@ Preferred communication style: Simple, everyday language.
 - **PostgreSQL**: Primary data store, required via `DATABASE_URL` environment variable
 
 ### Authentication
-- **Replit Auth**: OpenID Connect provider using `ISSUER_URL` (defaults to Replit's OIDC)
+- **Custom Auth**: Email/password authentication with bcrypt password hashing (SALT_ROUNDS=10)
+- **Legacy Support**: Replit Auth (OpenID Connect) still supported via `ISSUER_URL` for backward compatibility
 - **Session Secret**: `SESSION_SECRET` environment variable required
+- **CBU Storage**: Business accounts store CBU (22-digit bank account) for payment processing
 
 ### UI Components
 - **shadcn/ui**: Pre-built accessible components based on Radix UI primitives
