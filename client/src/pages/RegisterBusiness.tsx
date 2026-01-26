@@ -71,14 +71,18 @@ export default function RegisterBusiness() {
   const registerMutation = useMutation({
     mutationFn: async (data: FormValues) => {
       const { confirmPassword, ...registerData } = data;
-      return await apiRequest("POST", "/api/auth/register/comercio", registerData);
+      const response = await apiRequest("POST", "/api/auth/register/comercio", registerData);
+      return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast({
         title: "Comercio registrado",
         description: "Tu cuenta fue creada exitosamente. Ya podés crear ofertas.",
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      // Immediately set the user data in cache to avoid auth race condition
+      if (data.user) {
+        queryClient.setQueryData(["/api/auth/user"], data.user);
+      }
       navigate("/comercio");
     },
     onError: (error: Error) => {

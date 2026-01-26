@@ -50,7 +50,7 @@ export default function MisCompras() {
                 Necesitás estar logueado para ver tus compras y códigos QR.
               </p>
               <Button asChild>
-                <a href="/api/login">Iniciar sesión</a>
+                <a href="/login">Iniciar sesión</a>
               </Button>
             </CardContent>
           </Card>

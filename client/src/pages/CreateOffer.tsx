@@ -95,7 +95,7 @@ export default function CreateOffer() {
         variant: "destructive",
       });
       setTimeout(() => {
-        window.location.href = "/api/login";
+        window.location.href = "/login";
       }, 500);
     } else if (!authLoading && isAuthenticated && !isBusiness) {
       navigate("/convertir-comercio");
@@ -181,7 +181,7 @@ export default function CreateOffer() {
           variant: "destructive",
         });
         setTimeout(() => {
-          window.location.href = "/api/login";
+          window.location.href = "/login";
         }, 500);
         return;
       }

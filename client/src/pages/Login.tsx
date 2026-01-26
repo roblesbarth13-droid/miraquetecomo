@@ -51,7 +51,10 @@ export default function Login() {
         title: "Bienvenido",
         description: `Hola ${data.user.businessName || data.user.firstName || 'de nuevo'}`,
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      // Immediately set the user data in cache to avoid auth race condition
+      if (data.user) {
+        queryClient.setQueryData(["/api/auth/user"], data.user);
+      }
       
       if (data.user.userType === 'comercio') {
         navigate("/comercio");

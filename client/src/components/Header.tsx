@@ -136,7 +136,7 @@ export function Header() {
             </DropdownMenu>
           ) : (
             <Button asChild data-testid="button-login">
-              <a href="/api/login">
+              <a href="/login">
                 <User className="h-4 w-4 mr-2" />
                 Ingresar
               </a>

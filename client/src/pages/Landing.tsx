@@ -11,12 +11,12 @@ export default function Landing() {
   const getBusinessLink = () => {
     if (isBusiness) return "/comercio/ofertas/nueva";
     if (isAuthenticated) return "/convertir-comercio";
-    return "/api/login";
+    return "/registro-comercio";
   };
 
   const getUserLink = () => {
     if (isAuthenticated) return "/home";
-    return "/api/login";
+    return "/login";
   };
 
   return (
@@ -30,7 +30,7 @@ export default function Landing() {
             </Button>
           ) : (
             <Button asChild data-testid="button-landing-login">
-              <a href="/api/login">Ingresar</a>
+              <a href="/login">Ingresar</a>
             </Button>
           )}
         </div>
