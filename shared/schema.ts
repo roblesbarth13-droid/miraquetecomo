@@ -31,10 +31,11 @@ export const sessions = pgTable(
   (table) => [index("IDX_session_expire").on(table.expire)],
 );
 
-// Users table - Required for Replit Auth
+// Users table
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   email: varchar("email").unique(),
+  passwordHash: text("password_hash"),
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
@@ -43,6 +44,7 @@ export const users = pgTable("users", {
   phone: varchar("phone"),
   address: varchar("address"),
   category: categoryEnum("category"),
+  cbu: varchar("cbu", { length: 22 }),
   latitude: doublePrecision("latitude"),
   longitude: doublePrecision("longitude"),
   // Mercado Pago OAuth fields for marketplace split payments
@@ -217,6 +219,33 @@ export const updateBusinessProfileSchema = z.object({
   category: z.enum(['panaderia', 'verduleria', 'carniceria', 'rotiseria', 'supermercado']),
   latitude: z.number().optional(),
   longitude: z.number().optional(),
+});
+
+// Business registration schema (email + password)
+export const registerBusinessSchema = z.object({
+  email: z.string().email("Email inválido"),
+  password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
+  businessName: z.string().min(2, "El nombre del comercio debe tener al menos 2 caracteres"),
+  phone: z.string().optional(),
+  address: z.string().min(5, "Ingresá una dirección válida"),
+  category: z.enum(['panaderia', 'verduleria', 'carniceria', 'rotiseria', 'supermercado'], {
+    required_error: "Seleccioná una categoría",
+  }),
+  cbu: z.string().length(22, "El CBU debe tener 22 dígitos").regex(/^\d+$/, "El CBU solo debe contener números"),
+});
+
+// User registration schema (simpler for regular users)
+export const registerUserSchema = z.object({
+  email: z.string().email("Email inválido"),
+  password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
+  firstName: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
+  lastName: z.string().min(2, "El apellido debe tener al menos 2 caracteres"),
+});
+
+// Login schema
+export const loginSchema = z.object({
+  email: z.string().email("Email inválido"),
+  password: z.string().min(1, "Ingresá tu contraseña"),
 });
 
 // Types
