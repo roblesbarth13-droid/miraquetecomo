@@ -61,7 +61,7 @@ export default function Splash() {
           className="text-center"
         >
           <motion.h1 
-            className="text-4xl md:text-5xl font-bold"
+            className="text-2xl sm:text-4xl md:text-5xl font-bold whitespace-nowrap"
             animate={{
               scale: [1, 1.02, 1],
             }}
@@ -72,7 +72,7 @@ export default function Splash() {
               ease: "easeInOut",
             }}
           >
-            <span className="text-primary">mirá que te</span>{" "}
+            <span className="text-primary">mirá que te </span>
             <span className="text-accent">como</span>
           </motion.h1>
         </motion.div>

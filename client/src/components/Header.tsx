@@ -150,12 +150,19 @@ export function Header() {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Button asChild data-testid="button-login">
-              <a href="/login">
-                <User className="h-4 w-4 mr-2" />
-                Ingresar
-              </a>
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button asChild variant="outline" size="sm" data-testid="button-register">
+                <a href="/registro">
+                  Registrarse
+                </a>
+              </Button>
+              <Button asChild size="sm" data-testid="button-login">
+                <a href="/login">
+                  <User className="h-4 w-4 mr-1" />
+                  Ingresar
+                </a>
+              </Button>
+            </div>
           )}
         </div>
       </div>
