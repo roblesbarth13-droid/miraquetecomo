@@ -12,11 +12,24 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Logo, ArgentinaStripes } from "./Logo";
 import { useAuth } from "@/hooks/useAuth";
+import { queryClient } from "@/lib/queryClient";
 import { User, LogOut, Store, Package, MapPin, HelpCircle, QrCode, Bell } from "lucide-react";
 
 export function Header() {
   const { user, isAuthenticated, isBusiness } = useAuth();
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      queryClient.clear();
+      setLocation('/');
+    } catch (error) {
+      console.error('Logout error:', error);
+      window.location.href = '/';
+    }
+  };
 
   const { data: notificationCount } = useQuery<{ count: number }>({
     queryKey: ["/api/notificaciones/count"],
@@ -126,11 +139,13 @@ export function Header() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <a href="/api/logout" className="flex items-center gap-2 cursor-pointer text-destructive" data-testid="link-logout">
-                    <LogOut className="h-4 w-4" />
-                    Cerrar sesión
-                  </a>
+                <DropdownMenuItem 
+                  onClick={handleLogout}
+                  className="flex items-center gap-2 cursor-pointer text-destructive" 
+                  data-testid="link-logout"
+                >
+                  <LogOut className="h-4 w-4" />
+                  Cerrar sesión
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
