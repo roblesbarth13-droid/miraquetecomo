@@ -13,20 +13,20 @@ export function Logo({ size = "md", showText = true }: LogoProps) {
   };
 
   const textSizeClasses = {
-    sm: "text-lg",
-    md: "text-xl",
+    sm: "text-base sm:text-lg",
+    md: "text-sm sm:text-xl",
     lg: "text-3xl",
   };
 
   return (
-    <div className="flex items-center gap-2.5" data-testid="logo">
+    <div className="flex items-center gap-2" data-testid="logo">
       <img
         src={logoImage}
         alt="Mirá que te como logo"
         className={`${sizeClasses[size]} object-contain`}
       />
       {showText && (
-        <span className={`font-bold ${textSizeClasses[size]}`}>
+        <span className={`font-bold whitespace-nowrap ${textSizeClasses[size]}`}>
           <span className="text-primary">Mirá que te</span>{" "}
           <span className="text-accent">como</span>
         </span>
