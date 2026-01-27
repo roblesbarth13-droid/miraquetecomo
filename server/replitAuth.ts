@@ -37,11 +37,14 @@ export function getSession() {
     store: sessionStore,
     resave: false,
     saveUninitialized: false,
+    name: 'connect.sid',
+    proxy: true, // Trust proxy for HTTPS detection
     cookie: {
       httpOnly: true,
-      secure: isReplit, // true on Replit (HTTPS), false locally
-      sameSite: "lax",
+      secure: true, // Always secure on Replit
+      sameSite: "none" as const, // Required for cross-origin with secure
       maxAge: sessionTtl,
+      path: '/',
     },
   });
 }
