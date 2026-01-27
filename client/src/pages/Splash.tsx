@@ -61,7 +61,7 @@ export default function Splash() {
           className="text-center"
         >
           <motion.h1 
-            className="text-lg sm:text-4xl md:text-5xl font-bold"
+            className="text-2xl sm:text-4xl md:text-5xl font-bold whitespace-nowrap px-4"
             animate={{
               scale: [1, 1.02, 1],
             }}
