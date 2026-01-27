@@ -169,9 +169,15 @@ export default function Login() {
 
                 <div className="space-y-2 text-center text-sm text-muted-foreground">
                   <p>
-                    ¿Sos comercio y no tenés cuenta?{" "}
+                    ¿No tenés cuenta?{" "}
+                    <Link href="/registro" className="text-primary hover:underline" data-testid="link-register-user">
+                      Creá una acá
+                    </Link>
+                  </p>
+                  <p>
+                    ¿Sos comercio?{" "}
                     <Link href="/registro-comercio" className="text-primary hover:underline" data-testid="link-register-business">
-                      Registrate acá
+                      Registrá tu negocio
                     </Link>
                   </p>
                 </div>

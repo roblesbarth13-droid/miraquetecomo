@@ -19,6 +19,7 @@ import MapView from "@/pages/MapView";
 import HowItWorks from "@/pages/HowItWorks";
 import MisCompras from "@/pages/MisCompras";
 import RegisterBusiness from "@/pages/RegisterBusiness";
+import RegisterUser from "@/pages/RegisterUser";
 import Login from "@/pages/Login";
 
 function Router() {
@@ -45,6 +46,7 @@ function Router() {
       <Route path="/oferta/:id" component={OfferDetail} />
       <Route path="/landing" component={Landing} />
       <Route path="/registro-comercio" component={RegisterBusiness} />
+      <Route path="/registro" component={RegisterUser} />
       <Route path="/login" component={Login} />
       
       {/* Payment result routes */}
