@@ -151,9 +151,10 @@ export function Header() {
             </DropdownMenu>
           ) : (
             <div className="flex items-center gap-1 sm:gap-2">
-              <Button asChild variant="ghost" size="sm" className="hidden sm:flex" data-testid="button-register">
+              <Button asChild variant="outline" size="sm" data-testid="button-register">
                 <a href="/registro">
-                  Registrarse
+                  <span className="hidden sm:inline">Registrarse</span>
+                  <span className="sm:hidden">Registro</span>
                 </a>
               </Button>
               <Button asChild size="sm" data-testid="button-login">
