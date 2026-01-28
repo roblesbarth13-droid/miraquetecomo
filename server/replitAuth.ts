@@ -41,8 +41,8 @@ export function getSession() {
     proxy: true, // Trust proxy for HTTPS detection
     cookie: {
       httpOnly: true,
-      secure: true, // Always secure on Replit
-      sameSite: "none" as const, // Required for cross-origin with secure
+      secure: isReplit, // Secure only on Replit
+      sameSite: isReplit ? "none" as const : "lax" as const, // none for cross-origin on Replit
       maxAge: sessionTtl,
       path: '/',
     },
