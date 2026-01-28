@@ -46,7 +46,7 @@ export default function Login() {
       const res = await apiRequest("POST", "/api/auth/login", data);
       return res.json();
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       toast({
         title: "Bienvenido",
         description: `Hola ${data.user.businessName || data.user.firstName || 'de nuevo'}`,
@@ -55,6 +55,9 @@ export default function Login() {
       if (data.user) {
         queryClient.setQueryData(["/api/auth/user"], data.user);
       }
+      
+      // Small delay to ensure cookie is processed by browser before navigating
+      await new Promise(resolve => setTimeout(resolve, 100));
       
       if (data.user.userType === 'comercio') {
         navigate("/comercio");
