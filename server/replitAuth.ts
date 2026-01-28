@@ -138,6 +138,9 @@ export async function setupAuth(app: Express) {
 }
 
 export const isAuthenticated: RequestHandler = async (req, res, next) => {
+  // Debug logging
+  console.log(`Auth check - Session ID: ${req.sessionID}, userId: ${(req.session as any)?.userId}, cookies: ${req.headers.cookie?.substring(0, 50) || 'none'}`);
+  
   // First check for local session (email/password login)
   if ((req.session as any)?.userId) {
     return next();
