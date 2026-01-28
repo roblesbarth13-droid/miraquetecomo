@@ -29,8 +29,7 @@ export function getSession() {
   });
   
   // Replit always uses HTTPS, so we need secure: true
-  // Only use secure: false for local development without HTTPS
-  const isReplit = !!process.env.REPL_ID;
+  const isProduction = process.env.NODE_ENV === 'production';
   
   return session({
     secret: process.env.SESSION_SECRET!,
@@ -41,8 +40,8 @@ export function getSession() {
     proxy: true, // Trust proxy for HTTPS detection
     cookie: {
       httpOnly: true,
-      secure: isReplit, // Secure only on Replit
-      sameSite: isReplit ? "none" as const : "lax" as const, // none for cross-origin on Replit
+      secure: true, // Always secure on HTTPS
+      sameSite: "lax" as const, // Lax is more compatible than None
       maxAge: sessionTtl,
       path: '/',
     },
