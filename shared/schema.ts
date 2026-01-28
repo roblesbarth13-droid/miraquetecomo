@@ -45,6 +45,7 @@ export const users = pgTable("users", {
   address: varchar("address"),
   category: categoryEnum("category"),
   cbu: varchar("cbu", { length: 22 }),
+  mpAlias: varchar("mp_alias", { length: 50 }),
   latitude: doublePrecision("latitude"),
   longitude: doublePrecision("longitude"),
   // Mercado Pago OAuth fields for marketplace split payments
@@ -232,6 +233,7 @@ export const registerBusinessSchema = z.object({
     required_error: "Seleccioná una categoría",
   }),
   cbu: z.string().length(22, "El CBU debe tener 22 dígitos").regex(/^\d+$/, "El CBU solo debe contener números"),
+  mpAlias: z.string().max(50, "El alias es muy largo").optional(),
 });
 
 // User registration schema (simpler for regular users)

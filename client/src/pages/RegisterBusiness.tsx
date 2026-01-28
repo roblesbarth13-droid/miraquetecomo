@@ -41,6 +41,7 @@ const formSchema = z.object({
     required_error: "Seleccioná una categoría",
   }),
   cbu: z.string().length(22, "El CBU debe tener 22 dígitos").regex(/^\d+$/, "El CBU solo debe contener números"),
+  mpAlias: z.string().min(6, "El alias debe tener al menos 6 caracteres").max(50, "El alias es muy largo").optional().or(z.literal("")),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Las contraseñas no coinciden",
   path: ["confirmPassword"],
@@ -65,6 +66,7 @@ export default function RegisterBusiness() {
       address: "",
       category: undefined,
       cbu: "",
+      mpAlias: "",
     },
   });
 
@@ -305,6 +307,28 @@ export default function RegisterBusiness() {
                       </FormControl>
                       <FormDescription>
                         Acá vas a recibir el pago de tus ventas.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="mpAlias"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Alias de Mercado Pago (opcional)</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Ej: mi.comercio.mp"
+                          maxLength={50}
+                          {...field}
+                          data-testid="input-mp-alias"
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Tu alias de Mercado Pago para recibir transferencias.
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
