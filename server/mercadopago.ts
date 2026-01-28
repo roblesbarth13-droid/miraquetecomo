@@ -57,7 +57,7 @@ export function getOAuthUrl(redirectUri: string, state?: string): string {
     params.append('state', state);
   }
   
-  return `https://auth.mercadopago.com/authorization?${params.toString()}`;
+  return `https://auth.mercadopago.com.ar/authorization?${params.toString()}`;
 }
 
 export async function exchangeCodeForToken(code: string, redirectUri: string): Promise<OAuthTokenResponse> {
