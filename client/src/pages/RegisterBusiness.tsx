@@ -40,8 +40,6 @@ const formSchema = z.object({
   category: z.enum(["panaderia", "verduleria", "carniceria", "rotiseria", "supermercado"], {
     required_error: "Seleccioná una categoría",
   }),
-  cbu: z.string().length(22, "El CBU debe tener 22 dígitos").regex(/^\d+$/, "El CBU solo debe contener números"),
-  mpAlias: z.string().min(6, "El alias debe tener al menos 6 caracteres").max(50, "El alias es muy largo").optional().or(z.literal("")),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Las contraseñas no coinciden",
   path: ["confirmPassword"],
@@ -65,8 +63,6 @@ export default function RegisterBusiness() {
       phone: "",
       address: "",
       category: undefined,
-      cbu: "",
-      mpAlias: "",
     },
   });
 
@@ -291,49 +287,6 @@ export default function RegisterBusiness() {
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="cbu"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>CBU para recibir pagos</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="22 dígitos"
-                          maxLength={22}
-                          {...field}
-                          data-testid="input-cbu"
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        Acá vas a recibir el pago de tus ventas.
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="mpAlias"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Alias de Mercado Pago (opcional)</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Ej: mi.comercio.mp"
-                          maxLength={50}
-                          {...field}
-                          data-testid="input-mp-alias"
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        Tu alias de Mercado Pago para recibir transferencias.
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
 
                 <div className="bg-muted/50 rounded-lg p-4 space-y-3">
                   <p className="font-medium">Al registrarte como comercio podrás:</p>

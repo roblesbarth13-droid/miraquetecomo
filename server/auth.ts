@@ -65,7 +65,7 @@ export function setupLocalAuth(app: Express) {
         });
       }
 
-      const { email, password, businessName, phone, address, category, cbu, mpAlias } = validation.data;
+      const { email, password, businessName, phone, address, category } = validation.data;
 
       const existingUser = await storage.getUserByEmail(email);
       if (existingUser) {
@@ -87,8 +87,6 @@ export function setupLocalAuth(app: Express) {
         phone,
         address,
         category,
-        cbu,
-        mpAlias: mpAlias || null,
         latitude: coordinates?.lat,
         longitude: coordinates?.lng,
       });

@@ -232,8 +232,6 @@ export const registerBusinessSchema = z.object({
   category: z.enum(['panaderia', 'verduleria', 'carniceria', 'rotiseria', 'supermercado'], {
     required_error: "Seleccioná una categoría",
   }),
-  cbu: z.string().length(22, "El CBU debe tener 22 dígitos").regex(/^\d+$/, "El CBU solo debe contener números"),
-  mpAlias: z.string().max(50, "El alias es muy largo").optional(),
 });
 
 // User registration schema (simpler for regular users)
