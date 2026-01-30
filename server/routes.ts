@@ -750,9 +750,15 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
         return res.status(500).json({ message: "Mercado Pago OAuth no está configurado" });
       }
 
-      const baseUrl = process.env.REPLIT_DEV_DOMAIN 
-        ? `https://${process.env.REPLIT_DEV_DOMAIN}` 
-        : 'http://localhost:5000';
+      // In production, use the deployment URL; in dev, use REPLIT_DEV_DOMAIN
+      let baseUrl: string;
+      if (process.env.REPLIT_DEPLOYMENT === '1') {
+        baseUrl = 'https://miraquetecomo.replit.app';
+      } else if (process.env.REPLIT_DEV_DOMAIN) {
+        baseUrl = `https://${process.env.REPLIT_DEV_DOMAIN}`;
+      } else {
+        baseUrl = 'http://localhost:5000';
+      }
       
       const redirectUri = `${baseUrl}/api/mercadopago/oauth/callback`;
       
@@ -799,9 +805,15 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
       // Clear the state from session after validation
       delete req.session.mpOAuthState;
 
-      const baseUrl = process.env.REPLIT_DEV_DOMAIN 
-        ? `https://${process.env.REPLIT_DEV_DOMAIN}` 
-        : 'http://localhost:5000';
+      // In production, use the deployment URL; in dev, use REPLIT_DEV_DOMAIN
+      let baseUrl: string;
+      if (process.env.REPLIT_DEPLOYMENT === '1') {
+        baseUrl = 'https://miraquetecomo.replit.app';
+      } else if (process.env.REPLIT_DEV_DOMAIN) {
+        baseUrl = `https://${process.env.REPLIT_DEV_DOMAIN}`;
+      } else {
+        baseUrl = 'http://localhost:5000';
+      }
       
       const redirectUri = `${baseUrl}/api/mercadopago/oauth/callback`;
       
