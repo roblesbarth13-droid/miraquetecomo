@@ -427,9 +427,9 @@ export default function BusinessPanel() {
                 </Button>
               </div>
             ) : (
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+                  <div className="h-10 w-10 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center flex-shrink-0">
                     <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400" />
                   </div>
                   <div>
@@ -438,6 +438,11 @@ export default function BusinessPanel() {
                       Recibí el {100 - (mpStatus?.commission || 25)}% de cada venta directamente en tu cuenta
                     </p>
                   </div>
+                </div>
+                <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-md p-3">
+                  <p className="text-sm text-blue-800 dark:text-blue-300">
+                    <strong>Importante:</strong> Al conectar, ingresá con la cuenta de Mercado Pago del comercio (no con una cuenta personal). Los pagos se depositan en la cuenta que uses para conectar.
+                  </p>
                 </div>
                 <Button
                   onClick={() => connectMpMutation.mutate()}
