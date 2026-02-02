@@ -13,6 +13,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -36,6 +43,7 @@ export default function BusinessPanel() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editAddress, setEditAddress] = useState("");
   const [editPhone, setEditPhone] = useState("");
+  const [editCategory, setEditCategory] = useState<string>("");
   const [businessImage, setBusinessImage] = useState<string>("");
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [pickupCode, setPickupCode] = useState("");
@@ -57,6 +65,7 @@ export default function BusinessPanel() {
     if (user) {
       setEditAddress(user.address || "");
       setEditPhone(user.phone || "");
+      setEditCategory(user.category || "");
       setBusinessImage(user.defaultOfferImage || "");
     }
   }, [user]);
@@ -107,10 +116,10 @@ export default function BusinessPanel() {
   };
 
   const updateProfileMutation = useMutation({
-    mutationFn: async (data: { address: string; phone: string; defaultOfferImage: string }) => {
+    mutationFn: async (data: { address: string; phone: string; category: string; defaultOfferImage: string }) => {
       return apiRequest("PUT", "/api/comercio/perfil", {
         businessName: user?.businessName,
-        category: user?.category,
+        category: data.category,
         address: data.address,
         phone: data.phone,
         defaultOfferImage: data.defaultOfferImage,
@@ -348,7 +357,25 @@ export default function BusinessPanel() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Imagen del comercio</Label>
+                    <Label htmlFor="edit-category">Categoría del comercio</Label>
+                    <Select value={editCategory} onValueChange={setEditCategory}>
+                      <SelectTrigger data-testid="select-edit-category">
+                        <SelectValue placeholder="Seleccioná una categoría" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="panaderia">Panadería</SelectItem>
+                        <SelectItem value="verduleria">Verdulería</SelectItem>
+                        <SelectItem value="carniceria">Carnicería</SelectItem>
+                        <SelectItem value="rotiseria">Rotisería</SelectItem>
+                        <SelectItem value="supermercado">Supermercado</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-muted-foreground">
+                      Esto afecta la imagen automática que se muestra en tus ofertas
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Imagen del comercio (opcional)</Label>
                     <p className="text-xs text-muted-foreground mb-2">
                       Esta imagen se usará en todas tus ofertas cuando no subas una foto específica
                     </p>
@@ -406,7 +433,7 @@ export default function BusinessPanel() {
                     Cancelar
                   </Button>
                   <Button
-                    onClick={() => updateProfileMutation.mutate({ address: editAddress, phone: editPhone, defaultOfferImage: businessImage })}
+                    onClick={() => updateProfileMutation.mutate({ address: editAddress, phone: editPhone, category: editCategory, defaultOfferImage: businessImage })}
                     disabled={updateProfileMutation.isPending || isUploadingImage}
                     data-testid="button-save-profile"
                   >
