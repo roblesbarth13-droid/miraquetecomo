@@ -118,9 +118,15 @@ export async function refreshAccessToken(refreshToken: string): Promise<OAuthTok
 }
 
 export async function createPaymentPreference(params: CreatePreferenceParams): Promise<PreferenceResponse> {
-  const baseUrl = process.env.REPLIT_DEV_DOMAIN 
-    ? `https://${process.env.REPLIT_DEV_DOMAIN}` 
-    : 'http://localhost:5000';
+  // In production, use the deployment URL; in dev, use REPLIT_DEV_DOMAIN
+  let baseUrl: string;
+  if (process.env.REPLIT_DEPLOYMENT === '1') {
+    baseUrl = 'https://miraquetecomo.replit.app';
+  } else if (process.env.REPLIT_DEV_DOMAIN) {
+    baseUrl = `https://${process.env.REPLIT_DEV_DOMAIN}`;
+  } else {
+    baseUrl = 'http://localhost:5000';
+  }
 
   if (params.sellerAccessToken) {
     const sellerClient = new MercadoPagoConfig({ accessToken: params.sellerAccessToken });
