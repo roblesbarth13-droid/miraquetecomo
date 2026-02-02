@@ -91,17 +91,19 @@ export function Footer() {
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li className="flex items-center gap-2">
                 <Mail className="h-4 w-4 flex-shrink-0" />
-                <a href="mailto:hola@miraquetecomo.com" className="hover-elevate inline-block rounded px-1 -mx-1" data-testid="link-footer-email">
-                  hola@miraquetecomo.com
+                <a href="mailto:roblesbarth13@gmail.com" className="hover-elevate inline-block rounded px-1 -mx-1" data-testid="link-footer-email">
+                  roblesbarth13@gmail.com
                 </a>
               </li>
               <li className="flex items-center gap-2">
                 <Phone className="h-4 w-4 flex-shrink-0" />
-                <span>+54 11 1234-5678</span>
+                <a href="tel:+542983446464" className="hover-elevate inline-block rounded px-1 -mx-1" data-testid="link-footer-phone">
+                  +54 2983 446464
+                </a>
               </li>
               <li className="flex items-center gap-2">
                 <MapPin className="h-4 w-4 flex-shrink-0" />
-                <span>Buenos Aires, Argentina</span>
+                <span>Tres Arroyos, Buenos Aires</span>
               </li>
             </ul>
           </div>
