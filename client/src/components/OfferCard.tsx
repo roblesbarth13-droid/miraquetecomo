@@ -88,7 +88,7 @@ export function OfferCard({ offer }: OfferCardProps) {
 
   return (
     <Link href={`/oferta/${offer.id}`} data-testid={`card-offer-${offer.id}`}>
-      <Card className={`overflow-hidden hover-elevate active-elevate-2 cursor-pointer transition-all duration-200 group shadow-md hover:shadow-lg border border-border/50 ${isNew ? 'ring-2 ring-primary/40 ring-offset-1 animate-[pulse_3s_ease-in-out_infinite]' : ''}`}>
+      <Card className={`overflow-hidden hover-elevate active-elevate-2 cursor-pointer transition-all duration-200 group shadow-md hover:shadow-lg border border-border/50 ${isNew ? 'ring-2 ring-primary/40 ring-offset-1' : ''}`}>
         <div className="relative aspect-[4/3] overflow-hidden">
           {displayImage ? (
             <img
@@ -116,7 +116,7 @@ export function OfferCard({ offer }: OfferCardProps) {
             )}
             {isLowStock && (
               <Badge
-                className="bg-destructive text-destructive-foreground text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-md flex items-center gap-0.5 animate-pulse"
+                className="bg-destructive text-destructive-foreground text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-md flex items-center gap-0.5"
                 data-testid={`badge-low-stock-${offer.id}`}
               >
                 <Flame className="h-2.5 w-2.5" />
