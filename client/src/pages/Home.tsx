@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 import { CategoryFilter } from "@/components/CategoryFilter";
 import { OfferCard } from "@/components/OfferCard";
 import { OfferCardSkeleton } from "@/components/OfferCardSkeleton";
@@ -98,24 +99,25 @@ export default function Home() {
         )}
       </main>
 
+      <Footer />
+
       {!isBusiness && (
         <div className="fixed bottom-0 left-0 right-0 shadow-lg z-50">
-          {/* Argentine flag banner */}
           <div className="flex flex-col">
-            <div className="h-3 bg-[#74ACDF]" />
-            <div className="bg-white py-2.5">
+            <div className="h-2 bg-[#74ACDF]" />
+            <div className="bg-white py-2">
               <div className="max-w-7xl mx-auto px-4">
                 <a 
                   href="/registro-comercio"
-                  className="flex items-center justify-center gap-2 text-gray-800 font-semibold"
+                  className="flex items-center justify-center gap-2 text-gray-800 font-semibold text-sm"
                   data-testid="button-become-business-cta"
                 >
-                  <Store className="h-5 w-5 text-[#74ACDF]" />
+                  <Store className="h-4 w-4 text-[#74ACDF]" />
                   <span>¿Sos comercio? Registrate y cargá tu oferta</span>
                 </a>
               </div>
             </div>
-            <div className="h-3 bg-[#74ACDF]" />
+            <div className="h-2 bg-[#74ACDF]" />
           </div>
         </div>
       )}

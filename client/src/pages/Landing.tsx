@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Logo } from "@/components/Logo";
+import { Footer } from "@/components/Footer";
 import { ArrowRight, Store, Users, Percent, Clock } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Link } from "wouter";
@@ -209,14 +210,7 @@ export default function Landing() {
         </section>
       </main>
 
-      <footer className="border-t py-8">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
-          <Logo size="sm" />
-          <p className="text-sm text-muted-foreground">
-            2024 Mirá que te como. Reduciendo el desperdicio de comida.
-          </p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

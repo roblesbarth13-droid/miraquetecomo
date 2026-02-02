@@ -2,7 +2,7 @@ import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Clock, Package, MapPin, Star } from "lucide-react";
+import { Clock, Package, MapPin, Star, Flame, Sparkles } from "lucide-react";
 import type { OfferWithBusiness } from "@shared/schema";
 import { categoryDisplayNames } from "@shared/schema";
 
@@ -79,6 +79,8 @@ export function OfferCard({ offer }: OfferCardProps) {
   const originalPrice = parseFloat(offer.originalPrice);
   const discountedPrice = parseFloat(offer.discountedPrice);
   const quantityAvailable = (offer.quantity || 1) - (offer.quantitySold || 0);
+  const isLowStock = quantityAvailable <= 3 && quantityAvailable > 0;
+  const isNew = offer.createdAt && (Date.now() - new Date(offer.createdAt).getTime()) < 24 * 60 * 60 * 1000;
   
   const displayImage = (offer.imageUrl && offer.imageUrl.trim() !== '') 
     ? offer.imageUrl 
@@ -86,7 +88,7 @@ export function OfferCard({ offer }: OfferCardProps) {
 
   return (
     <Link href={`/oferta/${offer.id}`} data-testid={`card-offer-${offer.id}`}>
-      <Card className="overflow-hidden hover-elevate active-elevate-2 cursor-pointer transition-all duration-200 group shadow-md hover:shadow-lg border border-border/50">
+      <Card className={`overflow-hidden hover-elevate active-elevate-2 cursor-pointer transition-all duration-200 group shadow-md hover:shadow-lg border border-border/50 ${isNew ? 'ring-2 ring-primary/40 ring-offset-1 animate-[pulse_3s_ease-in-out_infinite]' : ''}`}>
         <div className="relative aspect-[4/3] overflow-hidden">
           {displayImage ? (
             <img
@@ -102,6 +104,26 @@ export function OfferCard({ offer }: OfferCardProps) {
               </span>
             </div>
           )}
+          <div className="absolute top-1.5 left-1.5 flex flex-col gap-1">
+            {isNew && (
+              <Badge
+                className="bg-primary text-primary-foreground text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-md flex items-center gap-0.5"
+                data-testid={`badge-new-${offer.id}`}
+              >
+                <Sparkles className="h-2.5 w-2.5" />
+                Nuevo
+              </Badge>
+            )}
+            {isLowStock && (
+              <Badge
+                className="bg-destructive text-destructive-foreground text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-md flex items-center gap-0.5 animate-pulse"
+                data-testid={`badge-low-stock-${offer.id}`}
+              >
+                <Flame className="h-2.5 w-2.5" />
+                {quantityAvailable === 1 ? 'Último!' : `Quedan ${quantityAvailable}`}
+              </Badge>
+            )}
+          </div>
           <Badge
             className="absolute top-1.5 right-1.5 bg-accent text-accent-foreground text-xs font-bold px-2 py-0.5 rounded-full shadow-md"
             data-testid={`badge-discount-${offer.id}`}
