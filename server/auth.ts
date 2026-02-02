@@ -1,5 +1,6 @@
 import { Express, Request, Response, NextFunction } from "express";
 import bcrypt from "bcrypt";
+import { z } from "zod";
 import { storage } from "./storage";
 import { registerBusinessSchema, registerUserSchema, loginSchema } from "@shared/schema";
 
@@ -180,8 +181,16 @@ export function setupLocalAuth(app: Express) {
       const { email, password } = validation.data;
 
       const user = await storage.getUserByEmail(email);
-      if (!user || !user.passwordHash) {
+      if (!user) {
         return res.status(401).json({ message: "Email o contraseña incorrectos" });
+      }
+      
+      if (!user.passwordHash) {
+        return res.status(401).json({ 
+          message: "Esta cuenta no tiene contraseña configurada", 
+          needsPassword: true,
+          email: user.email
+        });
       }
 
       const isValid = await verifyPassword(password, user.passwordHash);
@@ -223,6 +232,72 @@ export function setupLocalAuth(app: Express) {
       res.clearCookie('connect.sid');
       res.json({ message: "Sesión cerrada" });
     });
+  });
+
+  // Set password for users who don't have one (legacy OIDC users)
+  app.post('/api/auth/set-password', async (req, res) => {
+    console.log("Set-password endpoint called with body:", req.body);
+    try {
+      const schema = z.object({
+        email: z.string().email(),
+        password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
+      });
+      
+      const validation = schema.safeParse(req.body);
+      if (!validation.success) {
+        console.log("Set-password validation failed:", validation.error.errors);
+        return res.status(400).json({ 
+          message: "Datos inválidos", 
+          errors: validation.error.errors 
+        });
+      }
+
+      const { email, password } = validation.data;
+      console.log("Set-password for email:", email);
+
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        console.log("Set-password: user not found:", email);
+        return res.status(404).json({ message: "Usuario no encontrado" });
+      }
+
+      if (user.passwordHash) {
+        console.log("Set-password: user already has password:", email);
+        return res.status(400).json({ message: "Esta cuenta ya tiene contraseña configurada" });
+      }
+
+      const passwordHash = await hashPassword(password);
+      console.log("Set-password: updating password for:", email);
+      const updatedUser = await storage.setUserPassword(email, passwordHash);
+      console.log("Set-password: result:", updatedUser ? "success" : "failed");
+      
+      if (!updatedUser) {
+        return res.status(500).json({ message: "Error al guardar contraseña" });
+      }
+
+      // Log the user in automatically
+      req.session.userId = updatedUser.id;
+      req.session.save((err) => {
+        if (err) {
+          console.error("Error saving session:", err);
+          return res.status(500).json({ message: "Error al guardar sesión" });
+        }
+        res.json({
+          message: "Contraseña configurada exitosamente",
+          user: {
+            id: updatedUser.id,
+            email: updatedUser.email,
+            firstName: updatedUser.firstName,
+            lastName: updatedUser.lastName,
+            userType: updatedUser.userType,
+            businessName: updatedUser.businessName,
+          }
+        });
+      });
+    } catch (error) {
+      console.error("Error setting password:", error);
+      res.status(500).json({ message: "Error al configurar contraseña" });
+    }
   });
 
   app.get('/api/auth/me', async (req, res) => {
