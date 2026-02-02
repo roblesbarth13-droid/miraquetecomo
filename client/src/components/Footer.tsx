@@ -1,16 +1,43 @@
 import { Link } from "wouter";
-import { Mail, Phone, MapPin } from "lucide-react";
+import { Mail, Phone, MapPin, Instagram, Facebook } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-card border-t mt-auto py-4" data-testid="footer">
+    <footer className="bg-card border-t mt-auto py-4 pb-20" data-testid="footer">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex flex-col md:flex-row justify-between items-center gap-3 text-sm text-muted-foreground">
-          <p data-testid="text-copyright">
-            © {currentYear} Mirá que te como
-          </p>
+          <div className="flex items-center gap-3">
+            <p data-testid="text-copyright">
+              © {currentYear} Mirá que te como
+            </p>
+            <div className="flex gap-1">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-7 w-7"
+                asChild
+                data-testid="link-instagram"
+              >
+                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
+                  <Instagram className="h-4 w-4" />
+                </a>
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-7 w-7"
+                asChild
+                data-testid="link-facebook"
+              >
+                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">
+                  <Facebook className="h-4 w-4" />
+                </a>
+              </Button>
+            </div>
+          </div>
           
           <div className="flex flex-wrap justify-center items-center gap-x-4 gap-y-1">
             <a 
