@@ -48,6 +48,7 @@ export const users = pgTable("users", {
   mpAlias: varchar("mp_alias", { length: 50 }),
   latitude: doublePrecision("latitude"),
   longitude: doublePrecision("longitude"),
+  defaultOfferImage: text("default_offer_image"),
   // Mercado Pago OAuth fields for marketplace split payments
   mpAccessToken: text("mp_access_token"),
   mpRefreshToken: text("mp_refresh_token"),
@@ -220,6 +221,7 @@ export const updateBusinessProfileSchema = z.object({
   category: z.enum(['panaderia', 'verduleria', 'carniceria', 'rotiseria', 'supermercado']),
   latitude: z.number().optional(),
   longitude: z.number().optional(),
+  defaultOfferImage: z.string().optional(),
 });
 
 // Business registration schema (email + password)

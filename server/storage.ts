@@ -27,7 +27,7 @@ export interface IStorage {
   setUserPassword(email: string, passwordHash: string): Promise<User | undefined>;
   createUser(userData: { email: string; passwordHash: string; firstName?: string; lastName?: string; userType?: 'usuario' | 'comercio'; businessName?: string; phone?: string; address?: string; category?: string; cbu?: string; latitude?: number | null; longitude?: number | null }): Promise<User>;
   upsertUser(user: UpsertUser): Promise<User>;
-  updateUserToBusiness(id: string, businessData: { businessName: string; phone?: string; address?: string; category: string; latitude?: number | null; longitude?: number | null }): Promise<User>;
+  updateUserToBusiness(id: string, businessData: { businessName: string; phone?: string; address?: string; category: string; latitude?: number | null; longitude?: number | null; defaultOfferImage?: string }): Promise<User>;
   
   getOffers(category?: string): Promise<OfferWithBusiness[]>;
   getOfferById(id: number): Promise<OfferWithBusiness | undefined>;
@@ -121,7 +121,7 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
-  async updateUserToBusiness(id: string, businessData: { businessName: string; phone?: string; address?: string; category: string; latitude?: number | null; longitude?: number | null }): Promise<User> {
+  async updateUserToBusiness(id: string, businessData: { businessName: string; phone?: string; address?: string; category: string; latitude?: number | null; longitude?: number | null; defaultOfferImage?: string }): Promise<User> {
     const [user] = await db
       .update(users)
       .set({
@@ -132,6 +132,7 @@ export class DatabaseStorage implements IStorage {
         category: businessData.category as any,
         latitude: businessData.latitude,
         longitude: businessData.longitude,
+        defaultOfferImage: businessData.defaultOfferImage,
         updatedAt: new Date(),
       })
       .where(eq(users.id, id))

@@ -140,7 +140,9 @@ export default function OfferDetail() {
   
   const displayImage = (offer.imageUrl && offer.imageUrl.trim() !== '') 
     ? offer.imageUrl 
-    : categoryDefaultImages[offer.category];
+    : (offer.business?.defaultOfferImage && offer.business.defaultOfferImage.trim() !== '')
+      ? offer.business.defaultOfferImage
+      : categoryDefaultImages[offer.category];
 
   return (
     <div className="min-h-screen bg-background" data-testid="page-offer-detail">

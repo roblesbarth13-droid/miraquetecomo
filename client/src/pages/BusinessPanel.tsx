@@ -22,7 +22,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Link } from "wouter";
-import { Plus, Package, DollarSign, TrendingUp, Loader2, Settings, MapPin, CreditCard, Check, AlertCircle, QrCode, CheckCircle, XCircle, Clock } from "lucide-react";
+import { Plus, Package, DollarSign, TrendingUp, Loader2, Settings, MapPin, CreditCard, Check, AlertCircle, QrCode, CheckCircle, XCircle, Clock, Upload, Image, X } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
@@ -36,6 +36,8 @@ export default function BusinessPanel() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editAddress, setEditAddress] = useState("");
   const [editPhone, setEditPhone] = useState("");
+  const [businessImage, setBusinessImage] = useState<string>("");
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [pickupCode, setPickupCode] = useState("");
   const [verificationResult, setVerificationResult] = useState<{
     valid: boolean;
@@ -55,16 +57,63 @@ export default function BusinessPanel() {
     if (user) {
       setEditAddress(user.address || "");
       setEditPhone(user.phone || "");
+      setBusinessImage(user.defaultOfferImage || "");
     }
   }, [user]);
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "Archivo muy grande",
+        description: "La imagen debe ser menor a 5MB",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsUploadingImage(true);
+    try {
+      const formData = new FormData();
+      formData.append("image", file);
+
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al subir imagen");
+      }
+
+      const data = await response.json();
+      setBusinessImage(data.imageUrl);
+      toast({
+        title: "Imagen subida",
+        description: "La imagen se guardará cuando presiones Guardar",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "No se pudo subir la imagen",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploadingImage(false);
+    }
+  };
+
   const updateProfileMutation = useMutation({
-    mutationFn: async (data: { address: string; phone: string }) => {
+    mutationFn: async (data: { address: string; phone: string; defaultOfferImage: string }) => {
       return apiRequest("PUT", "/api/comercio/perfil", {
         businessName: user?.businessName,
         category: user?.category,
         address: data.address,
         phone: data.phone,
+        defaultOfferImage: data.defaultOfferImage,
       });
     },
     onSuccess: () => {
@@ -298,6 +347,55 @@ export default function BusinessPanel() {
                       data-testid="input-edit-phone"
                     />
                   </div>
+                  <div className="space-y-2">
+                    <Label>Imagen del comercio</Label>
+                    <p className="text-xs text-muted-foreground mb-2">
+                      Esta imagen se usará en todas tus ofertas cuando no subas una foto específica
+                    </p>
+                    {businessImage ? (
+                      <div className="relative">
+                        <img 
+                          src={businessImage} 
+                          alt="Imagen del comercio" 
+                          className="w-full h-32 object-cover rounded-md"
+                        />
+                        <Button
+                          variant="destructive"
+                          size="icon"
+                          className="absolute top-2 right-2 h-6 w-6"
+                          onClick={() => setBusinessImage("")}
+                          type="button"
+                          data-testid="button-remove-business-image"
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="relative">
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp,image/gif"
+                          onChange={handleImageUpload}
+                          className="hidden"
+                          id="business-image-upload"
+                          disabled={isUploadingImage}
+                        />
+                        <label
+                          htmlFor="business-image-upload"
+                          className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-muted-foreground/25 rounded-md cursor-pointer hover:border-primary/50 transition-colors"
+                        >
+                          {isUploadingImage ? (
+                            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                          ) : (
+                            <>
+                              <Upload className="h-8 w-8 text-muted-foreground mb-2" />
+                              <span className="text-sm text-muted-foreground">Subir imagen</span>
+                            </>
+                          )}
+                        </label>
+                      </div>
+                    )}
+                  </div>
                 </div>
                 <DialogFooter>
                   <Button
@@ -308,8 +406,8 @@ export default function BusinessPanel() {
                     Cancelar
                   </Button>
                   <Button
-                    onClick={() => updateProfileMutation.mutate({ address: editAddress, phone: editPhone })}
-                    disabled={updateProfileMutation.isPending}
+                    onClick={() => updateProfileMutation.mutate({ address: editAddress, phone: editPhone, defaultOfferImage: businessImage })}
+                    disabled={updateProfileMutation.isPending || isUploadingImage}
                     data-testid="button-save-profile"
                   >
                     {updateProfileMutation.isPending ? (

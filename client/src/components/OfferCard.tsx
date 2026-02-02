@@ -84,7 +84,9 @@ export function OfferCard({ offer }: OfferCardProps) {
   
   const displayImage = (offer.imageUrl && offer.imageUrl.trim() !== '') 
     ? offer.imageUrl 
-    : getDefaultImage(offer.category, offer.id);
+    : (offer.business?.defaultOfferImage && offer.business.defaultOfferImage.trim() !== '')
+      ? offer.business.defaultOfferImage
+      : getDefaultImage(offer.category, offer.id);
 
   return (
     <Link href={`/oferta/${offer.id}`} data-testid={`card-offer-${offer.id}`}>
