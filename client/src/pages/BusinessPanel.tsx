@@ -29,7 +29,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Link } from "wouter";
-import { Plus, Package, DollarSign, TrendingUp, Loader2, Settings, MapPin, CreditCard, Check, AlertCircle, QrCode, CheckCircle, XCircle, Clock, Upload, Image, X } from "lucide-react";
+import { Plus, Package, DollarSign, TrendingUp, Loader2, Settings, MapPin, CreditCard, Check, AlertCircle, QrCode, CheckCircle, XCircle, Clock, Upload, Image, X, Trash2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
@@ -137,6 +137,31 @@ export default function BusinessPanel() {
       toast({
         title: "Error",
         description: "No se pudo actualizar el perfil.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const deleteOfferMutation = useMutation({
+    mutationFn: async (offerId: number) => {
+      const res = await apiRequest("DELETE", `/api/comercio/ofertas/${offerId}`);
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.message || "Error al eliminar");
+      }
+      return res;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/comercio/ofertas"] });
+      toast({
+        title: "Oferta eliminada",
+        description: "La oferta fue eliminada correctamente.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message || "No se pudo eliminar la oferta.",
         variant: "destructive",
       });
     },
@@ -620,7 +645,25 @@ export default function BusinessPanel() {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" data-testid="active-offers-grid">
                 {activeOffers.map((offer) => (
-                  <OfferCard key={offer.id} offer={offer} />
+                  <div key={offer.id} className="relative">
+                    <OfferCard offer={offer} />
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      className="absolute top-2 right-2 z-10"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (confirm("¿Estás seguro de eliminar esta oferta?")) {
+                          deleteOfferMutation.mutate(offer.id);
+                        }
+                      }}
+                      disabled={deleteOfferMutation.isPending}
+                      data-testid={`button-delete-offer-${offer.id}`}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 ))}
               </div>
             )}

@@ -35,6 +35,8 @@ export interface IStorage {
   updateOfferStatus(id: number, status: 'activa' | 'vendida' | 'expirada'): Promise<Offer | undefined>;
   incrementOfferQuantitySold(id: number): Promise<Offer | undefined>;
   getOffersByBusinessId(businessId: string): Promise<Offer[]>;
+  deleteOffer(offerId: number, businessId: string): Promise<boolean>;
+  hasPurchasesForOffer(offerId: number): Promise<boolean>;
   
   createPurchase(purchase: InsertPurchase): Promise<Purchase>;
   getPurchaseById(id: number): Promise<Purchase | undefined>;
@@ -247,6 +249,22 @@ export class DatabaseStorage implements IStorage {
       .from(offers)
       .where(eq(offers.businessId, businessId))
       .orderBy(desc(offers.createdAt));
+  }
+
+  async deleteOffer(offerId: number, businessId: string): Promise<boolean> {
+    const result = await db
+      .delete(offers)
+      .where(and(eq(offers.id, offerId), eq(offers.businessId, businessId)))
+      .returning();
+    return result.length > 0;
+  }
+
+  async hasPurchasesForOffer(offerId: number): Promise<boolean> {
+    const result = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(purchases)
+      .where(eq(purchases.offerId, offerId));
+    return (result[0]?.count || 0) > 0;
   }
 
   private generatePickupCode(): string {

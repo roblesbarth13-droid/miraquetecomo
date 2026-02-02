@@ -251,6 +251,39 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     }
   });
 
+  // Delete offer
+  app.delete('/api/comercio/ofertas/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = getUserId(req);
+      const user = await storage.getUser(userId);
+      
+      if (!user || user.userType !== 'comercio') {
+        return res.status(403).json({ message: "Solo los comercios pueden eliminar ofertas" });
+      }
+
+      const offerId = parseInt(req.params.id);
+      if (isNaN(offerId)) {
+        return res.status(400).json({ message: "ID de oferta inválido" });
+      }
+
+      // Check if there are any purchases for this offer
+      const hasPurchases = await storage.hasPurchasesForOffer(offerId);
+      if (hasPurchases) {
+        return res.status(400).json({ message: "No se puede eliminar una oferta que tiene compras asociadas" });
+      }
+
+      const deleted = await storage.deleteOffer(offerId, userId);
+      if (!deleted) {
+        return res.status(404).json({ message: "Oferta no encontrada o no te pertenece" });
+      }
+
+      res.json({ message: "Oferta eliminada correctamente" });
+    } catch (error) {
+      console.error("Error deleting offer:", error);
+      res.status(500).json({ message: "Error al eliminar la oferta" });
+    }
+  });
+
   // Get business sales
   app.get('/api/comercio/ventas', isAuthenticated, async (req: any, res) => {
     try {
