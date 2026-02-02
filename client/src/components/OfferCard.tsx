@@ -39,10 +39,13 @@ const categoryDefaultImages: Record<string, string[]> = {
   carniceria: [carnicheriaImg1, carnicheriaImg2, carnicheriaImg3, carnicheriaImg4],
 };
 
-function getDefaultImage(category: string, offerId: number): string | undefined {
+function getDefaultImage(category: string, businessId: string | undefined): string | undefined {
   const images = categoryDefaultImages[category];
   if (!images || images.length === 0) return undefined;
-  return images[offerId % images.length];
+  if (!businessId) return images[0];
+  // Use hash of businessId to always get the same image for the same business
+  const hash = businessId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  return images[hash % images.length];
 }
 
 interface OfferCardProps {
@@ -86,7 +89,7 @@ export function OfferCard({ offer }: OfferCardProps) {
     ? offer.imageUrl 
     : (offer.business?.defaultOfferImage && offer.business.defaultOfferImage.trim() !== '')
       ? offer.business.defaultOfferImage
-      : getDefaultImage(offer.category, offer.id);
+      : getDefaultImage(offer.category, offer.business?.id || offer.businessId);
 
   return (
     <Link href={`/oferta/${offer.id}`} data-testid={`card-offer-${offer.id}`}>
