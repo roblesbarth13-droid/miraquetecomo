@@ -11,22 +11,45 @@ import type { OfferWithBusiness, RatingWithUser } from "@shared/schema";
 import { categoryDisplayNames, statusDisplayNames } from "@shared/schema";
 import { useAuth } from "@/hooks/useAuth";
 
-import panaderiaImg from "@/assets/images/category-panaderia.png";
-import verduleriaImg from "@/assets/images/category-verduleria.png";
-import supermercadoImg from "@/assets/images/category-supermercado.png";
-import rotiseriaImg from "@/assets/images/category-rotiseria.png";
-import carnicheriaImg from "@/assets/images/category-carniceria.png";
+import panaderiaImg1 from "@/assets/images/category-panaderia.png";
+import panaderiaImg2 from "@/assets/images/category-panaderia-2.png";
+import panaderiaImg3 from "@/assets/images/category-panaderia-3.png";
+import panaderiaImg4 from "@/assets/images/category-panaderia-4.png";
 
-const categoryDefaultImages: Record<string, string> = {
-  panaderia: panaderiaImg,
-  verduleria: verduleriaImg,
-  supermercado: supermercadoImg,
-  rotiseria: rotiseriaImg,
-  carniceria: carnicheriaImg,
+import verduleriaImg1 from "@/assets/images/category-verduleria.png";
+import verduleriaImg2 from "@/assets/images/category-verduleria-2.png";
+import verduleriaImg3 from "@/assets/images/category-verduleria-3.png";
+import verduleriaImg4 from "@/assets/images/category-verduleria-4.png";
+
+import supermercadoImg1 from "@/assets/images/category-supermercado.png";
+import supermercadoImg2 from "@/assets/images/category-supermercado-2.png";
+import supermercadoImg3 from "@/assets/images/category-supermercado-3.png";
+import supermercadoImg4 from "@/assets/images/category-supermercado-4.png";
+
+import rotiseriaImg1 from "@/assets/images/category-rotiseria.png";
+import rotiseriaImg2 from "@/assets/images/category-rotiseria-2.png";
+import rotiseriaImg3 from "@/assets/images/category-rotiseria-3.png";
+import rotiseriaImg4 from "@/assets/images/category-rotiseria-4.png";
+
+import carnicheriaImg1 from "@/assets/images/category-carniceria.png";
+import carnicheriaImg2 from "@/assets/images/category-carniceria-2.png";
+import carnicheriaImg3 from "@/assets/images/category-carniceria-3.png";
+import carnicheriaImg4 from "@/assets/images/category-carniceria-4.png";
+
+const categoryDefaultImages: Record<string, string[]> = {
+  panaderia: [panaderiaImg1, panaderiaImg2, panaderiaImg3, panaderiaImg4],
+  verduleria: [verduleriaImg1, verduleriaImg2, verduleriaImg3, verduleriaImg4],
+  supermercado: [supermercadoImg1, supermercadoImg2, supermercadoImg3, supermercadoImg4],
+  rotiseria: [rotiseriaImg1, rotiseriaImg2, rotiseriaImg3, rotiseriaImg4],
+  carniceria: [carnicheriaImg1, carnicheriaImg2, carnicheriaImg3, carnicheriaImg4],
 };
 
-function getDefaultImage(category: string, _businessId: string | undefined): string | undefined {
-  return categoryDefaultImages[category];
+function getDefaultImage(category: string, businessId: string | undefined): string | undefined {
+  const images = categoryDefaultImages[category];
+  if (!images || images.length === 0) return undefined;
+  if (!businessId) return images[0];
+  const hash = businessId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  return images[hash % images.length];
 }
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
