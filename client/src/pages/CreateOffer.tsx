@@ -132,21 +132,37 @@ export default function CreateOffer() {
   };
 
   const uploadImage = async (file: File): Promise<string | null> => {
-    const formData = new FormData();
-    formData.append("image", file);
-    
-    const response = await fetch("/api/upload", {
+    // Step 1: Request presigned URL from backend (send JSON metadata, NOT the file)
+    const urlResponse = await fetch("/api/uploads/request-url", {
       method: "POST",
-      body: formData,
+      headers: { "Content-Type": "application/json" },
       credentials: "include",
+      body: JSON.stringify({
+        name: file.name,
+        size: file.size,
+        contentType: file.type || "image/jpeg",
+      }),
     });
     
-    if (!response.ok) {
+    if (!urlResponse.ok) {
+      throw new Error("Error al obtener URL de subida");
+    }
+    
+    const { uploadURL, objectPath } = await urlResponse.json();
+    
+    // Step 2: Upload file directly to presigned URL (NOT to backend)
+    const uploadResponse = await fetch(uploadURL, {
+      method: "PUT",
+      body: file,
+      headers: { "Content-Type": file.type || "image/jpeg" },
+    });
+    
+    if (!uploadResponse.ok) {
       throw new Error("Error al subir la imagen");
     }
     
-    const data = await response.json();
-    return data.imageUrl;
+    // Return the object path for serving the image
+    return objectPath;
   };
 
   const createMutation = useMutation({

@@ -8,6 +8,7 @@ import { storage } from "./storage";
 import { setupAuth, isAuthenticated as isAuthenticatedReplit } from "./replitAuth";
 import { setupLocalAuth, isAuthenticatedLocal } from "./auth";
 import { insertOfferSchema, updateBusinessProfileSchema, insertRatingSchema } from "@shared/schema";
+import { registerObjectStorageRoutes, ObjectStorageService } from "./replit_integrations/object_storage";
 
 function isAuthenticated(req: Request, res: Response, next: NextFunction) {
   if (req.session?.userId) {
@@ -99,6 +100,9 @@ const upload = multer({
 export async function registerRoutes(httpServer: Server, app: Express): Promise<Server> {
   await setupAuth(app);
   setupLocalAuth(app);
+  
+  // Register Object Storage routes for persistent file uploads
+  registerObjectStorageRoutes(app);
 
   // Public config endpoint for frontend (maps API key)
   app.get('/api/config', (req, res) => {
