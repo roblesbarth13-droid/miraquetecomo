@@ -213,8 +213,8 @@ export default function OfferDetail() {
               <div className="flex items-start justify-between gap-4 flex-wrap">
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <Store className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-muted-foreground" data-testid="text-business-name">
+                    <Store className="h-5 w-5 text-primary" />
+                    <span className="text-lg font-semibold text-foreground" data-testid="text-business-name">
                       {offer.business?.businessName || "Comercio"}
                     </span>
                     {businessRating && businessRating.count > 0 && (
