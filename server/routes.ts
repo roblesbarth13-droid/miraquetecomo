@@ -387,7 +387,17 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
         return res.status(400).json({ message: "Error al generar código de retiro" });
       }
       
-      const qrDataUrl = await QRCode.toDataURL(pickupCode, {
+      let baseUrl: string;
+      if (process.env.NODE_ENV === 'production' || process.env.REPL_SLUG) {
+        baseUrl = 'https://miraquetecomo.replit.app';
+      } else if (process.env.REPLIT_DEV_DOMAIN) {
+        baseUrl = `https://${process.env.REPLIT_DEV_DOMAIN}`;
+      } else {
+        baseUrl = 'http://localhost:5000';
+      }
+      const verificationUrl = `${baseUrl}/verificar/${pickupCode}`;
+      
+      const qrDataUrl = await QRCode.toDataURL(verificationUrl, {
         width: 300,
         margin: 2,
         color: {

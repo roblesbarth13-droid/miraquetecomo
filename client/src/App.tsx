@@ -21,6 +21,7 @@ import MisCompras from "@/pages/MisCompras";
 import RegisterBusiness from "@/pages/RegisterBusiness";
 import RegisterUser from "@/pages/RegisterUser";
 import Login from "@/pages/Login";
+import VerificarQR from "@/pages/VerificarQR";
 
 function Router() {
   const { isAuthenticated, isLoading, isBusiness } = useAuth();
@@ -48,6 +49,9 @@ function Router() {
       <Route path="/registro-comercio" component={RegisterBusiness} />
       <Route path="/registro" component={RegisterUser} />
       <Route path="/login" component={Login} />
+      
+      {/* QR verification route */}
+      <Route path="/verificar/:code" component={VerificarQR} />
       
       {/* Payment result routes */}
       <Route path="/pago/exito" component={PaymentSuccess} />
