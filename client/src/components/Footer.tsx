@@ -18,23 +18,17 @@ export function Footer() {
                 variant="ghost" 
                 size="icon" 
                 className="h-7 w-7"
-                asChild
                 data-testid="link-instagram"
               >
-                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
-                  <Instagram className="h-4 w-4" />
-                </a>
+                <Instagram className="h-4 w-4" />
               </Button>
               <Button 
                 variant="ghost" 
                 size="icon" 
                 className="h-7 w-7"
-                asChild
                 data-testid="link-facebook"
               >
-                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">
-                  <Facebook className="h-4 w-4" />
-                </a>
+                <Facebook className="h-4 w-4" />
               </Button>
             </div>
           </div>
