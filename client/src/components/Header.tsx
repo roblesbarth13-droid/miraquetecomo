@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -10,14 +10,22 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Logo, ArgentinaStripes } from "./Logo";
 import { useAuth } from "@/hooks/useAuth";
-import { queryClient } from "@/lib/queryClient";
-import { User, LogOut, Store, Package, MapPin, HelpCircle, QrCode, Bell } from "lucide-react";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { Notification } from "@shared/schema";
+import { User, LogOut, Store, Package, MapPin, HelpCircle, QrCode, Bell, ShoppingBag, Check } from "lucide-react";
+import { useState } from "react";
 
 export function Header() {
   const { user, isAuthenticated, isBusiness } = useAuth();
   const [location, setLocation] = useLocation();
+  const [notifOpen, setNotifOpen] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -37,6 +45,21 @@ export function Header() {
     refetchInterval: 30000,
   });
 
+  const { data: notifications } = useQuery<Notification[]>({
+    queryKey: ["/api/notificaciones"],
+    enabled: isBusiness && notifOpen,
+  });
+
+  const markReadMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return apiRequest("POST", `/api/notificaciones/${id}/read`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/notificaciones"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/notificaciones/count"] });
+    },
+  });
+
   const getInitials = () => {
     if (user?.firstName && user?.lastName) {
       return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
@@ -45,6 +68,19 @@ export function Header() {
       return user.email[0].toUpperCase();
     }
     return "U";
+  };
+
+  const formatTimeAgo = (dateStr: string) => {
+    const now = new Date();
+    const date = new Date(dateStr);
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    if (diffMins < 1) return "Ahora";
+    if (diffMins < 60) return `Hace ${diffMins} min`;
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return `Hace ${diffHours}h`;
+    const diffDays = Math.floor(diffHours / 24);
+    return `Hace ${diffDays}d`;
   };
 
   return (
@@ -77,19 +113,87 @@ export function Header() {
             </Button>
           </Link>
           {isBusiness && (
-            <Link href="/comercio">
-              <Button variant="ghost" size="icon" className="relative" data-testid="button-notifications">
-                <Bell className="h-5 w-5" />
-                {(notificationCount?.count ?? 0) > 0 && (
-                  <Badge 
-                    className="absolute -top-1 -right-1 h-5 min-w-5 p-0 flex items-center justify-center text-xs bg-destructive text-destructive-foreground"
-                    data-testid="badge-notification-count"
+            <Popover open={notifOpen} onOpenChange={(open) => {
+              setNotifOpen(open);
+              if (open) {
+                queryClient.invalidateQueries({ queryKey: ["/api/notificaciones"] });
+              }
+            }}>
+              <PopoverTrigger asChild>
+                <Button variant="ghost" size="icon" className="relative" data-testid="button-notifications">
+                  <Bell className="h-5 w-5" />
+                  {(notificationCount?.count ?? 0) > 0 && (
+                    <Badge 
+                      className="absolute -top-1 -right-1 h-5 min-w-5 p-0 flex items-center justify-center text-xs bg-destructive text-destructive-foreground"
+                      data-testid="badge-notification-count"
+                    >
+                      {notificationCount!.count > 9 ? "9+" : notificationCount!.count}
+                    </Badge>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent align="end" className="w-80 p-0" data-testid="popover-notifications">
+                <div className="p-3 border-b">
+                  <h3 className="font-semibold text-sm">Notificaciones</h3>
+                </div>
+                <div className="max-h-80 overflow-y-auto">
+                  {!notifications || notifications.length === 0 ? (
+                    <div className="p-6 text-center">
+                      <Bell className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                      <p className="text-sm text-muted-foreground" data-testid="text-no-notifications">No tenés notificaciones</p>
+                    </div>
+                  ) : (
+                    notifications.map((notif) => (
+                      <div
+                        key={notif.id}
+                        className={`flex items-start gap-3 p-3 border-b last:border-b-0 ${
+                          !notif.read ? "bg-muted/50" : ""
+                        }`}
+                        data-testid={`notification-item-${notif.id}`}
+                      >
+                        <div className="flex-shrink-0 mt-0.5">
+                          <ShoppingBag className="h-5 w-5 text-green-600 dark:text-green-400" />
+                        </div>
+                        <div className="flex-1 min-w-0 space-y-1">
+                          <p className="text-sm font-medium" data-testid={`text-notification-title-${notif.id}`}>{notif.title}</p>
+                          <p className="text-xs text-muted-foreground leading-relaxed" data-testid={`text-notification-message-${notif.id}`}>{notif.message}</p>
+                          <p className="text-xs text-muted-foreground">{notif.createdAt ? formatTimeAgo(notif.createdAt.toString()) : ""}</p>
+                        </div>
+                        {!notif.read && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="flex-shrink-0"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              markReadMutation.mutate(notif.id);
+                            }}
+                            data-testid={`button-mark-read-${notif.id}`}
+                          >
+                            <Check className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                    ))
+                  )}
+                </div>
+                <div className="p-2 border-t">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="w-full text-xs"
+                    onClick={() => {
+                      setNotifOpen(false);
+                      setLocation("/comercio");
+                    }}
+                    data-testid="button-go-to-panel"
                   >
-                    {notificationCount!.count > 9 ? "9+" : notificationCount!.count}
-                  </Badge>
-                )}
-              </Button>
-            </Link>
+                    <Store className="h-4 w-4 mr-1" />
+                    Ir al panel del comercio
+                  </Button>
+                </div>
+              </PopoverContent>
+            </Popover>
           )}
           {isAuthenticated ? (
             <DropdownMenu>

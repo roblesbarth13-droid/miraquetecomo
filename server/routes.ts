@@ -950,15 +950,17 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
             await storage.updatePurchaseStatus(purchaseId, 'pagado', paymentId);
             await storage.incrementOfferQuantitySold(purchase.offerId);
             
-            // Get offer details for notification
             const offer = await storage.getOfferById(purchase.offerId);
+            const buyer = await storage.getUser(purchase.userId);
             if (offer) {
-              // Create notification for the business
+              const buyerName = buyer?.firstName && buyer?.lastName 
+                ? `${buyer.firstName} ${buyer.lastName}` 
+                : buyer?.email || "Un usuario";
               await storage.createNotification({
                 userId: offer.business.id,
                 type: 'nueva_venta',
                 title: 'Nueva venta',
-                message: `Vendiste "${offer.title}" por $${parseFloat(offer.discountedPrice).toLocaleString('es-AR')}`,
+                message: `${buyerName} compró "${offer.title}" por $${parseFloat(offer.discountedPrice).toLocaleString('es-AR')}. Preparalo para el retiro.`,
                 relatedId: purchaseId,
               });
             }
