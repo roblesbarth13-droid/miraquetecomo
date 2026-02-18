@@ -29,12 +29,13 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Link } from "wouter";
-import { Plus, Package, DollarSign, TrendingUp, Loader2, Settings, MapPin, CreditCard, Check, AlertCircle, QrCode, CheckCircle, XCircle, Clock, Upload, Image, X, Trash2 } from "lucide-react";
+import { Plus, Package, DollarSign, TrendingUp, Loader2, Settings, MapPin, CreditCard, Check, AlertCircle, QrCode, CheckCircle, XCircle, Clock, Upload, Image, X, Trash2, BarChart3 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import type { OfferWithBusiness, PurchaseWithOfferAndUser } from "@shared/schema";
 import { statusDisplayNames, categoryDisplayNames } from "@shared/schema";
+import { BusinessStats } from "@/components/BusinessStats";
 
 export default function BusinessPanel() {
   const [, navigate] = useLocation();
@@ -631,6 +632,10 @@ export default function BusinessPanel() {
               <QrCode className="h-4 w-4 mr-1" />
               Verificar retiro
             </TabsTrigger>
+            <TabsTrigger value="estadisticas" data-testid="tab-stats">
+              <BarChart3 className="h-4 w-4 mr-1" />
+              Estadisticas
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="activas">
@@ -879,6 +884,22 @@ export default function BusinessPanel() {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="estadisticas">
+            {offersLoading || salesLoading ? (
+              <div className="space-y-4">
+                {[1, 2, 3].map(i => (
+                  <Card key={i}>
+                    <CardContent className="p-6">
+                      <Skeleton className="h-48 w-full" />
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <BusinessStats sales={sales || []} offers={offers || []} />
+            )}
           </TabsContent>
         </Tabs>
       </main>

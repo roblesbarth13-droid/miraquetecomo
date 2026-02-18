@@ -10,6 +10,7 @@ import { Link } from "wouter";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import type { PurchaseWithOfferAndUser } from "@shared/schema";
+import { UserSavingsStats } from "@/components/UserSavingsStats";
 
 export default function MisCompras() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
@@ -76,6 +77,8 @@ export default function MisCompras() {
 
       <main className="max-w-4xl mx-auto px-4 py-6">
         <h1 className="text-2xl font-bold mb-6" data-testid="text-title">Mis Compras</h1>
+
+        {!isLoading && compras && <UserSavingsStats purchases={compras} />}
 
         {isLoading ? (
           <div className="space-y-4">
