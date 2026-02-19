@@ -23,7 +23,25 @@ export default function Home() {
   const { data: pendingPurchases } = useQuery<PurchaseWithOfferAndUser[]>({
     queryKey: ["/api/mis-compras"],
     enabled: isAuthenticated && !isBusiness,
-    select: (data) => data.filter((p) => p.paymentStatus === "pagado" && !p.pickedUp),
+    select: (data) => data.filter((p) => {
+      if (p.paymentStatus !== "pagado" || p.pickedUp) return false;
+      if (p.offer?.expiresAt && new Date() > new Date(p.offer.expiresAt)) return false;
+      const purchaseDate = p.createdAt ? new Date(p.createdAt) : null;
+      const pickupEnd = p.offer?.pickupTimeEnd;
+      if (purchaseDate && pickupEnd) {
+        const parts = pickupEnd.split(":");
+        if (parts.length === 2) {
+          const [hours, minutes] = parts.map(Number);
+          if (!isNaN(hours) && !isNaN(minutes)) {
+            const deadline = new Date(purchaseDate);
+            deadline.setHours(hours, minutes, 0, 0);
+            if (deadline <= purchaseDate) deadline.setDate(deadline.getDate() + 1);
+            if (new Date() > deadline) return false;
+          }
+        }
+      }
+      return true;
+    }),
   });
 
   const { data: qrData, isLoading: qrLoading } = useQuery<{ qrCode: string; pickupCode: string; pickedUp: string | null }>({

@@ -497,6 +497,9 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
       }
       
       const updatedPurchase = await storage.markPurchaseAsPickedUp(purchaseId);
+      
+      await storage.deleteNotificationsByRelatedId(purchaseId);
+      
       res.json({ success: true, purchase: updatedPurchase });
     } catch (error) {
       console.error("Error marking pickup:", error);
