@@ -8,14 +8,28 @@ import { OfferCardSkeleton } from "@/components/OfferCardSkeleton";
 import { EmptyState } from "@/components/EmptyState";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Store, Search, X } from "lucide-react";
-import type { OfferWithBusiness } from "@shared/schema";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Store, Search, X, QrCode, ShoppingBag } from "lucide-react";
+import type { OfferWithBusiness, PurchaseWithOfferAndUser } from "@shared/schema";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedPurchaseId, setSelectedPurchaseId] = useState<number | null>(null);
   const { isAuthenticated, isBusiness } = useAuth();
+
+  const { data: pendingPurchases } = useQuery<PurchaseWithOfferAndUser[]>({
+    queryKey: ["/api/mis-compras"],
+    enabled: isAuthenticated && !isBusiness,
+    select: (data) => data.filter((p) => p.paymentStatus === "pagado" && !p.pickedUp),
+  });
+
+  const { data: qrData, isLoading: qrLoading } = useQuery<{ qrCode: string; pickupCode: string; pickedUp: string | null }>({
+    queryKey: ["/api/compras", selectedPurchaseId, "qr"],
+    enabled: !!selectedPurchaseId,
+  });
 
   const { data: offers, isLoading } = useQuery<OfferWithBusiness[]>({
     queryKey: ["/api/ofertas", selectedCategory],
@@ -67,6 +81,43 @@ export default function Home() {
           )}
         </div>
       </div>
+
+      {pendingPurchases && pendingPurchases.length > 0 && (
+        <div className="max-w-7xl mx-auto px-4 pt-4" data-testid="pending-pickups-banner">
+          <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-md p-3">
+            <div className="flex items-center gap-3 mb-2">
+              <ShoppingBag className="h-5 w-5 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+              <p className="font-medium text-amber-800 dark:text-amber-300 text-sm">
+                {pendingPurchases.length === 1
+                  ? "Tenés 1 retiro pendiente"
+                  : `Tenés ${pendingPurchases.length} retiros pendientes`}
+              </p>
+            </div>
+            <div className="space-y-2 pl-8">
+              {pendingPurchases.map((purchase) => (
+                <button
+                  key={purchase.id}
+                  onClick={() => setSelectedPurchaseId(purchase.id)}
+                  className="w-full flex items-center justify-between gap-2 rounded-md p-2 text-left hover-elevate"
+                  data-testid={`button-pending-pickup-${purchase.id}`}
+                >
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{purchase.offer.title}</p>
+                    <p className="text-xs text-muted-foreground truncate">
+                      {purchase.offer.business?.businessName}
+                      {purchase.offer.business?.address && ` - ${purchase.offer.business.address}`}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1 text-primary flex-shrink-0">
+                    <QrCode className="h-4 w-4" />
+                    <span className="text-xs font-medium">Ver QR</span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="py-4">
         <CategoryFilter
@@ -121,6 +172,38 @@ export default function Home() {
           </div>
         </div>
       )}
+
+      <Dialog open={!!selectedPurchaseId} onOpenChange={(open) => !open && setSelectedPurchaseId(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-center">Codigo de Retiro</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col items-center py-4">
+            {qrLoading ? (
+              <Skeleton className="h-64 w-64" />
+            ) : qrData ? (
+              <>
+                <img
+                  src={qrData.qrCode}
+                  alt="Codigo QR"
+                  className="w-64 h-64 mb-4"
+                  data-testid="img-home-qr-code"
+                />
+                <div className="text-center">
+                  <p className="text-sm text-muted-foreground mb-1">
+                    Mostra este codigo en el comercio
+                  </p>
+                  <p className="text-3xl font-mono font-bold tracking-widest" data-testid="text-home-qr-pickup-code">
+                    {qrData.pickupCode}
+                  </p>
+                </div>
+              </>
+            ) : (
+              <p className="text-muted-foreground">Error al cargar el codigo QR</p>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
