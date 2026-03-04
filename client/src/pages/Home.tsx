@@ -173,20 +173,19 @@ export default function Home() {
       {!isBusiness && (
         <div className="fixed bottom-0 left-0 right-0 shadow-lg z-50">
           <div className="flex flex-col">
-            <div className="h-2 bg-[#74ACDF]" />
-            <div className="bg-white py-2">
-              <div className="max-w-7xl mx-auto px-4">
-                <a 
-                  href="/registro-comercio"
-                  className="flex items-center justify-center gap-2 text-gray-800 font-semibold text-sm"
-                  data-testid="button-become-business-cta"
-                >
-                  <Store className="h-4 w-4 text-[#74ACDF]" />
-                  <span>¿Sos comercio? Registrate y cargá tu oferta</span>
+            <div className="h-1.5 bg-[#74ACDF]" />
+            <div className="bg-white py-3">
+              <div className="max-w-7xl mx-auto px-4 flex items-center justify-center gap-3">
+                <Store className="h-5 w-5 text-[#74ACDF] flex-shrink-0" />
+                <span className="text-gray-700 font-medium text-sm">¿Tenés un comercio?</span>
+                <a href="/registro-comercio" data-testid="button-become-business-cta">
+                  <Button size="sm" className="bg-[#74ACDF] hover:bg-[#5a9bcf] text-white font-semibold px-4 shadow-sm">
+                    Registrá tu negocio
+                  </Button>
                 </a>
               </div>
             </div>
-            <div className="h-2 bg-[#74ACDF]" />
+            <div className="h-1.5 bg-[#74ACDF]" />
           </div>
         </div>
       )}
