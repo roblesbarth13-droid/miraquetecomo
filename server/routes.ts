@@ -155,6 +155,17 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     }
   });
 
+  app.get('/descargar-android', (req, res) => {
+    const filePath = path.join(process.cwd(), 'client', 'public', 'android-project.tar.gz');
+    if (fs.existsSync(filePath)) {
+      res.setHeader('Content-Disposition', 'attachment; filename="android-project.tar.gz"');
+      res.setHeader('Content-Type', 'application/gzip');
+      res.sendFile(filePath);
+    } else {
+      res.status(404).send('Archivo no disponible');
+    }
+  });
+
   // Public config endpoint for frontend (maps API key)
   app.get('/api/config', (req, res) => {
     res.json({
