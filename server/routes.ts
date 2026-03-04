@@ -144,6 +144,17 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   // Register Object Storage routes for persistent file uploads
   registerObjectStorageRoutes(app);
 
+  app.get('/descargar-proyecto', (req, res) => {
+    const filePath = path.join(process.cwd(), 'client', 'public', 'descarga.tar.gz');
+    if (fs.existsSync(filePath)) {
+      res.setHeader('Content-Disposition', 'attachment; filename="miraquetecomo-proyecto.tar.gz"');
+      res.setHeader('Content-Type', 'application/gzip');
+      res.sendFile(filePath);
+    } else {
+      res.status(404).send('Archivo no disponible');
+    }
+  });
+
   // Public config endpoint for frontend (maps API key)
   app.get('/api/config', (req, res) => {
     res.json({
