@@ -1,0 +1,38 @@
+import type { CapacitorConfig } from '@capacitor/cli';
+
+const config: CapacitorConfig = {
+  appId: 'com.miraquetecomo.app',
+  appName: 'Mirá que te como',
+  webDir: 'dist/public',
+  server: {
+    url: 'https://miraquetecomo.replit.app',
+    cleartext: false,
+  },
+  plugins: {
+    SplashScreen: {
+      launchAutoHide: true,
+      launchShowDuration: 2000,
+      backgroundColor: '#FFFFFF',
+      showSpinner: false,
+      androidScaleType: 'CENTER_CROP',
+      splashFullScreen: true,
+      splashImmersive: true,
+    },
+    StatusBar: {
+      backgroundColor: '#FFFFFF',
+      style: 'LIGHT',
+    },
+  },
+  android: {
+    allowMixedContent: false,
+    backgroundColor: '#FFFFFF',
+  },
+  ios: {
+    backgroundColor: '#FFFFFF',
+    contentInset: 'automatic',
+    preferredContentMode: 'mobile',
+    scheme: 'miraquetecomo',
+  },
+};
+
+export default config;

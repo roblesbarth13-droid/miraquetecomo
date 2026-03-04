@@ -1,0 +1,26 @@
+{
+  "name": "Mirá que te como",
+  "short_name": "MiráQTC",
+  "description": "Comprá comida con descuento de comercios locales. Ahorrá hasta 70% en productos frescos.",
+  "start_url": "/home",
+  "display": "standalone",
+  "background_color": "#FFFFFF",
+  "theme_color": "#74ACDF",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["food", "shopping", "lifestyle"],
+  "lang": "es-AR"
+}

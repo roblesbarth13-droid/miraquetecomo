@@ -58,6 +58,14 @@ Preferred communication style: Simple, everyday language.
 - Auth-required: Convert to Business (`/convertir-comercio`), My Purchases (`/mis-compras`)
 - Business-only: Business Panel (`/comercio`), Create Offer (`/comercio/ofertas/nueva`)
 
+### Mobile App (Capacitor)
+- **Capacitor**: Configured to wrap the web app as native Android/iOS app
+- **App ID**: `com.miraquetecomo.app`
+- **Config**: `capacitor.config.ts` points to `https://miraquetecomo.replit.app`
+- **Resources**: Icons and splash screens pre-generated in `resources/` directory
+- **PWA Manifest**: `client/public/manifest.json` for installable web app support
+- **Guide**: `GUIA_APP_STORES.md` has step-by-step instructions for publishing
+
 ### Build System
 - Development: Vite dev server with HMR, proxied through Express
 - Production: Client bundled to `dist/public`, server bundled with esbuild to `dist/index.cjs`
