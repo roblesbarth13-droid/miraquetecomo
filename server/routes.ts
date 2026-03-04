@@ -4,6 +4,7 @@ import path from "path";
 import fs from "fs";
 import multer from "multer";
 import QRCode from "qrcode";
+import rateLimit from "express-rate-limit";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated as isAuthenticatedReplit } from "./replitAuth";
 import { setupLocalAuth, isAuthenticatedLocal } from "./auth";
@@ -97,7 +98,46 @@ const upload = multer({
   }
 });
 
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 200,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: "Demasiadas solicitudes. Intentá de nuevo en unos minutos." },
+});
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 15,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: "Demasiados intentos de acceso. Esperá unos minutos antes de intentar de nuevo." },
+});
+
+const paymentLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: "Demasiados intentos de pago. Intentá de nuevo en unos minutos." },
+});
+
+const uploadLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: "Demasiadas subidas de archivos. Intentá de nuevo en unos minutos." },
+});
+
 export async function registerRoutes(httpServer: Server, app: Express): Promise<Server> {
+  app.use("/api/", generalLimiter);
+  app.use("/api/auth/login", authLimiter);
+  app.use("/api/auth/register/usuario", authLimiter);
+  app.use("/api/auth/register/comercio", authLimiter);
+  app.use("/api/checkout", paymentLimiter);
+  app.use("/api/upload", uploadLimiter);
+
   await setupAuth(app);
   setupLocalAuth(app);
   

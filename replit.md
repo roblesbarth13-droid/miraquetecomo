@@ -49,9 +49,11 @@ Preferred communication style: Simple, everyday language.
 - **Edit Business Profile**: Businesses can update their address/phone from the panel to enable geocoding
 - **Mercado Pago Integration**: Simulated marketplace payment splitting (platform commission + merchant payout)
 - **QR Pickup Verification**: Each purchase generates a unique 6-character alphanumeric code; users see QR code on "Mis Compras" page; businesses verify codes in "Verificar retiro" tab
+- **Rate Limiting**: API endpoints protected with express-rate-limit (general 200/15min, auth 15/15min, payments 30/15min, uploads 20/15min)
+- **Legal Pages**: Terms & Conditions (`/terminos`) and Privacy Policy (`/privacidad`) compliant with Argentine law (Ley 25.326)
 
 ### Route Structure
-- Public routes: Home (`/`), Offer Details (`/oferta/:id`), Landing (`/landing`), Map (`/mapa`), How it Works (`/como-funciona`)
+- Public routes: Home (`/`), Offer Details (`/oferta/:id`), Landing (`/landing`), Map (`/mapa`), How it Works (`/como-funciona`), Terms (`/terminos`), Privacy (`/privacidad`)
 - Auth routes: Login (`/login`), Business Registration (`/registro-comercio`)
 - Auth-required: Convert to Business (`/convertir-comercio`), My Purchases (`/mis-compras`)
 - Business-only: Business Panel (`/comercio`), Create Offer (`/comercio/ofertas/nueva`)
