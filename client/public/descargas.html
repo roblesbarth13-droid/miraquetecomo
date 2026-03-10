@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Descargar imágenes para Google Play</title>
+<style>
+body { font-family: Arial, sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; background: #f5f5f5; }
+h1 { color: #2e7d32; }
+.card { background: white; border-radius: 12px; padding: 20px; margin: 20px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+.card h3 { margin-top: 0; }
+.card img { max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 8px; }
+a.btn { display: inline-block; background: #2e7d32; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; margin-top: 10px; font-size: 16px; }
+a.btn:hover { background: #1b5e20; }
+.screenshots { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+.screenshots img { max-height: 300px; object-fit: contain; }
+</style>
+</head>
+<body>
+<h1>Imágenes para Google Play Console</h1>
+<p>Hacé clic en cada botón para descargar la imagen. Después subila en Google Play Console.</p>
+
+<div class="card">
+<h3>1. Ícono de la app (512x512 px)</h3>
+<img src="/app_icon_512_final.png" alt="Icono" style="max-width:200px">
+<br>
+<a class="btn" href="/app_icon_512_final.png" download="app_icon_512.png">Descargar Ícono</a>
+</div>
+
+<div class="card">
+<h3>2. Gráfico de funciones (1024x500 px)</h3>
+<img src="/feature_graphic_1024x500.png" alt="Feature Graphic">
+<br>
+<a class="btn" href="/feature_graphic_1024x500.png" download="feature_graphic.png">Descargar Gráfico de Funciones</a>
+</div>
+
+<div class="card">
+<h3>3. Capturas de pantalla (1080x1920 px)</h3>
+<div class="screenshots">
+<div>
+<p><strong>Pantalla principal</strong></p>
+<img src="/screenshot_1_home_final.png" alt="Screenshot 1">
+<br><a class="btn" href="/screenshot_1_home_final.png" download="screenshot_1.png">Descargar</a>
+</div>
+<div>
+<p><strong>Mapa</strong></p>
+<img src="/screenshot_2_map_final.png" alt="Screenshot 2">
+<br><a class="btn" href="/screenshot_2_map_final.png" download="screenshot_2.png">Descargar</a>
+</div>
+<div>
+<p><strong>Detalle de oferta</strong></p>
+<img src="/screenshot_3_detail_final.png" alt="Screenshot 3">
+<br><a class="btn" href="/screenshot_3_detail_final.png" download="screenshot_3.png">Descargar</a>
+</div>
+<div>
+<p><strong>Retiro con QR</strong></p>
+<img src="/screenshot_4_qr_final.png" alt="Screenshot 4">
+<br><a class="btn" href="/screenshot_4_qr_final.png" download="screenshot_4.png">Descargar</a>
+</div>
+</div>
+</div>
+</body>
+</html>
