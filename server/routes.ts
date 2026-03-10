@@ -144,6 +144,23 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   // Register Object Storage routes for persistent file uploads
   registerObjectStorageRoutes(app);
 
+  app.use('/assets-store', (req, res, next) => {
+    const assetsPath = path.join(process.cwd(), 'client', 'public');
+    const filePath = path.join(assetsPath, req.path);
+    if (fs.existsSync(filePath) && !fs.statSync(filePath).isDirectory()) {
+      return res.sendFile(filePath);
+    }
+    next();
+  });
+
+  app.get('/descargas', (req, res) => {
+    const filePath = path.join(process.cwd(), 'client', 'public', 'descargas.html');
+    if (fs.existsSync(filePath)) {
+      return res.sendFile(filePath);
+    }
+    res.status(404).send('Página no encontrada');
+  });
+
   app.get('/descargar-proyecto', (req, res) => {
     const filePath = path.join(process.cwd(), 'client', 'public', 'descarga.tar.gz');
     if (fs.existsSync(filePath)) {
