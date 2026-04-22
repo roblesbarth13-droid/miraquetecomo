@@ -62,7 +62,7 @@ export default function MapView() {
     }
 
     const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initMap`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initMap&loading=async&v=weekly`;
     script.async = true;
     script.defer = true;
     script.onerror = () => {
@@ -141,14 +141,7 @@ export default function MapView() {
         const colors = categoryColors[offer.category] || { bg: '#16a34a', border: '#15803d' };
         const discountText = `-${offer.discountPercentage}%`;
         
-        const svgMarker = `
-          <svg xmlns="http://www.w3.org/2000/svg" width="70" height="36" viewBox="0 0 70 36">
-            <rect x="0" y="0" width="70" height="28" rx="4" fill="${colors.bg}" stroke="${colors.border}" stroke-width="1"/>
-            <polygon points="35,28 30,36 40,36" fill="${colors.bg}"/>
-            <text x="35" y="12" text-anchor="middle" fill="white" font-size="9" font-weight="bold" font-family="Arial">${catLabel}</text>
-            <text x="35" y="23" text-anchor="middle" fill="white" font-size="10" font-weight="bold" font-family="Arial">${discountText}</text>
-          </svg>
-        `;
+        const svgMarker = `<svg xmlns="http://www.w3.org/2000/svg" width="70" height="36" viewBox="0 0 70 36"><rect x="0" y="0" width="70" height="28" rx="4" fill="${colors.bg}" stroke="${colors.border}" stroke-width="1"/><polygon points="35,28 30,36 40,36" fill="${colors.bg}"/><text x="35" y="12" text-anchor="middle" fill="white" font-size="9" font-weight="bold" font-family="Arial,sans-serif">${catLabel}</text><text x="35" y="23" text-anchor="middle" fill="white" font-size="10" font-weight="bold" font-family="Arial,sans-serif">${discountText}</text></svg>`;
         const encodedSvg = encodeURIComponent(svgMarker);
 
         const marker = new google.maps.Marker({
@@ -156,7 +149,7 @@ export default function MapView() {
           position,
           title: `${offer.title} - ${categoryDisplayNames[offer.category]} - $${offer.discountedPrice}`,
           icon: {
-            url: `data:image/svg+xml,${encodedSvg}`,
+            url: `data:image/svg+xml;charset=UTF-8,${encodedSvg}`,
             scaledSize: new google.maps.Size(70, 36),
             anchor: new google.maps.Point(35, 36),
           },
