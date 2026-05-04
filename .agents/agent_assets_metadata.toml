@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "VO31skXR6g6H_t52TBJIf"
+uri = "file://client/public/logo-mira-que-te-como.svg"
+type = "image"
+title = "Logo completo - Mirá que te como"
