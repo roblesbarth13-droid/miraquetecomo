@@ -177,6 +177,7 @@ export default function Login() {
                             <Input
                               type={showPassword ? "text" : "password"}
                               placeholder="Mínimo 6 caracteres"
+                              autoComplete="new-password"
                               {...field}
                               data-testid="input-new-password"
                             />
@@ -206,6 +207,7 @@ export default function Login() {
                           <Input
                             type={showPassword ? "text" : "password"}
                             placeholder="Repetí tu contraseña"
+                            autoComplete="new-password"
                             {...field}
                             data-testid="input-confirm-password"
                           />
