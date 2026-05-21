@@ -6,3 +6,9 @@ id = "VO31skXR6g6H_t52TBJIf"
 uri = "file://client/public/logo-mira-que-te-como.svg"
 type = "image"
 title = "Logo completo - Mirá que te como"
+
+[[outputs]]
+id = "IzeeDJ9Rrp9eWa144-ZU2"
+uri = "file://client/public/icon-playstore-512.png"
+type = "image"
+title = "Ícono para Play Store (512x512)"
