@@ -274,13 +274,13 @@ export default function RegisterBusiness() {
                       <FormLabel>Dirección</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="Ej: Av. Corrientes 1234, CABA"
+                          placeholder="Ej: Av. Corrientes 1234, Buenos Aires, CABA"
                           {...field}
                           data-testid="input-address"
                         />
                       </FormControl>
                       <FormDescription>
-                        Esta dirección se usará para mostrar tu comercio en el mapa.
+                        Incluí calle, número, ciudad y provincia para que aparezca correctamente en el mapa.
                       </FormDescription>
                       <FormMessage />
                     </FormItem>

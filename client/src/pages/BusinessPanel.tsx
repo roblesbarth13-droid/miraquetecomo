@@ -363,13 +363,13 @@ export default function BusinessPanel() {
                     <Label htmlFor="edit-address">Dirección completa</Label>
                     <Input
                       id="edit-address"
-                      placeholder="Ej: Av. Corrientes 1234, Buenos Aires"
+                      placeholder="Ej: Av. Corrientes 1234, Buenos Aires, CABA"
                       value={editAddress}
                       onChange={(e) => setEditAddress(e.target.value)}
                       data-testid="input-edit-address"
                     />
                     <p className="text-xs text-muted-foreground">
-                      Incluí calle, número, ciudad y provincia para mejor precisión en el mapa
+                      Incluí calle, número, ciudad y provincia para que aparezca correctamente en el mapa
                     </p>
                   </div>
                   <div className="space-y-2">
