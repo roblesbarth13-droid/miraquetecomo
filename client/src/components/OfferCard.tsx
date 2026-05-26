@@ -31,14 +31,24 @@ import carnicheriaImg2 from "@/assets/images/category-carniceria-2.png";
 import carnicheriaImg3 from "@/assets/images/category-carniceria-3.png";
 import carnicheriaImg4 from "@/assets/images/category-carniceria-4.png";
 
+import restauranteImg1 from "@/assets/images/category-restaurante.png";
+import restauranteImg2 from "@/assets/images/category-restaurante-2.png";
+import restauranteImg3 from "@/assets/images/category-restaurante-3.png";
+import restauranteImg4 from "@/assets/images/category-restaurante-4.png";
+
+import cafeteriaImg1 from "@/assets/images/category-cafeteria.png";
+import cafeteriaImg2 from "@/assets/images/category-cafeteria-2.png";
+import cafeteriaImg3 from "@/assets/images/category-cafeteria-3.png";
+import cafeteriaImg4 from "@/assets/images/category-cafeteria-4.png";
+
 const categoryDefaultImages: Record<string, string[]> = {
   panaderia: [panaderiaImg1, panaderiaImg2, panaderiaImg3, panaderiaImg4],
   verduleria: [verduleriaImg1, verduleriaImg2, verduleriaImg3, verduleriaImg4],
   supermercado: [supermercadoImg1, supermercadoImg2, supermercadoImg3, supermercadoImg4],
   rotiseria: [rotiseriaImg1, rotiseriaImg2, rotiseriaImg3, rotiseriaImg4],
   carniceria: [carnicheriaImg1, carnicheriaImg2, carnicheriaImg3, carnicheriaImg4],
-  restaurante: [rotiseriaImg1, rotiseriaImg2, rotiseriaImg3, rotiseriaImg4],
-  cafeteria: [panaderiaImg1, panaderiaImg2, panaderiaImg3, panaderiaImg4],
+  restaurante: [restauranteImg1, restauranteImg2, restauranteImg3, restauranteImg4],
+  cafeteria: [cafeteriaImg1, cafeteriaImg2, cafeteriaImg3, cafeteriaImg4],
 };
 
 function getDefaultImage(category: string, businessId: string | undefined): string | undefined {
