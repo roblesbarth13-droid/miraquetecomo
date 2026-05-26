@@ -129,6 +129,8 @@ export default function MapView() {
           carniceria: 'Carn',
           rotiseria: 'Roti',
           supermercado: 'Super',
+          restaurante: 'Rest',
+          cafeteria: 'Café',
         };
         const categoryColors: Record<string, { bg: string; border: string }> = {
           panaderia: { bg: '#d97706', border: '#b45309' },
@@ -136,6 +138,8 @@ export default function MapView() {
           carniceria: { bg: '#dc2626', border: '#b91c1c' },
           rotiseria: { bg: '#ca8a04', border: '#a16207' },
           supermercado: { bg: '#2563eb', border: '#1d4ed8' },
+          restaurante: { bg: '#7c3aed', border: '#6d28d9' },
+          cafeteria: { bg: '#92400e', border: '#78350f' },
         };
         const catLabel = categoryShort[offer.category] || offer.category.slice(0, 4);
         const colors = categoryColors[offer.category] || { bg: '#16a34a', border: '#15803d' };

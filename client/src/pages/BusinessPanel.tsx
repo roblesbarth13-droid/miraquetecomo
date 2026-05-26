@@ -394,6 +394,8 @@ export default function BusinessPanel() {
                         <SelectItem value="carniceria">Carnicería</SelectItem>
                         <SelectItem value="rotiseria">Rotisería</SelectItem>
                         <SelectItem value="supermercado">Supermercado</SelectItem>
+                        <SelectItem value="restaurante">Restaurante</SelectItem>
+                        <SelectItem value="cafeteria">Cafetería</SelectItem>
                       </SelectContent>
                     </Select>
                     <p className="text-xs text-muted-foreground">

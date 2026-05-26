@@ -119,6 +119,8 @@ export function BusinessStats({ sales, offers }: BusinessStatsProps) {
       carniceria: "Carniceria",
       rotiseria: "Rotiseria",
       supermercado: "Supermercado",
+      restaurante: "Restaurante",
+      cafeteria: "Cafetería",
       otro: "Otro",
     };
     return Object.entries(catMap).map(([cat, count]) => ({

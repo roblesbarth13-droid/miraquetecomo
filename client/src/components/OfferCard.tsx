@@ -37,6 +37,8 @@ const categoryDefaultImages: Record<string, string[]> = {
   supermercado: [supermercadoImg1, supermercadoImg2, supermercadoImg3, supermercadoImg4],
   rotiseria: [rotiseriaImg1, rotiseriaImg2, rotiseriaImg3, rotiseriaImg4],
   carniceria: [carnicheriaImg1, carnicheriaImg2, carnicheriaImg3, carnicheriaImg4],
+  restaurante: [rotiseriaImg1, rotiseriaImg2, rotiseriaImg3, rotiseriaImg4],
+  cafeteria: [panaderiaImg1, panaderiaImg2, panaderiaImg3, panaderiaImg4],
 };
 
 function getDefaultImage(category: string, businessId: string | undefined): string | undefined {
