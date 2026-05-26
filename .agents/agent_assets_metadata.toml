@@ -4,49 +4,49 @@ uploads = []
 id = "1gR0xg6U9hR3TypwDqWD7"
 uri = "file://client/src/assets/images/category-restaurante.png"
 type = "image"
-title = "restaurant-illustration-1"
+title = "restaurant-kawaii-1"
 
 [[generated]]
 id = "Fw5AZgo5N7k_CAp2aUBsG"
 uri = "file://client/src/assets/images/category-restaurante-2.png"
 type = "image"
-title = "restaurant-illustration-2"
+title = "restaurant-kawaii-2"
 
 [[generated]]
 id = "COKMsrNwk0aFbs1csJupy"
 uri = "file://client/src/assets/images/category-restaurante-3.png"
 type = "image"
-title = "restaurant-illustration-3"
+title = "restaurant-kawaii-3"
 
 [[generated]]
 id = "2hFx9ARajuQvnPuQ9Jq8T"
 uri = "file://client/src/assets/images/category-restaurante-4.png"
 type = "image"
-title = "restaurant-illustration-4"
+title = "restaurant-kawaii-4"
 
 [[generated]]
 id = "GX5Ui6S1HZ3_V84aDXTku"
 uri = "file://client/src/assets/images/category-cafeteria.png"
 type = "image"
-title = "cafeteria-illustration-1"
+title = "cafeteria-kawaii-1"
 
 [[generated]]
 id = "ABLvtxs6SEE7drogYchUY"
 uri = "file://client/src/assets/images/category-cafeteria-2.png"
 type = "image"
-title = "cafeteria-illustration-2"
+title = "cafeteria-kawaii-2"
 
 [[generated]]
 id = "ZXCHAK72WdhSlxjzKTTBh"
 uri = "file://client/src/assets/images/category-cafeteria-3.png"
 type = "image"
-title = "cafeteria-illustration-3"
+title = "cafeteria-kawaii-3"
 
 [[generated]]
 id = "aNoRSM8uxEFtBZ5no-Nsn"
 uri = "file://client/src/assets/images/category-cafeteria-4.png"
 type = "image"
-title = "cafeteria-illustration-4"
+title = "cafeteria-kawaii-4"
 
 [[outputs]]
 id = "VO31skXR6g6H_t52TBJIf"
@@ -112,7 +112,7 @@ title = "Cafetería 4"
 id = "Eh_hvYqMGqHHo_MaYiYgx"
 uri = "file://client/src/assets/images/category-panaderia.png"
 type = "image"
-title = "Panadería (estilo actual)"
+title = "Pan 1"
 
 [[outputs]]
 id = "-srNRvmfObpS7GYsQOahb"
@@ -124,4 +124,22 @@ title = "Rotisería (estilo actual)"
 id = "7w2DvahBJzWAwf4sGJL_5"
 uri = "file://client/src/assets/images/category-verduleria.png"
 type = "image"
-title = "Verdulería (estilo actual)"
+title = "Verd 1"
+
+[[outputs]]
+id = "koZT_wsjmXwcychMFRL8-"
+uri = "file://client/src/assets/images/category-panaderia-2.png"
+type = "image"
+title = "Pan 2"
+
+[[outputs]]
+id = "IEhzQ5ZtRGhZhk8HM9LRG"
+uri = "file://client/src/assets/images/category-carniceria.png"
+type = "image"
+title = "Carn 1"
+
+[[outputs]]
+id = "HF_tJ5McwZfGqQ3KzAK6D"
+uri = "file://client/src/assets/images/category-supermercado.png"
+type = "image"
+title = "Super 1"
