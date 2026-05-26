@@ -4,49 +4,49 @@ uploads = []
 id = "1gR0xg6U9hR3TypwDqWD7"
 uri = "file://client/src/assets/images/category-restaurante.png"
 type = "image"
-title = "restaurant-flat-1"
+title = "restaurant-pastel-1"
 
 [[generated]]
 id = "Fw5AZgo5N7k_CAp2aUBsG"
 uri = "file://client/src/assets/images/category-restaurante-2.png"
 type = "image"
-title = "restaurant-flat-2"
+title = "restaurant-pastel-2"
 
 [[generated]]
 id = "COKMsrNwk0aFbs1csJupy"
 uri = "file://client/src/assets/images/category-restaurante-3.png"
 type = "image"
-title = "restaurant-flat-3"
+title = "restaurant-pastel-3"
 
 [[generated]]
 id = "2hFx9ARajuQvnPuQ9Jq8T"
 uri = "file://client/src/assets/images/category-restaurante-4.png"
 type = "image"
-title = "restaurant-flat-4"
+title = "restaurant-pastel-4"
 
 [[generated]]
 id = "GX5Ui6S1HZ3_V84aDXTku"
 uri = "file://client/src/assets/images/category-cafeteria.png"
 type = "image"
-title = "cafeteria-flat-1"
+title = "cafeteria-pastel-1"
 
 [[generated]]
 id = "ABLvtxs6SEE7drogYchUY"
 uri = "file://client/src/assets/images/category-cafeteria-2.png"
 type = "image"
-title = "cafeteria-flat-2"
+title = "cafeteria-pastel-2"
 
 [[generated]]
 id = "ZXCHAK72WdhSlxjzKTTBh"
 uri = "file://client/src/assets/images/category-cafeteria-3.png"
 type = "image"
-title = "cafeteria-flat-3"
+title = "cafeteria-pastel-3"
 
 [[generated]]
 id = "aNoRSM8uxEFtBZ5no-Nsn"
 uri = "file://client/src/assets/images/category-cafeteria-4.png"
 type = "image"
-title = "cafeteria-flat-4"
+title = "cafeteria-pastel-4"
 
 [[outputs]]
 id = "VO31skXR6g6H_t52TBJIf"
@@ -112,19 +112,19 @@ title = "Cafetería 4"
 id = "Eh_hvYqMGqHHo_MaYiYgx"
 uri = "file://client/src/assets/images/category-panaderia.png"
 type = "image"
-title = "Pan 1"
+title = "Panadería (existente)"
 
 [[outputs]]
 id = "-srNRvmfObpS7GYsQOahb"
 uri = "file://client/src/assets/images/category-rotiseria.png"
 type = "image"
-title = "Rotisería (estilo actual)"
+title = "Rotisería (existente)"
 
 [[outputs]]
 id = "7w2DvahBJzWAwf4sGJL_5"
 uri = "file://client/src/assets/images/category-verduleria.png"
 type = "image"
-title = "Verd 1"
+title = "Verdulería (existente)"
 
 [[outputs]]
 id = "koZT_wsjmXwcychMFRL8-"
@@ -136,10 +136,10 @@ title = "Pan 2"
 id = "IEhzQ5ZtRGhZhk8HM9LRG"
 uri = "file://client/src/assets/images/category-carniceria.png"
 type = "image"
-title = "Carn 1"
+title = "Carnicería (existente)"
 
 [[outputs]]
 id = "HF_tJ5McwZfGqQ3KzAK6D"
 uri = "file://client/src/assets/images/category-supermercado.png"
 type = "image"
-title = "Super 1"
+title = "Supermercado (existente)"
