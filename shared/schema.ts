@@ -18,7 +18,7 @@ import { z } from "zod";
 export const userTypeEnum = pgEnum('user_type', ['usuario', 'comercio']);
 export const offerStatusEnum = pgEnum('offer_status', ['activa', 'vendida', 'expirada']);
 export const paymentStatusEnum = pgEnum('payment_status', ['pendiente', 'pagado', 'fallido']);
-export const categoryEnum = pgEnum('category', ['panaderia', 'verduleria', 'carniceria', 'rotiseria', 'supermercado']);
+export const categoryEnum = pgEnum('category', ['panaderia', 'verduleria', 'carniceria', 'rotiseria', 'supermercado', 'restaurante', 'cafeteria']);
 
 // Session storage table - Required for Replit Auth
 export const sessions = pgTable(
@@ -218,7 +218,7 @@ export const updateBusinessProfileSchema = z.object({
   businessName: z.string().min(2, "El nombre del comercio debe tener al menos 2 caracteres"),
   phone: z.string().optional(),
   address: z.string().optional(),
-  category: z.enum(['panaderia', 'verduleria', 'carniceria', 'rotiseria', 'supermercado']),
+  category: z.enum(['panaderia', 'verduleria', 'carniceria', 'rotiseria', 'supermercado', 'restaurante', 'cafeteria']),
   latitude: z.number().optional(),
   longitude: z.number().optional(),
   defaultOfferImage: z.string().optional(),
@@ -231,7 +231,7 @@ export const registerBusinessSchema = z.object({
   businessName: z.string().min(2, "El nombre del comercio debe tener al menos 2 caracteres"),
   phone: z.string().optional(),
   address: z.string().min(5, "Ingresá una dirección válida"),
-  category: z.enum(['panaderia', 'verduleria', 'carniceria', 'rotiseria', 'supermercado'], {
+  category: z.enum(['panaderia', 'verduleria', 'carniceria', 'rotiseria', 'supermercado', 'restaurante', 'cafeteria'], {
     required_error: "Seleccioná una categoría",
   }),
 });
@@ -288,6 +288,8 @@ export const categoryDisplayNames: Record<string, string> = {
   carniceria: "Carnicería",
   rotiseria: "Rotisería",
   supermercado: "Supermercado",
+  restaurante: "Restaurante",
+  cafeteria: "Cafetería",
 };
 
 // Status display names

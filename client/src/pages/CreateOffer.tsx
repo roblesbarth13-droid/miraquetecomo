@@ -36,7 +36,7 @@ import { categoryDisplayNames } from "@shared/schema";
 const formSchema = z.object({
   title: z.string().min(3, "El título debe tener al menos 3 caracteres"),
   description: z.string().min(10, "La descripción debe tener al menos 10 caracteres"),
-  category: z.enum(["panaderia", "verduleria", "carniceria", "rotiseria", "supermercado"], {
+  category: z.enum(["panaderia", "verduleria", "carniceria", "rotiseria", "supermercado", "restaurante", "cafeteria"], {
     required_error: "Seleccioná una categoría",
   }),
   originalPrice: z.string().refine((val) => parseFloat(val) > 0, {

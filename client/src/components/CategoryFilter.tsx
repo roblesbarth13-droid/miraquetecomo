@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { Croissant, Carrot, Beef, ChefHat, ShoppingCart } from "lucide-react";
+import { Croissant, Carrot, Beef, ChefHat, ShoppingCart, Utensils, Coffee } from "lucide-react";
 import { categoryDisplayNames } from "@shared/schema";
 
 interface CategoryFilterProps {
@@ -14,6 +14,8 @@ const categories = [
   { id: "carniceria", icon: Beef },
   { id: "rotiseria", icon: ChefHat },
   { id: "supermercado", icon: ShoppingCart },
+  { id: "restaurante", icon: Utensils },
+  { id: "cafeteria", icon: Coffee },
 ];
 
 export function CategoryFilter({ selectedCategory, onCategoryChange }: CategoryFilterProps) {

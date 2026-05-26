@@ -34,7 +34,7 @@ const formSchema = z.object({
   businessName: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
   phone: z.string().optional(),
   address: z.string().optional(),
-  category: z.enum(["panaderia", "verduleria", "carniceria", "rotiseria", "supermercado"], {
+  category: z.enum(["panaderia", "verduleria", "carniceria", "rotiseria", "supermercado", "restaurante", "cafeteria"], {
     required_error: "Seleccioná una categoría",
   }),
 });
