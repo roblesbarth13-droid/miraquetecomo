@@ -59,3 +59,51 @@ id = "IzeeDJ9Rrp9eWa144-ZU2"
 uri = "file://client/public/icon-playstore-512.png"
 type = "image"
 title = "Ícono para Play Store (512x512)"
+
+[[outputs]]
+id = "vS2Nn5Pncg5jkXG5S6WvK"
+uri = "file://client/src/assets/images/category-restaurante.png"
+type = "image"
+title = "Restaurante 1"
+
+[[outputs]]
+id = "GG9fuIC1DZ5FJ5No_3vsk"
+uri = "file://client/src/assets/images/category-restaurante-2.png"
+type = "image"
+title = "Restaurante 2"
+
+[[outputs]]
+id = "Nr2oY3LHF90EbU6J-h_1b"
+uri = "file://client/src/assets/images/category-restaurante-3.png"
+type = "image"
+title = "Restaurante 3"
+
+[[outputs]]
+id = "MUI3qEJAlPgJgj7O2FWJt"
+uri = "file://client/src/assets/images/category-restaurante-4.png"
+type = "image"
+title = "Restaurante 4"
+
+[[outputs]]
+id = "Au9OX1NDsYRHJv5o08dGT"
+uri = "file://client/src/assets/images/category-cafeteria.png"
+type = "image"
+title = "Cafetería 1"
+
+[[outputs]]
+id = "LMckAWdvyV8DEpIqj4c6A"
+uri = "file://client/src/assets/images/category-cafeteria-2.png"
+type = "image"
+title = "Cafetería 2"
+
+[[outputs]]
+id = "_xY3q7iZCBBdNykClbzJz"
+uri = "file://client/src/assets/images/category-cafeteria-3.png"
+type = "image"
+title = "Cafetería 3"
+
+[[outputs]]
+id = "WAqBv7Yq-sCf1P7b-E62s"
+uri = "file://client/src/assets/images/category-cafeteria-4.png"
+type = "image"
+title = "Cafetería 4"
