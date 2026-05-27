@@ -85,12 +85,11 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b" data-testid="header">
-      <div className="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between gap-4">
-        <div className="flex items-center gap-1 sm:gap-3 min-w-0">
+      <div className="max-w-7xl mx-auto px-4 h-16 sm:h-20 flex items-center justify-between gap-4">
+        <div className="flex items-center gap-2 flex-shrink-0">
           <Link href="/home" data-testid="link-home">
             <Logo size="md" />
           </Link>
-          <ArgentinaStripes />
         </div>
 
         <div className="flex items-center gap-2">
@@ -276,6 +275,12 @@ export function Header() {
             </div>
           )}
         </div>
+      </div>
+      {/* Franja argentina decorativa al fondo del header */}
+      <div className="flex h-1" aria-label="Argentina">
+        <div className="flex-1" style={{ backgroundColor: "#74ACDF" }} />
+        <div className="flex-1 bg-white" />
+        <div className="flex-1" style={{ backgroundColor: "#74ACDF" }} />
       </div>
     </header>
   );
