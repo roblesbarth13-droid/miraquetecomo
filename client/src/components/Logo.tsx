@@ -22,13 +22,13 @@ export function Logo({ size = "md", showText = true }: LogoProps) {
     <div className="flex items-center gap-2" data-testid="logo">
       <img
         src={logoImage}
-        alt="Mirá que te como logo"
+        alt="Plato Amigo logo"
         className={`${sizeClasses[size]} object-contain`}
       />
       {showText && (
         <span className={`font-bold whitespace-nowrap hidden sm:inline ${textSizeClasses[size]}`}>
-          <span className="text-primary">Mirá que te</span>{" "}
-          <span className="text-accent">como</span>
+          <span className="text-primary">Plato</span>{" "}
+          <span className="text-accent">Amigo</span>
         </span>
       )}
     </div>

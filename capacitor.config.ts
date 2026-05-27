@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.miraquetecomo.app',
-  appName: 'Mirá que te como',
+  appName: 'Plato Amigo',
   webDir: 'dist/public',
   server: {
     url: 'https://miraquetecomo.replit.app',
@@ -31,7 +31,7 @@ const config: CapacitorConfig = {
     backgroundColor: '#FFFFFF',
     contentInset: 'automatic',
     preferredContentMode: 'mobile',
-    scheme: 'miraquetecomo',
+    scheme: 'platoamigo',
   },
 };
 

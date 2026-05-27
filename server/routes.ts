@@ -164,7 +164,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   app.get('/descargar-proyecto', (req, res) => {
     const filePath = path.join(process.cwd(), 'client', 'public', 'descarga.tar.gz');
     if (fs.existsSync(filePath)) {
-      res.setHeader('Content-Disposition', 'attachment; filename="miraquetecomo-proyecto.tar.gz"');
+      res.setHeader('Content-Disposition', 'attachment; filename="platoamigo-proyecto.tar.gz"');
       res.setHeader('Content-Type', 'application/gzip');
       res.sendFile(filePath);
     } else {

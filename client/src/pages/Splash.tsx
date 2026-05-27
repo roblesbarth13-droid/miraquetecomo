@@ -40,7 +40,7 @@ export default function Splash() {
         >
           <motion.img
             src={logoImage}
-            alt="Mirá que te como logo"
+            alt="Plato Amigo logo"
             className="h-48 w-48 object-contain"
             animate={{
               y: [0, -10, 0],
@@ -72,8 +72,8 @@ export default function Splash() {
               ease: "easeInOut",
             }}
           >
-            <span className="text-primary">mirá que te </span>
-            <span className="text-accent">como</span>
+            <span className="text-primary">Plato </span>
+            <span className="text-accent">Amigo</span>
           </motion.h1>
         </motion.div>
 

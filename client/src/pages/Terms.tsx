@@ -14,7 +14,7 @@ export default function Terms() {
             <section>
               <h2 className="text-base font-semibold text-foreground mb-2">1. Aceptación de los Términos</h2>
               <p>
-                Al acceder y utilizar la plataforma "Mirá que te como" (en adelante, "la Plataforma"), 
+                Al acceder y utilizar la plataforma "Plato Amigo" (en adelante, "la Plataforma"), 
                 aceptás estos Términos y Condiciones en su totalidad. Si no estás de acuerdo con alguno 
                 de estos términos, te pedimos que no utilices la Plataforma.
               </p>
@@ -23,7 +23,7 @@ export default function Terms() {
             <section>
               <h2 className="text-base font-semibold text-foreground mb-2">2. Descripción del Servicio</h2>
               <p>
-                "Mirá que te como" es una plataforma digital que conecta comercios locales (panaderías, 
+                "Plato Amigo" es una plataforma digital que conecta comercios locales (panaderías, 
                 verdulerías, carnicerías, rotiserías, supermercados y otros) que tienen excedentes de 
                 alimentos con usuarios que desean adquirirlos a precios reducidos. La Plataforma actúa 
                 como intermediaria, facilitando la conexión entre comercios y consumidores con el objetivo 
@@ -103,7 +103,7 @@ export default function Terms() {
               <h2 className="text-base font-semibold text-foreground mb-2">9. Propiedad Intelectual</h2>
               <p>
                 Todo el contenido de la Plataforma (diseño, logotipos, textos, código) es propiedad de 
-                "Mirá que te como" y está protegido por las leyes de propiedad intelectual. No se permite 
+                "Plato Amigo" y está protegido por las leyes de propiedad intelectual. No se permite 
                 la reproducción, distribución o modificación sin autorización previa.
               </p>
             </section>

@@ -14,7 +14,7 @@ export default function Privacy() {
             <section>
               <h2 className="text-base font-semibold text-foreground mb-2">1. Introducción</h2>
               <p>
-                En "Mirá que te como" nos comprometemos a proteger tu privacidad. Esta Política de Privacidad 
+                En "Plato Amigo" nos comprometemos a proteger tu privacidad. Esta Política de Privacidad 
                 describe cómo recopilamos, usamos, almacenamos y protegemos tu información personal cuando 
                 utilizás nuestra plataforma. Al usar nuestros servicios, aceptás las prácticas descritas en 
                 esta política.

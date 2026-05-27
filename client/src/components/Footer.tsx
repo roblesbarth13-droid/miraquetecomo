@@ -11,7 +11,7 @@ export function Footer() {
         <div className="flex flex-col md:flex-row justify-between items-center gap-3 text-sm text-muted-foreground">
           <div className="flex items-center gap-3">
             <p data-testid="text-copyright">
-              © {currentYear} Mirá que te como
+              © {currentYear} Plato Amigo
             </p>
             <div className="flex gap-1">
               <Button 

@@ -1,6 +1,6 @@
 {
-  "name": "Mirá que te como",
-  "short_name": "MiráQTC",
+  "name": "Plato Amigo",
+  "short_name": "Plato Amigo",
   "description": "Comprá comida con descuento de comercios locales. Ahorrá hasta 70% en productos frescos.",
   "start_url": "/home",
   "display": "standalone",
