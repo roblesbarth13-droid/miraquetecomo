@@ -8,6 +8,13 @@ export default function Splash() {
   const [isAnimationComplete, setIsAnimationComplete] = useState(false);
 
   useEffect(() => {
+    // Si ya vio el splash en esta sesión, ir directo a /home
+    if (sessionStorage.getItem("splashShown")) {
+      setLocation("/home", { replace: true });
+      return;
+    }
+    sessionStorage.setItem("splashShown", "1");
+
     const timer = setTimeout(() => {
       setIsAnimationComplete(true);
     }, 4500);
