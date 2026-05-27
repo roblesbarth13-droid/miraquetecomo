@@ -26,7 +26,7 @@ export function Logo({ size = "md", showText = true }: LogoProps) {
         className={`${sizeClasses[size]} object-contain`}
       />
       {showText && (
-        <span className={`font-bold whitespace-nowrap hidden sm:inline ${textSizeClasses[size]}`}>
+        <span className={`font-bold whitespace-nowrap ${textSizeClasses[size]}`}>
           <span className="text-primary">Plato</span>{" "}
           <span className="text-accent">Amigo</span>
         </span>
