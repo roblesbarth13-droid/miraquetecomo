@@ -48,6 +48,12 @@ uri = "file://client/src/assets/images/category-cafeteria-4.png"
 type = "image"
 title = "cafeteria-pastel-4"
 
+[[generated]]
+id = "arKCemOlWhRatJ7QuoL8D"
+uri = "file://client/src/assets/logo-platoamigo.png"
+type = "image"
+title = "plato-amigo-logo"
+
 [[outputs]]
 id = "VO31skXR6g6H_t52TBJIf"
 uri = "file://client/public/logo-mira-que-te-como.svg"
@@ -143,3 +149,9 @@ id = "HF_tJ5McwZfGqQ3KzAK6D"
 uri = "file://client/src/assets/images/category-supermercado.png"
 type = "image"
 title = "Supermercado (existente)"
+
+[[outputs]]
+id = "68E_wArIXpXLOlMFMmNL-"
+uri = "file://client/src/assets/logo-platoamigo.png"
+type = "image"
+title = "Nuevo logo Plato Amigo"

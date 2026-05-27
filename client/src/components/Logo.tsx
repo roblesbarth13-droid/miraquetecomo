@@ -1,4 +1,4 @@
-import logoImage from "@assets/Gemini_Generated_Image_q9ud4dq9ud4dq9ud_(1)_1765315558086.png";
+import logoImage from "@assets/logo-platoamigo.png";
 
 interface LogoProps {
   size?: "sm" | "md" | "lg";

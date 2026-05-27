@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
-import logoImage from "@assets/Gemini_Generated_Image_q9ud4dq9ud4dq9ud_(1)_1765315558086.png";
+import logoImage from "@assets/logo-platoamigo.png";
 
 export default function Splash() {
   const [, setLocation] = useLocation();
