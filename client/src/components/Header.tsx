@@ -90,7 +90,7 @@ export function Header() {
           <Link href="/home" data-testid="link-home">
             <Logo size="md" />
           </Link>
-          <ArgentinaStripes />
+          <span className="hidden sm:block"><ArgentinaStripes /></span>
         </div>
 
         <div className="flex items-center gap-2">
