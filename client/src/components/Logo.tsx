@@ -19,14 +19,14 @@ export function Logo({ size = "md", showText = true }: LogoProps) {
   };
 
   return (
-    <div className="flex flex-col items-center" data-testid="logo">
+    <div className="flex items-center gap-2" data-testid="logo">
       <img
         src={logoImage}
         alt="Plato Amigo logo"
-        className={`${sizeClasses[size]} object-contain`}
+        className={`${sizeClasses[size]} object-contain flex-shrink-0`}
       />
       {showText && (
-        <span className={`font-bold whitespace-nowrap leading-none mt-0.5 ${textSizeClasses[size]}`}>
+        <span className={`font-bold whitespace-nowrap ${textSizeClasses[size]}`}>
           <span className="text-primary">Plato</span>{" "}
           <span className="text-accent">Amigo</span>
         </span>
