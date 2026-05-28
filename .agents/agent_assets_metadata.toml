@@ -161,3 +161,9 @@ id = "ZMxXTrKrk8DQjo0Qzkgjh"
 uri = "file://app-release.zip"
 type = "unspecified"
 title = "app-release.zip — contiene el app-release.aab firmado"
+
+[[outputs]]
+id = "XcMTrHAIgk9MdP1-TILgj"
+uri = "file://resources/icon.png"
+type = "image"
+title = "Ícono actual de la app"
