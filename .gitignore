@@ -4,3 +4,9 @@ dist
 server/public
 vite.config.ts.*
 *.tar.gz
+
+# Android SDK (downloaded locally, not part of source)
+android-sdk/
+
+# Android keystore credentials (keep keystore file but exclude passwords file if desired)
+# android/keystore.properties
