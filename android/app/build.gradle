@@ -16,7 +16,8 @@ if (!keystorePropertiesFile.exists()) {
         tmpKs.bytes = Base64.decoder.decode(base64Keystore.trim())
         resolvedKeystoreFile = tmpKs
     } else if (System.getenv('KEYSTORE_FILE')) {
-        resolvedKeystoreFile = file(System.getenv('KEYSTORE_FILE'))
+        def ksPath = System.getenv('KEYSTORE_FILE')
+        resolvedKeystoreFile = ksPath.startsWith('/') ? new File(ksPath) : rootProject.file(ksPath)
     }
 }
 

@@ -50,7 +50,6 @@ integrations = ["javascript_log_in_with_replit:1.0.0", "javascript_database:1.0.
 
 [userenv.shared]
 VITE_GOOGLE_MAPS_API_KEY = "AIzaSyBZoVbBqzAHGwXDQA6dIDHBfJ0k3r9LF-E"
-KEYSTORE_FILE = "app/miraquetecomo-release.keystore"
 
 [postMerge]
 path = "scripts/post-merge.sh"
