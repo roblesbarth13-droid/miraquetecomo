@@ -10,7 +10,7 @@ export default function Splash({ onComplete }: SplashProps) {
   useEffect(() => {
     const timer = setTimeout(() => {
       onComplete();
-    }, 4500);
+    }, 2000);
     return () => clearTimeout(timer);
   }, [onComplete]);
 
