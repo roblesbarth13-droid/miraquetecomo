@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.miraquetecomo.app',
+  appId: 'com.platoamigo.app',
   appName: 'Plato Amigo',
   webDir: 'dist/public',
   server: {
