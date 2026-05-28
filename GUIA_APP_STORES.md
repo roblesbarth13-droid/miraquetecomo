@@ -34,30 +34,28 @@ npm install
 
 ## PARTE 2: Publicar en Google Play (Android)
 
-### 2.1 Generar el keystore de firma (solo la primera vez)
+### 2.1 Keystore de firma — dónde está y cómo configurarlo
 
-El keystore es el archivo que firma la app. Tenés que generarlo **una sola vez** y guardarlo en un lugar seguro para siempre. **Nunca lo subas a ningún repositorio.**
+El keystore (`miraquetecomo-release.keystore`) es la llave que identifica la app en Google Play. **Sin ella no podés publicar actualizaciones.** Guardala siempre en un lugar seguro fuera del repositorio (por ejemplo, en un gestor de contraseñas como 1Password o Bitwarden).
 
-En la consola de Replit (o en tu computadora si tenés Java instalado):
+**El keystore está almacenado de forma segura en Replit Secrets** con las siguientes variables:
+- `KEYSTORE_PASSWORD` — contraseña del archivo keystore
+- `KEY_ALIAS` — alias de la llave (normalmente `miraquetecomo`)
+- `KEY_PASSWORD` — contraseña del alias
+
+Si necesitás restaurar el keystore (por ejemplo, en un workspace nuevo), tenés que volver a subir el archivo `.jks` y configurar estos Secrets en Replit. Para convertir el archivo a texto y guardarlo como secret `KEYSTORE_BASE64`:
+
+**En Mac:**
 ```bash
-keytool -genkey -v \
-  -keystore android/app/miraquetecomo-release.keystore \
-  -alias miraquetecomo \
-  -keyalg RSA -keysize 2048 -validity 10000 \
-  -storepass TU_CONTRASEÑA_SEGURA \
-  -keypass TU_CONTRASEÑA_SEGURA \
-  -dname "CN=Tu Nombre, OU=App, O=TuEmpresa, L=Buenos Aires, ST=Buenos Aires, C=AR"
+base64 -i miraquetecomo-release.keystore | tr -d '\n'
 ```
-
-Luego creá el archivo `android/keystore.properties` (también **nunca lo subas al repo**):
-```properties
-storeFile=miraquetecomo-release.keystore
-storePassword=TU_CONTRASEÑA_SEGURA
-keyAlias=miraquetecomo
-keyPassword=TU_CONTRASEÑA_SEGURA
+**En Linux/Windows WSL:**
+```bash
+base64 -w 0 miraquetecomo-release.keystore
 ```
+Copiá el resultado y pegalo como el secret `KEYSTORE_BASE64` en Replit (Secrets → New Secret).
 
-⚠️ **Estos archivos están en `.gitignore` y nunca se deben subir al repositorio.** Guardá el keystore y las contraseñas en un gestor de contraseñas o almacenamiento seguro. Sin ellos no podés publicar actualizaciones.
+⚠️ **Los archivos `.keystore` y `.jks` están en `.gitignore` y nunca se suben al repositorio.** Si trabajás localmente, podés poner el keystore en `android/app/` y las contraseñas en `android/keystore.properties` (también ignorado por git).
 
 ### 2.2 Compilar el AAB desde Replit
 
