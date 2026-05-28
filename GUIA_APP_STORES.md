@@ -34,69 +34,63 @@ npm install
 
 ## PARTE 2: Publicar en Google Play (Android)
 
-### 2.1 Instalar Android Studio
+### 2.1 Generar el keystore de firma (solo la primera vez)
 
-1. Andá a https://developer.android.com/studio
-2. Descargá e instalá Android Studio
-3. Abrilo una vez para que descargue los SDKs necesarios (tarda un rato la primera vez)
-4. Aceptá las licencias cuando te lo pida
+El keystore es el archivo que firma la app. Tenés que generarlo **una sola vez** y guardarlo en un lugar seguro para siempre. **Nunca lo subas a ningún repositorio.**
 
-### 2.2 Generar el proyecto Android
-
-En la terminal, dentro de la carpeta del proyecto, ejecutá estos comandos en orden:
+En la consola de Replit (o en tu computadora si tenés Java instalado):
+```bash
+keytool -genkey -v \
+  -keystore android/app/miraquetecomo-release.keystore \
+  -alias miraquetecomo \
+  -keyalg RSA -keysize 2048 -validity 10000 \
+  -storepass TU_CONTRASEÑA_SEGURA \
+  -keypass TU_CONTRASEÑA_SEGURA \
+  -dname "CN=Tu Nombre, OU=App, O=TuEmpresa, L=Buenos Aires, ST=Buenos Aires, C=AR"
 ```
-npx cap add android
+
+Luego creá el archivo `android/keystore.properties` (también **nunca lo subas al repo**):
+```properties
+storeFile=miraquetecomo-release.keystore
+storePassword=TU_CONTRASEÑA_SEGURA
+keyAlias=miraquetecomo
+keyPassword=TU_CONTRASEÑA_SEGURA
+```
+
+⚠️ **Estos archivos están en `.gitignore` y nunca se deben subir al repositorio.** Guardá el keystore y las contraseñas en un gestor de contraseñas o almacenamiento seguro. Sin ellos no podés publicar actualizaciones.
+
+### 2.2 Compilar el AAB desde Replit
+
+Con el keystore en su lugar, podés generar el AAB directamente desde la consola de Replit:
+
+```bash
+# 1. Instalar Android SDK (solo la primera vez, o si no está instalado)
+mkdir -p android-sdk && curl -L "https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip" -o /tmp/cmdline-tools.zip
+cd android-sdk && unzip -qo /tmp/cmdline-tools.zip && mkdir -p cmdline-tools/latest && mv cmdline-tools/* cmdline-tools/latest/ 2>/dev/null; cd ..
+export ANDROID_HOME=/home/runner/workspace/android-sdk && export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
+yes | sdkmanager --licenses && sdkmanager "platform-tools" "build-tools;36.0.0" "platforms;android-36"
+echo "sdk.dir=/home/runner/workspace/android-sdk" > android/local.properties
+
+# 2. Sincronizar los assets web más recientes
 npx cap sync android
+
+# 3. Compilar el AAB firmado
+export ANDROID_HOME=/home/runner/workspace/android-sdk
+export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH
+export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))
+cd android && ./gradlew bundleRelease --no-daemon
 ```
 
-### 2.3 Generar los íconos automáticamente
+El AAB resultante queda en `android/app/build/outputs/bundle/release/app-release.aab`.
 
-Capacitor tiene una herramienta que genera todos los íconos y splash screens en los tamaños correctos. Ejecutá:
-```
-npx @capacitor/assets generate --android
-```
-
-Esto usa la imagen `resources/icon.png` (que ya está preparada) y genera todos los tamaños necesarios automáticamente.
-
-Si preferís hacerlo manualmente, los íconos pre-generados están en `resources/android/` y podés copiarlos:
-```
-cp resources/android/icon-mdpi.png android/app/src/main/res/mipmap-mdpi/ic_launcher.png
-cp resources/android/icon-hdpi.png android/app/src/main/res/mipmap-hdpi/ic_launcher.png
-cp resources/android/icon-xhdpi.png android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
-cp resources/android/icon-xxhdpi.png android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
-cp resources/android/icon-xxxhdpi.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
-```
-
-En Windows usá `copy` en vez de `cp`, o simplemente copiá y pegá los archivos manualmente.
-
-### 2.4 Abrir en Android Studio
-
-```
-npx cap open android
-```
-
-Esto abre el proyecto en Android Studio.
-
-### 2.5 Generar el archivo .aab (Android App Bundle)
-
-En Android Studio:
-1. Menú **Build** → **Generate Signed Bundle / APK**
-2. Seleccioná **Android App Bundle**
-3. Hacé click en **Create new...** para crear un keystore (guardalo en un lugar seguro, lo vas a necesitar para futuras actualizaciones)
-4. Completá los datos del keystore (contraseña, alias, etc.)
-5. Seleccioná **release** y hacé click en **Finish**
-6. El archivo .aab se genera en `android/app/release/app-release.aab`
-
-**IMPORTANTE:** Guardá el archivo keystore y las contraseñas en un lugar seguro. Sin ellos no vas a poder actualizar la app en el futuro.
-
-### 2.6 Crear cuenta de Google Play Developer
+### 2.3 Crear cuenta de Google Play Developer
 
 1. Andá a https://play.google.com/console
 2. Registrate con una cuenta de Google
 3. Pagá los $25 USD (pago único)
 4. Completá la verificación de identidad
 
-### 2.7 Subir la app a Google Play
+### 2.4 Subir la app a Google Play
 
 1. En Google Play Console, hacé click en **Crear aplicación**
 2. Completá:
@@ -191,16 +185,24 @@ La revisión de Apple suele tardar entre 1 y 3 días, pero pueden pedir cambios.
 
 Cuando hagas cambios en la app desde Replit:
 
-1. Descargá el proyecto actualizado
-2. En tu computadora:
-   ```
-   npm install
+**Para Android (desde la consola de Replit):**
+1. Incrementá `versionCode` y `versionName` en `android/app/build.gradle`
+2. Ejecutá en la consola de Replit:
+   ```bash
    npx cap sync android
-   npx cap sync ios
+   export ANDROID_HOME=/home/runner/workspace/android-sdk
+   export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH
+   export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))
+   cd android && ./gradlew bundleRelease --no-daemon
    ```
-3. Abrí Android Studio / Xcode
-4. Generá un nuevo .aab / archive
-5. Subí la nueva versión a las stores (incrementá el número de versión)
+3. Descargá el nuevo `android/app/build/outputs/bundle/release/app-release.aab`
+4. Subilo en Google Play Console como nueva versión
+
+**Para iOS (requiere Mac con Xcode):**
+1. Descargá el proyecto actualizado
+2. En tu computadora: `npm install && npx cap sync ios`
+3. Abrí Xcode y generá un nuevo archive
+4. Subí la nueva versión a App Store Connect
 
 ---
 

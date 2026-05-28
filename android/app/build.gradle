@@ -1,5 +1,11 @@
 apply plugin: 'com.android.application'
 
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
 android {
     namespace = "com.miraquetecomo.app"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -16,10 +22,36 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        release {
+            // Prefer keystore.properties file if present (local dev / Replit)
+            // Fall back to environment variables for CI/CD pipelines
+            def ksFile = keystorePropertiesFile.exists()
+                    ? file(keystoreProperties['storeFile'])
+                    : (System.getenv('KEYSTORE_FILE') ? file(System.getenv('KEYSTORE_FILE')) : null)
+            def ksPassword = keystorePropertiesFile.exists()
+                    ? keystoreProperties['storePassword']
+                    : System.getenv('KEYSTORE_PASSWORD')
+            def keyAlias = keystorePropertiesFile.exists()
+                    ? keystoreProperties['keyAlias']
+                    : System.getenv('KEY_ALIAS')
+            def keyPass = keystorePropertiesFile.exists()
+                    ? keystoreProperties['keyPassword']
+                    : System.getenv('KEY_PASSWORD')
+
+            if (ksFile && ksPassword && keyAlias && keyPass) {
+                storeFile ksFile
+                storePassword ksPassword
+                this.keyAlias keyAlias
+                keyPassword keyPass
+            }
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
 }
