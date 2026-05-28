@@ -8,5 +8,7 @@ vite.config.ts.*
 # Android SDK (downloaded locally, not part of source)
 android-sdk/
 
-# Android keystore credentials (keep keystore file but exclude passwords file if desired)
-# android/keystore.properties
+# Android keystore — never commit signing keys
+*.jks
+*.keystore
+android/keystore.properties
