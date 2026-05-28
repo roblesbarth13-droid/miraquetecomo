@@ -6,6 +6,20 @@ if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
 
+// Decode base64 keystore from environment variable to a temp file if needed
+def resolvedKeystoreFile = null
+if (!keystorePropertiesFile.exists()) {
+    def base64Keystore = System.getenv('KEYSTORE_BASE64')
+    if (base64Keystore) {
+        def tmpKs = new File("${buildDir}/tmp-release.keystore")
+        tmpKs.parentFile.mkdirs()
+        tmpKs.bytes = Base64.decoder.decode(base64Keystore.trim())
+        resolvedKeystoreFile = tmpKs
+    } else if (System.getenv('KEYSTORE_FILE')) {
+        resolvedKeystoreFile = file(System.getenv('KEYSTORE_FILE'))
+    }
+}
+
 android {
     namespace = "com.miraquetecomo.app"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -24,11 +38,11 @@ android {
     }
     signingConfigs {
         release {
-            // Prefer keystore.properties file if present (local dev / Replit)
-            // Fall back to environment variables for CI/CD pipelines
+            // Prefer keystore.properties file if present (local dev)
+            // Otherwise use environment variables / secrets (CI/CD or Replit Secrets)
             def ksFile = keystorePropertiesFile.exists()
                     ? file(keystoreProperties['storeFile'])
-                    : (System.getenv('KEYSTORE_FILE') ? file(System.getenv('KEYSTORE_FILE')) : null)
+                    : resolvedKeystoreFile
             def ksPassword = keystorePropertiesFile.exists()
                     ? keystoreProperties['storePassword']
                     : System.getenv('KEYSTORE_PASSWORD')
