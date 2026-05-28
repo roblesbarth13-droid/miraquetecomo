@@ -155,3 +155,9 @@ id = "68E_wArIXpXLOlMFMmNL-"
 uri = "file://client/src/assets/logo-platoamigo.png"
 type = "image"
 title = "Nuevo logo Plato Amigo"
+
+[[outputs]]
+id = "ZMxXTrKrk8DQjo0Qzkgjh"
+uri = "file://app-release.zip"
+type = "unspecified"
+title = "app-release.zip — contiene el app-release.aab firmado"
