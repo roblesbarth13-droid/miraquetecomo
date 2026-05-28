@@ -1,32 +1,18 @@
-import { useEffect, useState } from "react";
-import { useLocation } from "wouter";
+import { useEffect } from "react";
 import { motion } from "framer-motion";
 import logoImage from "@assets/logo-platoamigo.png";
 
-export default function Splash() {
-  const [, setLocation] = useLocation();
-  const [isAnimationComplete, setIsAnimationComplete] = useState(false);
+interface SplashProps {
+  onComplete: () => void;
+}
 
+export default function Splash({ onComplete }: SplashProps) {
   useEffect(() => {
-    // Si ya vio el splash en esta sesión, ir directo a /home
-    if (sessionStorage.getItem("splashShown")) {
-      setLocation("/home", { replace: true });
-      return;
-    }
-    sessionStorage.setItem("splashShown", "1");
-
     const timer = setTimeout(() => {
-      setIsAnimationComplete(true);
+      onComplete();
     }, 4500);
-
     return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    if (isAnimationComplete) {
-      setLocation("/home", { replace: true });
-    }
-  }, [isAnimationComplete, setLocation]);
+  }, [onComplete]);
 
   return (
     <div 
