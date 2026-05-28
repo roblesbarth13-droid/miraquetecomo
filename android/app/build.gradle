@@ -47,17 +47,17 @@ android {
             def ksPassword = keystorePropertiesFile.exists()
                     ? keystoreProperties['storePassword']
                     : System.getenv('KEYSTORE_PASSWORD')
-            def keyAlias = keystorePropertiesFile.exists()
+            def ksAlias = keystorePropertiesFile.exists()
                     ? keystoreProperties['keyAlias']
                     : System.getenv('KEY_ALIAS')
             def keyPass = keystorePropertiesFile.exists()
                     ? keystoreProperties['keyPassword']
                     : System.getenv('KEY_PASSWORD')
 
-            if (ksFile && ksPassword && keyAlias && keyPass) {
+            if (ksFile && ksPassword && ksAlias && keyPass) {
                 storeFile ksFile
                 storePassword ksPassword
-                this.keyAlias keyAlias
+                keyAlias ksAlias
                 keyPassword keyPass
             }
         }
