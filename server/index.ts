@@ -63,6 +63,13 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  app.get("/download/aab", (_req, res) => {
+    const file = "/home/runner/workspace/app-release.aab";
+    res.setHeader("Content-Disposition", "attachment; filename=app-release.aab");
+    res.setHeader("Content-Type", "application/octet-stream");
+    res.sendFile(file);
+  });
+
   await registerRoutes(httpServer, app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
