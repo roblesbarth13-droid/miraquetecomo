@@ -1,0 +1,2 @@
+- [Capacitor adaptive icon fix](capacitor-adaptive-icon.md) — three conflicting files cause blue X icon on Android 8+; must all be removed before generating correct PNGs
+- [Android AAB build from Replit](android-aab-build.md) — Android SDK installed at /home/runner/workspace/android-sdk; build with ./gradlew bundleRelease --no-daemon -Xmx512m from android/; AAB lands at android/app/build/outputs/bundle/release/app-release.aab
