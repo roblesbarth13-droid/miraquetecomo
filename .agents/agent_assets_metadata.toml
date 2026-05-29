@@ -167,3 +167,9 @@ id = "XcMTrHAIgk9MdP1-TILgj"
 uri = "file://resources/icon.png"
 type = "image"
 title = "Ícono actual de la app"
+
+[[outputs]]
+id = "TLHwCmkqxakgEfmDV0ByQ"
+uri = "file://app-release-v1.0.7.zip"
+type = "unspecified"
+title = "AAB v1.0.7 — Mirá que te como (descomprimir para obtener el .aab)"
